@@ -3,7 +3,7 @@
 ### To-Do
 
 - [x] CAR website analyse
-- [ ] Create Dataset using [Play framework](https://www.playframework.com/documentation/1.1/guide5)
+- [ ] Create Dataset
 - [ ] Train Neural Network
 - [ ] Save model
 - [ ] Use model to bypass captcha
