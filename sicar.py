@@ -88,6 +88,8 @@ class Sicar:
         path: str = "temp/",
         debug: bool = False,
     ):
+        Path(path).mkdir(parents=True, exist_ok=True)
+
         while tries > 0:
             try:
                 self.get_captcha()
@@ -95,20 +97,26 @@ class Sicar:
 
                 if len(captcha) == 5:
                     self.download_shapefile(city_code, captcha, path)
+                    if debug:
+                        print(
+                            "Try {} - Downloaded city code: {} using captcha {}".format(
+                                tries, city_code, captcha
+                            )
+                        )
                     return True
                 else:
                     if debug:
-                        print("Try {} - Short Captcha: {}".format(tries, captcha))
+                        print("Try {} - Misdetected Captcha: {}".format(tries, captcha))
                     time.sleep(0.75 + random.random() + random.random())
 
-            except:
+            except AssertionError:
                 if debug:
                     print("Try {} - Invalid Captcha: {}".format(tries, captcha))
                 time.sleep(1 + random.random() + random.random())
 
             tries -= 1
 
-    def download_shapefile(self, city_code, captcha: str, path: str = "temp/"):
+    def download_shapefile(self, city_code: str, captcha: str, path: str = "temp/"):
         query = {
             "municipio[id]": city_code,
             "email": self.email,
@@ -121,7 +129,7 @@ class Sicar:
 
         assert response.ok, "Oh no! Failed to get shapefile"
 
-        filename = response.headers["Content-Disposition"].split("filename=")[-1]
+        filename = city_code + ".zip"
 
         with open(path + filename, "wb") as fd:
             for chunk in response.iter_content(chunk_size=1024):
