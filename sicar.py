@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.image as mpimg
 from datetime import datetime
 import time
-from bs4 import BeautifulSoup
 from html import unescape
 
 
@@ -94,6 +93,7 @@ class Sicar:
                 self.download_shapefile(city_code, captcha)
                 return True
 
+            i -= 1
             time.sleep(2)
 
     def download_shapefile(self, city_code, captcha: str, path="temp/"):
@@ -143,7 +143,7 @@ class Sicar:
 
         return path + filename + ".png"
 
-    def otsu_thresholding(self, image):
+    def improve_image(self, image):
         _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU + 2)
         image = cv2.dilate(image, np.ones((3, 2), np.uint8), iterations=1)
         image = cv2.erode(image, np.ones((4, 1), np.uint8), iterations=2)
@@ -168,12 +168,16 @@ class Sicar:
 
         img = cv2.cvtColor(cv2.imread(path + filename + ".jpg", -1), cv2.COLOR_BGR2GRAY)
 
-        res = self.otsu_thresholding(img)
+        res = self.improve_image(img)
 
         mpimg.imsave("{}processed_{}.jpg".format(path, filename), res, cmap="gray")
+
+        custom_l_psm_config = r"-l eng --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
         return re.sub(
             "[^A-Za-z0-9]+",
             "",
-            pytesseract.image_to_string("{}processed_{}.jpg".format(path, filename)),
+            pytesseract.image_to_string(
+                "{}processed_{}.jpg".format(path, filename), config=custom_l_psm_config
+            ),
         )
