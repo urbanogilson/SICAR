@@ -11,6 +11,7 @@ import matplotlib.image as mpimg
 from datetime import datetime
 import time
 from html import unescape
+import random
 
 
 class Sicar:
@@ -80,30 +81,39 @@ class Sicar:
 
         return True
 
-    # * Testing
-    def auto_download(self, city_code):
-        i = 20
-        while i > 0:
-            self.get_captcha()
-            captcha = self.process_captcha()
+    def auto_download(
+        self,
+        city_code: str,
+        tries: int = 25,
+        path: str = "temp/",
+        debug: bool = False,
+    ):
+        while tries > 0:
+            try:
+                self.get_captcha()
+                captcha = self.process_captcha()
 
-            print(str(i) + " -> " + captcha)
+                if len(captcha) == 5:
+                    self.download_shapefile(city_code, captcha, path)
+                    return True
+                else:
+                    if debug:
+                        print("Try {} - Short Captcha: {}".format(tries, captcha))
+                    time.sleep(0.75 + random.random() + random.random())
 
-            if len(captcha) == 5:
-                self.download_shapefile(city_code, captcha)
-                return True
+            except:
+                if debug:
+                    print("Try {} - Invalid Captcha: {}".format(tries, captcha))
+                time.sleep(1 + random.random() + random.random())
 
-            i -= 1
-            time.sleep(2)
+            tries -= 1
 
-    def download_shapefile(self, city_code, captcha: str, path="temp/"):
+    def download_shapefile(self, city_code, captcha: str, path: str = "temp/"):
         query = {
             "municipio[id]": city_code,
             "email": self.email,
             "captcha": captcha,
         }
-
-        print(self.__shapefile_url + urlencode(query))
 
         response = self.session.get(
             self.__shapefile_url + urlencode(query), stream=True
