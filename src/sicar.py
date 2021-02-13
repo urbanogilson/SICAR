@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.image as mpimg
 import time
 from html import unescape
+from tqdm import tqdm
 
 
 class Sicar:
@@ -90,18 +91,23 @@ class Sicar:
         folder: str = "temp",
         debug: bool = False,
     ):
+
+        failed = {}
+
         for city, code in cities_codes.items():
-            print("Downloading:", city, code)
-            self.download_city_code(
+            if not self.download_city_code(
                 city_code=code, tries=tries, folder=folder, debug=debug
-            )
+            ):
+                failed[city] = code
+
+        return failed if len(failed) else True
 
     def download_state(
         self, state: str, tries: int = 25, folder: str = None, debug: bool = False
     ):
         cities_codes = self.get_cities_codes(state)
 
-        self.download_cities(
+        return self.download_cities(
             cities_codes=cities_codes,
             tries=tries,
             folder=folder if type(folder) is str else state,
@@ -195,7 +201,14 @@ class Sicar:
             )
 
         with open("{}/{}.zip".format(folder, city_code), "wb") as fd:
-            for chunk in response.iter_content(chunk_size):
+            for chunk in tqdm(
+                iterable=response.iter_content(chunk_size),
+                total=int(response.headers["Content-Length"]) / chunk_size,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc="Downloading city {}".format(city_code),
+            ):
                 fd.write(chunk)
 
         return True

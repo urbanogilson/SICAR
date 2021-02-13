@@ -3,3 +3,4 @@ urllib3==1.25.8
 pytesseract==0.3.7
 opencv-python==4.5.1.48
 numpy==1.19.5
+tqdm==4.56.2
