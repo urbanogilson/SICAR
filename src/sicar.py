@@ -126,18 +126,13 @@ class Sicar:
                 captcha = self.get_captcha_ocr(filename, folder=folder)
 
                 if len(captcha) == 5:
-                    print(
-                        "Try {} - Requesting shape file with captcha: {}".format(
-                            tries, captcha
-                        )
-                    )
-                    self.__download_shapefile(city_code, captcha, folder, debug)
                     if debug:
                         print(
-                            "Try {} - Downloaded city code: {} using captcha {}".format(
-                                tries, city_code, captcha
+                            "Try {} - Requesting shape file with captcha: {}".format(
+                                tries, captcha
                             )
                         )
+                    self.__download_shapefile(city_code, captcha, folder, debug)
                     return True
                 else:
                     if debug:
@@ -149,6 +144,8 @@ class Sicar:
                     print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
                 tries -= 1
                 time.sleep(1 + random.random() + random.random())
+
+        return False
 
     def get_cities_codes(self, state: str = "AM"):
         """Get cities and codes by state
@@ -203,7 +200,8 @@ class Sicar:
         with open("{}/{}.zip".format(folder, city_code), "wb") as fd:
             for chunk in tqdm(
                 iterable=response.iter_content(chunk_size),
-                total=int(response.headers["Content-Length"]) / chunk_size,
+                total=int(response.headers.get("Content-Length", False) or 0)
+                / chunk_size,
                 unit="B",
                 unit_scale=True,
                 unit_divisor=1024,
