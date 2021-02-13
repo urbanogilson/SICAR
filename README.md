@@ -11,7 +11,7 @@ This tool is designed for students, researchers, data scientists or anyone who 
 
 ## How to use SICAR?
 
-[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](#)
+[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/src/example.ipynb)
 
 ### To-Do
 
