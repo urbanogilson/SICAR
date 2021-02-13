@@ -84,6 +84,39 @@ class Sicar:
             }
         )
 
+    def download_city_code(
+        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
+    ):
+        Path(folder).mkdir(parents=True, exist_ok=True)
+
+        while tries > 0:
+            try:
+                self.__get_captcha(folder=folder)
+                _, filename = self.__process_captcha(folder=folder)
+                captcha = self.__get_captcha_ocr(filename, folder=folder)
+
+                if len(captcha) == 5:
+                    if debug:
+                        print(
+                            "Try {} - Requesting shape file with captcha: {}".format(
+                                tries, captcha
+                            )
+                        )
+                    self.__download_shapefile(city_code, captcha, folder, debug)
+                    return True
+                else:
+                    if debug:
+                        print("Invalid Captcha: {}".format(captcha))
+                    time.sleep(0.75 + random.random() + random.random())
+
+            except Exception:
+                if debug:
+                    print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
+                tries -= 1
+                time.sleep(1 + random.random() + random.random())
+
+        return False
+
     def download_cities(
         self,
         cities_codes: dict,
@@ -114,39 +147,6 @@ class Sicar:
             debug=debug,
         )
 
-    def download_city_code(
-        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
-    ):
-        Path(folder).mkdir(parents=True, exist_ok=True)
-
-        while tries > 0:
-            try:
-                self.get_captcha(folder=folder)
-                _, filename = self.process_captcha(folder=folder)
-                captcha = self.get_captcha_ocr(filename, folder=folder)
-
-                if len(captcha) == 5:
-                    if debug:
-                        print(
-                            "Try {} - Requesting shape file with captcha: {}".format(
-                                tries, captcha
-                            )
-                        )
-                    self.__download_shapefile(city_code, captcha, folder, debug)
-                    return True
-                else:
-                    if debug:
-                        print("Invalid Captcha: {}".format(captcha))
-                    time.sleep(0.75 + random.random() + random.random())
-
-            except Exception:
-                if debug:
-                    print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
-                tries -= 1
-                time.sleep(1 + random.random() + random.random())
-
-        return False
-
     def get_cities_codes(self, state: str = "AM"):
         """Get cities and codes by state
 
@@ -170,12 +170,7 @@ class Sicar:
         return dict(zip(list(map(unescape, cities_codes[0::3])), cities_codes[1::3]))
 
     def __download_shapefile(
-        self,
-        city_code: str,
-        captcha: str,
-        folder: str = "temp",
-        chunk_size: int = 2048,
-        debug: bool = False,
+        self, city_code: str, captcha: str, folder: str = "temp", chunk_size: int = 2048
     ):
         response = self.__session.get(
             self.__shapefile_url
@@ -192,11 +187,6 @@ class Sicar:
         if not response.ok:
             raise Exception("Failed to get shapefile!")
 
-        if debug:
-            print(
-                "Downloading shapefile {} using captcha {}".format(city_code, captcha)
-            )
-
         with open("{}/{}.zip".format(folder, city_code), "wb") as fd:
             for chunk in tqdm(
                 iterable=response.iter_content(chunk_size),
@@ -211,7 +201,7 @@ class Sicar:
 
         return True
 
-    def get_captcha(self, filename: str = "captcha", folder: str = "temp"):
+    def __get_captcha(self, filename: str = "captcha", folder: str = "temp"):
         response = self.__session.get(
             "https://car.gov.br/publico/municipios/captcha?id={}".format(
                 int(random.random() * 1000000)
@@ -227,7 +217,7 @@ class Sicar:
 
         return "{}/{}.png".format(folder, filename)
 
-    def improve_image(self, image):
+    def __improve_image(self, image):
         _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU + 2)
         image = cv2.dilate(image, np.ones((3, 2), np.uint8), iterations=1)
         image = cv2.erode(image, np.ones((4, 1), np.uint8), iterations=2)
@@ -235,7 +225,7 @@ class Sicar:
         image = cv2.erode(image, np.ones((2, 1), np.uint8), iterations=2)
         return image
 
-    def png_to_jpg(self, filename: str = "captcha", folder: str = "temp"):
+    def __png_to_jpg(self, filename: str = "captcha", folder: str = "temp"):
         mpimg.imsave(
             "{}/{}.jpg".format(folder, filename),
             mpimg.imread("{}/{}.png".format(folder, filename), 0),
@@ -246,21 +236,21 @@ class Sicar:
 
         return "{}/{}.jpg".format(folder, filename)
 
-    def process_captcha(self, filename="captcha", folder="temp"):
+    def __process_captcha(self, filename="captcha", folder="temp"):
 
-        self.png_to_jpg(filename, folder)
+        self.__png_to_jpg(filename, folder)
 
         img = cv2.cvtColor(
             cv2.imread("{}/{}.jpg".format(folder, filename), -1), cv2.COLOR_BGR2GRAY
         )
 
-        res = self.improve_image(img)
+        res = self.__improve_image(img)
 
         mpimg.imsave("{}/processed_{}.jpg".format(folder, filename), res, cmap="gray")
 
         return folder, "processed_{}.jpg".format(filename)
 
-    def get_captcha_ocr(self, filename="processed_captcha.jpg", folder="temp"):
+    def __get_captcha_ocr(self, filename="processed_captcha.jpg", folder="temp"):
         custom_l_psm_config = r"-l eng --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
         return re.sub(
