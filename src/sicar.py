@@ -93,7 +93,7 @@ class Sicar:
             try:
                 self.__get_captcha(folder=folder)
                 _, filename = self.__process_captcha(folder=folder)
-                captcha = self.__get_captcha_ocr(filename, folder=folder)
+                captcha = self.__get_captcha_ocr(filename=filename, folder=folder)
 
                 if len(captcha) == 5:
                     if debug:
@@ -102,7 +102,9 @@ class Sicar:
                                 tries, captcha
                             )
                         )
-                    self.__download_shapefile(city_code, captcha, folder, debug)
+                    self.__download_shapefile(
+                        city_code=city_code, captcha=captcha, folder=captcha
+                    )
                     return True
                 else:
                     if debug:
@@ -138,7 +140,7 @@ class Sicar:
     def download_state(
         self, state: str, tries: int = 25, folder: str = None, debug: bool = False
     ):
-        cities_codes = self.get_cities_codes(state)
+        cities_codes = self.get_cities_codes(state=state)
 
         return self.download_cities(
             cities_codes=cities_codes,
