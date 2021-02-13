@@ -103,7 +103,7 @@ class Sicar:
                             )
                         )
                     self.__download_shapefile(
-                        city_code=city_code, captcha=captcha, folder=captcha
+                        city_code=city_code, captcha=captcha, folder=folder
                     )
                     return True
                 else:
