@@ -115,7 +115,7 @@ class Sicar:
 
         while tries > 0:
             try:
-                self.get_captcha()
+                self.get_captcha(folder=folder)
                 _, filename = self.process_captcha(folder=folder)
                 captcha = self.get_captcha_ocr(filename, folder=folder)
 
