@@ -249,7 +249,9 @@ class Sicar(Tesseract):
             debug=debug,
         )
 
-    def download_all_from_list(self, folder: str = None, debug: bool = False):
+    def download_all_from_list(self, base_folder: str = None, debug: bool = False):
 
         for state in self.__states:
+            folder="{0}/{1}".format(base_folder,state)
+            Path(folder).mkdir(parents=True, exist_ok=True)
             self.download_state(state=state, folder=folder, debug=debug)
