@@ -22,7 +22,6 @@ from exceptions import (
 )
 from captcha import Tesseract
 
-
 class Sicar(Tesseract):
     """
     Sicar
@@ -193,6 +192,7 @@ class Sicar(Tesseract):
 
         while tries > 0:
             try:
+                captcha = ""
                 captcha = self._get_captcha(self._download_captcha(folder=folder))
 
                 if len(captcha) == 5:
@@ -227,7 +227,6 @@ class Sicar(Tesseract):
         folder: str = "temp",
         debug: bool = False,
     ):
-
         failed = {}
 
         for city, code in cities_codes.items():
@@ -249,3 +248,8 @@ class Sicar(Tesseract):
             folder=folder if type(folder) is str else state,
             debug=debug,
         )
+
+    def download_all_from_list(self, folder: str = None, debug: bool = False):
+
+        for state in self.__states:
+            self.download_state(state=state, folder=folder, debug=debug)
