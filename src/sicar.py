@@ -254,4 +254,8 @@ class Sicar(Tesseract):
         for state in self.__states:
             folder="{0}/{1}".format(base_folder,state)
             Path(folder).mkdir(parents=True, exist_ok=True)
-            self.download_state(state=state, folder=folder, debug=debug)
+            details=self.download_state(state=state, folder=folder, debug=debug)
+            if isinstance(details, dict):
+                # store log file with failed codes
+                with open(folder+'/failed_codes.txt', 'w') as f:
+                    print(details, file=f)
