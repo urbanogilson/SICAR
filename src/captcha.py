@@ -10,7 +10,7 @@ from exceptions import NotImplemented
 
 class Captcha(object):
     def _png_to_jpg(self, captcha: Path = Path("temp/captcha.png")) -> Path:
-        captcha_jpg = captcha.with_suffix(".png")
+        captcha_jpg = captcha.with_suffix(".jpeg")
 
         mpimg.imsave(
             captcha_jpg,
@@ -51,10 +51,10 @@ class Tesseract(Captcha):
 
         captcha_jpg = self._png_to_jpg(captcha)
 
-        img = cv2.cvtColor(cv2.imread(captcha_jpg, -1), cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(cv2.imread(str(captcha_jpg), -1), cv2.COLOR_BGR2GRAY)
 
-        res = self.__improve_image(img)
+        res = self._improve_image(img)
 
         mpimg.imsave(captcha_jpg, res, cmap="gray")
 
-        return captcha_jpg
+        return res
