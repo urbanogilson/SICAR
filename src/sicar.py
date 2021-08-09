@@ -3,7 +3,6 @@ import random
 from urllib.parse import urlencode
 import re
 import shutil
-from pathlib import Path
 from cv2 import cv2
 import numpy as np
 import matplotlib.image as mpimg
