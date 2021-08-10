@@ -6,10 +6,9 @@ setup(
     author="Gilson Urbano",
     author_email="gilson@gilsonurbano.com",
     packages=["SICAR"],
-    scripts=["bin/sicar.py"],
     url="https://github.com/urbanogilson/SICAR",
     license="https://github.com/urbanogilson/SICAR/blob/main/LICENSE",
-    description="SICAR - This tool is designed for students, researchers, data scientists or anyone who would like to have access to SICAR files.",
+    description="SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files.",
     long_description=open("README.md").read(),
     install_requires=[
         "requests==2.22.0",
