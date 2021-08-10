@@ -16,6 +16,6 @@ This tool is designed for students, researchers, data scientists or anyone who 
 
 ### To-Do
 
-[] Download CSV files
-[] Add tests
+- [ ] Download CSV files
+- [ ] Add tests
   
