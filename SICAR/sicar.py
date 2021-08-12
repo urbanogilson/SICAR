@@ -235,7 +235,6 @@ class Sicar:
         folder: str = "temp",
         debug: bool = False,
     ):
-
         failed = {}
 
         for city, code in cities_codes.items():
@@ -257,3 +256,14 @@ class Sicar:
             folder=folder if type(folder) is str else state,
             debug=debug,
         )
+
+    def download_all_from_list(self, base_folder: str = None, debug: bool = False):
+
+        for state in self.__states:
+            folder="{0}/{1}".format(base_folder,state)
+            Path(folder).mkdir(parents=True, exist_ok=True)
+            details=self.download_state(state=state, folder=folder, debug=debug)
+            if isinstance(details, dict):
+                # store log file with failed codes
+                with open(folder+'/failed_codes.txt', 'w') as f:
+                    print(details, file=f)
