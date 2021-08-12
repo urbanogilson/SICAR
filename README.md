@@ -34,5 +34,6 @@ docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 
 ### To-Do
 
-- Download CSV files
+- [ ] Download CSV files
+- [ ] Add tests
   

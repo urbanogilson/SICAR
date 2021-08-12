@@ -1,9 +1,3 @@
-class NotImplemented(Exception):
-    """Exception raised when the method is not implemented."""
-
-    pass
-
-
 class EmailNotValidException(Exception):
     """Exception raised for errors in the input email.
 

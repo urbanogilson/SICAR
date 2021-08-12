@@ -5,25 +5,8 @@ import pytesseract
 from pathlib import Path
 from cv2 import cv2
 import numpy as np
-from exceptions import NotImplemented
 
-
-class Captcha(object):
-    def _png_to_jpg(self, captcha: Path = Path("temp/captcha.png")) -> Path:
-        captcha_jpg = captcha.with_suffix(".jpeg")
-
-        mpimg.imsave(
-            captcha_jpg,
-            mpimg.imread(captcha, 0),
-            cmap="gray",
-            vmin=0,
-            vmax=255,
-        )
-
-        return captcha_jpg
-
-    def _get_captcha(self, captcha: Path = Path("temp/captcha.png")) -> str:
-        raise NotImplemented()
+from SICAR.drivers.captcha import Captcha
 
 
 class Tesseract(Captcha):

@@ -3,25 +3,24 @@ import random
 from urllib.parse import urlencode
 import re
 import shutil
-from cv2 import cv2
-import numpy as np
-import matplotlib.image as mpimg
+from pathlib import Path
 import time
 from html import unescape
 from tqdm import tqdm
 from typing import Dict
 import os
 from pathlib import Path
-from exceptions import (
+from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
     EmailNotValidException,
     StateCodeNotValidException,
     UrlNotOkException,
 )
-from captcha import Tesseract
+from SICAR.drivers import Captcha, Tesseract
 
-class Sicar(Tesseract):
+
+class Sicar:
     """
     Sicar
     """
@@ -64,10 +63,19 @@ class Sicar(Tesseract):
         "TO",
     ]
 
-    def __init__(self, email: str = "sicar@sicar.com", headers: Dict = None):
+    def __init__(
+        self,
+        driver: Captcha = Tesseract,
+        email: str = "sicar@sicar.com",
+        headers: Dict = None,
+    ):
+        self.__driver = driver
         self.__email = self._validate_email(email)
         self._create_session(headers)
         self._get(self.__base_url)
+
+    def __str__(self):
+        return "SICAR - {}".format(self.__email)
 
     def _get(self, url: str, *args, **kwargs):
         response = self.__session.get(url, *args, **kwargs)
@@ -191,8 +199,9 @@ class Sicar(Tesseract):
 
         while tries > 0:
             try:
-                captcha = ""
-                captcha = self._get_captcha(self._download_captcha(folder=folder))
+                captcha = self.__driver._get_captcha(
+                    self._download_captcha(folder=folder)
+                )
 
                 if len(captcha) == 5:
                     if debug:
