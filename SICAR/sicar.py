@@ -9,7 +9,6 @@ from html import unescape
 from tqdm import tqdm
 from typing import Dict
 import os
-from pathlib import Path
 from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
@@ -76,6 +75,9 @@ class Sicar:
 
     def __str__(self):
         return "SICAR - {}".format(self.__email)
+
+    def get_base_url(self) -> str:
+        return self.__base_url
 
     def _get(self, url: str, *args, **kwargs):
         response = self.__session.get(url, *args, **kwargs)
