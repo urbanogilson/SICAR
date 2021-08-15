@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 
 class Captcha(ABC):
-    def _png_to_jpg(self, captcha: Path = Path("temp/captcha.png")) -> Path:
+    def _png_to_jpg(self, captcha: Path) -> Path:
         captcha_jpg = captcha.with_suffix(".jpg")
 
         mpimg.imsave(
@@ -18,5 +18,5 @@ class Captcha(ABC):
         return captcha_jpg
 
     @abstractmethod
-    def _get_captcha(self, captcha: Path = Path("temp/captcha.png")) -> str:
+    def _get_captcha(self, captcha: Path) -> str:
         pass

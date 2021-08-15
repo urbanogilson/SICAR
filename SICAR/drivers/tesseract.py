@@ -11,7 +11,7 @@ from SICAR.drivers.captcha import Captcha
 class Tesseract(Captcha):
     __custom_l_psm_config = r"-l eng --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
-    def _get_captcha(self, captcha: Path = Path("temp/captcha.png")) -> str:
+    def _get_captcha(self, captcha: Path) -> str:
         return re.sub(
             "[^A-Za-z0-9]+",
             "",
@@ -29,7 +29,7 @@ class Tesseract(Captcha):
         image = cv2.erode(image, np.ones((2, 1), np.uint8), iterations=2)
         return image
 
-    def _process_captcha(self, captcha: Path = Path("temp/captcha.png")):
+    def _process_captcha(self, captcha: Path):
 
         captcha_jpg = self._png_to_jpg(captcha)
 

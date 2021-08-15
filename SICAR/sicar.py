@@ -68,7 +68,7 @@ class Sicar:
         email: str = "sicar@sicar.com",
         headers: Dict = None,
     ):
-        self.__driver = driver
+        self.__driver = driver()
         self.__email = self._validate_email(email)
         self._create_session(headers)
         self._get(self.__base_url)
@@ -198,6 +198,7 @@ class Sicar:
         self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
     ):
         Path(folder).mkdir(parents=True, exist_ok=True)
+        captcha = ""
 
         while tries > 0:
             try:
