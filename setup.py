@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="SICAR",
-    version="0.1.0",
+    version="0.2.0",
     author="Gilson Urbano",
     author_email="gilson@gilsonurbano.com",
     packages=["SICAR"],
