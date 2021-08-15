@@ -17,5 +17,6 @@ setup(
         "opencv-python>=4.5.1.48",
         "numpy>=1.19.5",
         "tqdm>=4.56.2",
+        "matplotlib>=3.3.3",
     ],
 )
