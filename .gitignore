@@ -150,5 +150,5 @@ dmypy.json
 .ionide
 /temp
 *.jpg
-*.png
+.png
 *.zip
