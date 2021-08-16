@@ -1,25 +1,34 @@
 # SICAR
 
+This tool is designed for students, researchers, data scientists or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
+
+## Badges
+
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![GitHub license](https://img.shields.io/github/license/urbanogilson/SICAR)](https://github.com/urbanogilson/SICAR/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/urbanogilson/SICAR?style=social)](https://github.com/urbanogilson/SICAR/stargazers/)
 [![GitHub issues](https://img.shields.io/github/issues/urbanogilson/SICAR)](https://github.com/urbanogilson/SICAR/issues/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/urbanogilson/SICAR.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/urbanogilson/SICAR/context:python)
 
-## What is SICAR?
+## Features
 
-This tool is designed for students, researchers, data scientists or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
+- Get cities-codes by state code
+- Download city (Shapefile) by code
+- Download lists of cities (Shapefile) by code
+- Download all cities (Shapefile) in a state by code
+- Download the entire country (Shapefile)
+- Tesseract driver to automatically detect captcha
+- Manual driver to automate the download process
 
-## How to use SICAR?
+## Installation
 
-### Run on your computer
+Install SICAR with pip
 
-SICAR was developed and tested with Python 3.8.
-
-To install SICAR using pip
-```sh
-pip install git+https://github.com/urbanogilson/SICAR@v0.2
+```bash
+pip install git+https://github.com/urbanogilson/SICAR
 ```
+
+## Usage/Examples
 
 ```python
 from SICAR import Sicar
@@ -56,8 +65,7 @@ car.download_city_code('1400050', folder='Roraima')
 
 Using Google Colab, you don't need to install the dependencies on your computer and you can save files directly to your Google Drive.
 
-[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/src/example.ipynb)
-
+[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
 
 ### Run with Docker
 
@@ -77,8 +85,23 @@ Make an external directory to store the downloaded data, /my/local/data/dir, and
 docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 ```
 
-### To-Do
+## Acknowledgements
 
-- [ ] Download CSV files
-- [ ] Add tests
-  
+ - [Sicar - Sistema Nacional de Cadastro Ambiental Rural](https://www.car.gov.br/)
+ - [Sicar - Bade de Downloads](https://www.car.gov.br/publico/municipios/downloads)
+
+## Roadmap
+
+- Add support to download csv files 
+
+## Contributing
+
+Contributions are always welcome!
+
+## Feedback
+
+If you have any feedback, please reach me at gilson@gilsonurbano.com
+
+## License
+
+[MIT](LICENSE)
