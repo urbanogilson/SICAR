@@ -9,8 +9,6 @@ class EmailNotValidException(Exception):
         self.email = email
         super().__init__("Email {} not valid!".format(self.email))
 
-    pass
-
 
 class UrlNotOkException(Exception):
     """Exception raised when the input url is not ok.
@@ -22,8 +20,6 @@ class UrlNotOkException(Exception):
     def __init__(self, url: str):
         self.url = url
         super().__init__("Oh no! Failed to access {}!".format(self.url))
-
-    pass
 
 
 class StateCodeNotValidException(Exception):
@@ -37,8 +33,6 @@ class StateCodeNotValidException(Exception):
         self.state = state
         super().__init__("State code {} not valid!".format(self.state))
 
-    pass
-
 
 class FailedToDownloadCaptchaException(Exception):
     """Exception raised when the captcha download failed."""
@@ -47,8 +41,6 @@ class FailedToDownloadCaptchaException(Exception):
         self.message = message
         super().__init__(self.message)
 
-    pass
-
 
 class FailedToDownloadShapefileException(Exception):
     """Exception raised when the shapefile download failed."""
@@ -56,5 +48,3 @@ class FailedToDownloadShapefileException(Exception):
     def __init__(self, message: str = "Failed to download shapefile!!"):
         self.message = message
         super().__init__(self.message)
-
-    pass

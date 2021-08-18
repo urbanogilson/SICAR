@@ -188,7 +188,7 @@ class Sicar:
                 unit="KB",
                 unit_scale=True,
                 unit_divisor=1024,
-                desc="Downloading shapefile city code {}".format(city_code, captcha),
+                desc="Downloading shapefile city code {}".format(city_code),
             ):
                 fd.write(chunk)
 
