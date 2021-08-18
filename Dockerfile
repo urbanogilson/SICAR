@@ -3,13 +3,11 @@ FROM python:3
 WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y python3-opencv python-matplotlib tesseract-ocr && \
-    pip install --no-cache-dir git+https://github.com/urbanogilson/SICAR@v0.2
+    pip install --no-cache-dir git+https://github.com/urbanogilson/SICAR
 
 COPY . .
 
 VOLUME [ "/data" ]
-
-RUN git checkout v0.2
 
 RUN pip list
 
