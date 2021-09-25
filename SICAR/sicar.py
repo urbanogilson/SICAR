@@ -119,6 +119,8 @@ class Sicar:
         Returns:
             dict: Cities and codes by state
         """
+        state = state.upper()
+
         if state not in self.__states:
             raise StateCodeNotValidException(state)
 
