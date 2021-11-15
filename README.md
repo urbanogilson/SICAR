@@ -1,6 +1,6 @@
 # SICAR
 
-This tool is designed for students, researchers, data scientists or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
+This tool is designed for students, researchers, data scientists, or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
 
 ## Badges
 
@@ -70,7 +70,7 @@ Using Google Colab, you don't need to install the dependencies on your computer 
 
 ### Run with Docker
 
-Update the the entry point file [./examples/docker.py](./examples/docker.py) to dowload data based on your needs.
+Update the entry point file [./examples/docker.py](./examples/docker.py) to download data based on your needs.
 
 Generate docker image
 ```sh
