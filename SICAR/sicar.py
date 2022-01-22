@@ -9,6 +9,7 @@ from html import unescape
 from tqdm import tqdm
 from typing import Dict
 import os
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
@@ -17,6 +18,8 @@ from SICAR.exceptions import (
     UrlNotOkException,
 )
 from SICAR.drivers import Captcha, Tesseract
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class Sicar:
@@ -80,7 +83,7 @@ class Sicar:
         return self.__base_url
 
     def _get(self, url: str, *args, **kwargs):
-        response = self.__session.get(url, *args, **kwargs)
+        response = self.__session.get(url, verify=False, *args, **kwargs)
 
         if not response.ok:
             raise UrlNotOkException(url)
