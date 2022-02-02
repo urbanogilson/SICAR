@@ -89,7 +89,7 @@ docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 ## Acknowledgements
 
  - [Sicar - Sistema Nacional de Cadastro Ambiental Rural](https://www.car.gov.br/)
- - [Sicar - Bade de Downloads](https://www.car.gov.br/publico/municipios/downloads)
+ - [Sicar - Base de Downloads](https://www.car.gov.br/publico/municipios/downloads)
 
 ## Roadmap
 
