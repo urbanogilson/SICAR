@@ -1,6 +1,6 @@
 # SICAR
 
-This tool is designed for students, researchers, data scientists, or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
+This tool is designed for students, researchers, data scientists, or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
 
 ## Badges
 
@@ -38,7 +38,7 @@ import pprint
 # Create Sicar instance
 car = Sicar(email = "name@domain.com")
 
-# Get cities codes in Roraima
+# Get cities codes in Roraima state
 cities_codes = car.get_cities_codes(state='RR')
 
 pprint.pprint(cities_codes)
@@ -60,6 +60,17 @@ pprint.pprint(cities_codes)
 
 # Download 'Alto Alegre': '1400050'
 car.download_city_code('1400050', folder='Roraima')
+
+# Download specific cities
+cities_codes = {
+    'São Gabriel da Cachoeira': '1303809',
+    'São Paulo de Olivença': '1303908'
+}
+
+car.download_cities(cities_codes=cities_codes, folder='cities')
+
+# Download all cities in Roraima state
+car.download_state(state='RR', folder='RR')
 ```
 
 ### Run with Google Colab
