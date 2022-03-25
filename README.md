@@ -29,6 +29,12 @@ Install SICAR with pip
 pip install git+https://github.com/urbanogilson/SICAR
 ```
 
+Prerequisite:
+
+Install [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info how to install the engine on Linux, Mac OSX and Windows).
+
+If you don't want to install dependencies on your computer or don't know how to install them, I strongly recommend [Google Colab](#run-with-google-colab).
+
 ## Usage/Examples
 
 ```python
