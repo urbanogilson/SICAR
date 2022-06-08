@@ -13,7 +13,7 @@ setup(
     install_requires=[
         "requests>=2.22.0",
         "urllib3>=1.24.3",
-        "pytesseract>=0.3.7",
+        "pytesseract==0.3.7",
         "opencv-python>=4.1.2.30",
         "numpy>=1.19.5",
         "tqdm>=4.56.2",
