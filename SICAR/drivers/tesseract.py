@@ -2,7 +2,7 @@ from pathlib import Path
 import matplotlib.image as mpimg
 import re
 import pytesseract
-from cv2 import cv2
+import cv2
 import numpy as np
 
 from SICAR.drivers.captcha import Captcha
