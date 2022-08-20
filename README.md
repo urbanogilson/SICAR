@@ -4,11 +4,10 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Badges
 
+[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![GitHub license](https://img.shields.io/github/license/urbanogilson/SICAR)](https://github.com/urbanogilson/SICAR/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/urbanogilson/SICAR?style=social)](https://github.com/urbanogilson/SICAR/stargazers/)
-[![GitHub issues](https://img.shields.io/github/issues/urbanogilson/SICAR)](https://github.com/urbanogilson/SICAR/issues/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/urbanogilson/SICAR.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/urbanogilson/SICAR/context:python)
 
 ## Features
@@ -90,6 +89,7 @@ Using Google Colab, you don't need to install the dependencies on your computer 
 Update the entry point file [./examples/docker.py](./examples/docker.py) to download data based on your needs.
 
 Generate docker image
+
 ```sh
 # using the docker build script
 ./docker-build.sh
@@ -98,6 +98,7 @@ Generate docker image
 Run to download all data defined in the [./examples/docker.py](./examples/docker.py) entry point to an external directory.
 
 Make an external directory to store the downloaded data, /my/local/data/dir, and use a volume parameter in the run command to point to it.
+
 ```sh
 # run the docker image in detached mode
 docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
@@ -105,12 +106,12 @@ docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 
 ## Acknowledgements
 
- - [Sicar - Sistema Nacional de Cadastro Ambiental Rural](https://www.car.gov.br/)
- - [Sicar - Base de Downloads](https://www.car.gov.br/publico/municipios/downloads)
+- [Sicar - Sistema Nacional de Cadastro Ambiental Rural](https://www.car.gov.br/)
+- [Sicar - Base de Downloads](https://www.car.gov.br/publico/municipios/downloads)
 
 ## Roadmap
 
-- Add support to download csv files 
+- Add support to download csv files
 
 ## Contributing
 
