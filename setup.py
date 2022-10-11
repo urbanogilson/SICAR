@@ -18,5 +18,7 @@ setup(
         "numpy>=1.19.5",
         "tqdm>=4.56.2",
         "matplotlib>=3.2.2",
+        "paddlepaddle==2.3.2",
+        "paddleocr>=2.0.1",
     ],
 )
