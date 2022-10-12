@@ -17,7 +17,7 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 - Download lists of cities (Shapefile) by code
 - Download all cities (Shapefile) in a state by code
 - Download the entire country (Shapefile)
-- Tesseract driver to automatically detect captcha
+- Tesseract, and PaddleOCR drivers to automatically detect captcha
 - Manual driver to automate the download process
 
 ## Installation
@@ -32,7 +32,9 @@ Prerequisite:
 
 Install [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info how to install the engine on Linux, Mac OSX and Windows).
 
-If you don't want to install dependencies on your computer or don't know how to install them, I strongly recommend [Google Colab](#run-with-google-colab).
+Install [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional info how to install the engine on Linux, Mac OSX and Windows).
+
+If you don't want to install dependencies on your computer or don't know how to install them, we strongly recommend [Google Colab](#run-with-google-colab).
 
 ## Usage/Examples
 
@@ -146,6 +148,10 @@ docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 - Add support to download csv files
 
 ## Contributing
+
+The development environment with all necessary packages is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
+
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 
 Contributions are always welcome!
 
