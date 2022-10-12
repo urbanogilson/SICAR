@@ -78,6 +78,38 @@ car.download_cities(cities_codes=cities_codes, folder='cities')
 car.download_state(state='RR', folder='RR')
 ```
 
+### OCR drivers
+
+[Optical character recognition (OCR)](https://en.wikipedia.org/wiki/Optical_character_recognition) drivers are used to recognize characters in captcha.
+
+We currently have two options for automating the download process.
+
+#### [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (Default)
+
+```python
+from SICAR import Sicar
+from SICAR.drivers import Tesseract
+
+# Create Sicar instance using Tesseract OCR
+car = Sicar(email="name@domain.com", driver=Tesseract)
+
+# Download a city
+car.download_cities(cities_codes={'Belo Horizonte': '3106200'}, folder='SICAR/cities')
+```
+
+#### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+
+```python
+from SICAR import Sicar
+from SICAR.drivers import Paddle
+
+# Create Sicar instance using PaddleOCR
+car = Sicar(email="name@domain.com", driver=Paddle)
+
+# Download a city
+car.download_cities(cities_codes={'Balneário Camboriú': '4202008'}, folder='SICAR/cities')
+```
+
 ### Run with Google Colab
 
 Using Google Colab, you don't need to install the dependencies on your computer and you can save files directly to your Google Drive.
