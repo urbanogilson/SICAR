@@ -1,6 +1,7 @@
 from paddleocr import PaddleOCR
 from pathlib import Path
 import matplotlib.image as mpimg
+import itertools
 import re
 import cv2
 import numpy as np
@@ -16,7 +17,11 @@ class Paddle(Captcha):
         return re.sub(
             "[^A-Za-z0-9]+",
             "",
-            self.ocr.ocr(self._process_captcha(captcha), det=False, cls=False)[0][0],
+            list(
+                itertools.chain.from_iterable(
+                    self.ocr.ocr(self._process_captcha(captcha), det=False, cls=False)
+                )
+            )[0][0],
         )
 
     def _improve_image(self, image):
