@@ -32,7 +32,7 @@ class Sicar:
 
     __downloads_url = "https://car.gov.br/publico/municipios/downloads"
     
-    __csv_url = "https://car.gov.br/publico/municipios/downloads"
+    __csv_url = "https://car.gov.br/publico/municipios/csv"
 
     __capctha_url = "https://car.gov.br/publico/municipios/captcha"
 
