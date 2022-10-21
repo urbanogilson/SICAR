@@ -342,7 +342,7 @@ class Sicar:
                                 tries, captcha
                             )
                         )
-                    # TODO: here
+
                     return self._download_csv(
                         city_code=city_code, captcha=captcha, folder=folder
                     )
