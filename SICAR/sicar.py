@@ -13,6 +13,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
+    FailedToDownloadCSVException,
     EmailNotValidException,
     StateCodeNotValidException,
     UrlNotOkException,
@@ -30,6 +31,8 @@ class Sicar:
     __base_url = "https://car.gov.br/publico/imoveis/index"
 
     __downloads_url = "https://car.gov.br/publico/municipios/downloads"
+    
+    __csv_url = "https://car.gov.br/publico/municipios/downloads"
 
     __capctha_url = "https://car.gov.br/publico/municipios/captcha"
 
@@ -199,6 +202,49 @@ class Sicar:
 
         return path
 
+    def _download_csv(
+        self,
+        city_code: str,
+        captcha: str,
+        folder: str = 'csv',
+        chunk_size: int = 2048,
+    ):
+        response = self._get(
+            "{}?{}".format(
+                self.__csv_url,
+                urlencode(
+                    {
+                        "municipio[id]": city_code,
+                        "email": self.__email,
+                        "captcha": captcha,
+                    }
+                ),
+            ),
+            stream=True,
+        )
+
+        if not response.ok:
+            raise FailedToDownloadCSVException()
+
+        path = Path(
+            os.path.join(
+                folder, response.headers.get("filename", "CSV_{}".format(city_code))
+            )
+        ).with_suffix(".csv")
+
+        with open(path, "wb") as fd:
+            for chunk in tqdm(
+                iterable=response.iter_content(chunk_size),
+                total=float(response.headers.get("Content-Length", 0)) / chunk_size,
+                unit="KB",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc="Downloading csv city code {}".format(city_code),
+            ):
+                fd.write(chunk)
+
+        return path
+
     def download_city_code(
         self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
     ):
@@ -276,3 +322,40 @@ class Sicar:
                 # store log file with failed codes
                 with open(folder + "/failed_codes.txt", "w") as f:
                     print(details, file=f)
+
+    def download_city_csv(
+        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
+    ):
+        Path(folder).mkdir(parents=True, exist_ok=True)
+        captcha = ""
+
+        while tries > 0:
+            try:
+                captcha = self.__driver._get_captcha(
+                    self._download_captcha(folder=folder)
+                )
+
+                if len(captcha) == 5:
+                    if debug:
+                        print(
+                            "Try {} - Requesting csv file with captcha: {}".format(
+                                tries, captcha
+                            )
+                        )
+                    # TODO: here
+                    return self._download_csv(
+                        city_code=city_code, captcha=captcha, folder=folder
+                    )
+                else:
+                    if debug:
+                        print("Invalid Captcha: {}".format(captcha))
+
+                    time.sleep(0.75 + random.random() + random.random())
+
+            except Exception:
+                if debug:
+                    print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
+                tries -= 1
+                time.sleep(1 + random.random() + random.random())
+
+        return False
