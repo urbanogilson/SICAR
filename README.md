@@ -13,7 +13,7 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 ## Features
 
 - Get cities-codes by state code
-- Download city (Shapefile) by code
+- Download city (Shapefile or csv) by code
 - Download lists of cities (Shapefile) by code
 - Download all cities (Shapefile) in a state by code
 - Download the entire country (Shapefile)
@@ -67,6 +67,10 @@ pprint.pprint(cities_codes)
 
 # Download 'Alto Alegre': '1400050'
 car.download_city_code('1400050', folder='Roraima')
+
+# Download in csv format
+from SICAR import OutputFormat
+car.download_city_code('1400050', output_format = OutputFormat.CSV, folder='Roraima')
 
 # Download specific cities
 cities_codes = {

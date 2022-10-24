@@ -23,7 +23,7 @@ from SICAR.drivers import Captcha, Tesseract
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-class Mode(str, Enum):
+class OutputFormat(str, Enum):
     SHAPEFILE = 'shapefile'
     CSV = 'csv'
 
@@ -250,7 +250,7 @@ class Sicar:
         return path
 
     def download_city_code(
-        self, city_code: str, tries: int = 25, mode: str = Mode.SHAPEFILE, folder: str = "temp", debug: bool = False
+        self, city_code: str, tries: int = 25, output_format: str = OutputFormat.SHAPEFILE, folder: str = "temp", debug: bool = False
     ):
         Path(folder).mkdir(parents=True, exist_ok=True)
         captcha = ""
@@ -265,10 +265,10 @@ class Sicar:
                     if debug:
                         print(
                             "Try {} - Requesting {} with captcha: {}".format(
-                                tries, mode, captcha
+                                tries, output_format, captcha
                             )
                         )
-                    if mode is Mode.CSV:
+                    if output_format is OutputFormat.CSV:
                         return self._download_csv(
                             city_code=city_code, captcha=captcha, folder=folder
                         )
