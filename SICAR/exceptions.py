@@ -49,6 +49,7 @@ class FailedToDownloadShapefileException(Exception):
         self.message = message
         super().__init__(self.message)
 
+
 class FailedToDownloadCsvException(Exception):
     """Exception raised when the csv download failed."""
 
