@@ -13,7 +13,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
-    FailedToDownloadCSVException,
+    FailedToDownloadCsvException,
     EmailNotValidException,
     StateCodeNotValidException,
     UrlNotOkException,
