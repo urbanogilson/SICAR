@@ -208,7 +208,7 @@ class Sicar:
         captcha: str,
         folder: str = 'csv',
         chunk_size: int = 2048,
-    ):
+    ) -> Path:
         response = self._get(
             "{}?{}".format(
                 self.__csv_url,
