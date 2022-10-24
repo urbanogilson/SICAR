@@ -210,7 +210,7 @@ class Sicar:
         self,
         city_code: str,
         captcha: str,
-        folder: str = 'csv',
+        folder: str = "csv",
         chunk_size: int = 2048,
     ) -> Path:
         response = self._get(
