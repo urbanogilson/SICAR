@@ -1,4 +1,5 @@
 import requests
+from enum import Enum
 import random
 from urllib.parse import urlencode
 import re
@@ -13,6 +14,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
+    FailedToDownloadCsvException,
     EmailNotValidException,
     StateCodeNotValidException,
     UrlNotOkException,
@@ -20,6 +22,11 @@ from SICAR.exceptions import (
 from SICAR.drivers import Captcha, Tesseract
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+class OutputFormat(str, Enum):
+    SHAPEFILE = "shapefile"
+    CSV = "csv"
 
 
 class Sicar:
@@ -30,6 +37,8 @@ class Sicar:
     __base_url = "https://car.gov.br/publico/imoveis/index"
 
     __downloads_url = "https://car.gov.br/publico/municipios/downloads"
+
+    __csv_url = "https://car.gov.br/publico/municipios/csv"
 
     __capctha_url = "https://car.gov.br/publico/municipios/captcha"
 
@@ -199,9 +208,57 @@ class Sicar:
 
         return path
 
+    def _download_csv(
+        self,
+        city_code: str,
+        captcha: str,
+        folder: str = "csv",
+        chunk_size: int = 2048,
+    ) -> Path:
+        response = self._get(
+            "{}?{}".format(
+                self.__csv_url,
+                urlencode(
+                    {
+                        "municipio[id]": city_code,
+                        "email": self.__email,
+                        "captcha": captcha,
+                    }
+                ),
+            ),
+            stream=True,
+        )
+
+        if not response.ok:
+            raise FailedToDownloadCsvException()
+
+        path = Path(
+            os.path.join(
+                folder, response.headers.get("filename", "CSV_{}".format(city_code))
+            )
+        ).with_suffix(".csv")
+
+        with open(path, "wb") as fd:
+            for chunk in tqdm(
+                iterable=response.iter_content(chunk_size),
+                total=float(response.headers.get("Content-Length", 0)) / chunk_size,
+                unit="KB",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc="Downloading csv city code {}".format(city_code),
+            ):
+                fd.write(chunk)
+
+        return path
+
     def download_city_code(
-        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
-    ):
+        self,
+        city_code: str,
+        tries: int = 25,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        folder: str = "temp",
+        debug: bool = False,
+    ) -> Path:
         Path(folder).mkdir(parents=True, exist_ok=True)
         captcha = ""
 
@@ -214,11 +271,14 @@ class Sicar:
                 if len(captcha) == 5:
                     if debug:
                         print(
-                            "Try {} - Requesting shape file with captcha: {}".format(
-                                tries, captcha
+                            "Try {} - Requesting {} with captcha: {}".format(
+                                tries, output_format, captcha
                             )
                         )
-
+                    if output_format is OutputFormat.CSV:
+                        return self._download_csv(
+                            city_code=city_code, captcha=captcha, folder=folder
+                        )
                     return self._download_shapefile(
                         city_code=city_code, captcha=captcha, folder=folder
                     )
@@ -230,7 +290,7 @@ class Sicar:
 
             except Exception:
                 if debug:
-                    print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
+                    print("Try {} - Incorrect captcha: {} :-(".format(tries, captcha))
                 tries -= 1
                 time.sleep(1 + random.random() + random.random())
 
@@ -239,6 +299,7 @@ class Sicar:
     def download_cities(
         self,
         cities_codes: dict,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
         tries: int = 25,
         folder: str = "temp",
         debug: bool = False,
@@ -247,30 +308,47 @@ class Sicar:
 
         for city, code in cities_codes.items():
             if not self.download_city_code(
-                city_code=code, tries=tries, folder=folder, debug=debug
+                city_code=code,
+                output_format=output_format,
+                tries=tries,
+                folder=folder,
+                debug=debug,
             ):
                 failed[city] = code
 
         return failed if len(failed) else True
 
     def download_state(
-        self, state: str, tries: int = 25, folder: str = None, debug: bool = False
+        self,
+        state: str,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        tries: int = 25,
+        folder: str = None,
+        debug: bool = False,
     ):
         cities_codes = self.get_cities_codes(state=state)
 
         return self.download_cities(
             cities_codes=cities_codes,
+            output_format=output_format,
             tries=tries,
             folder=folder if type(folder) is str else state,
             debug=debug,
         )
 
-    def download_country(self, base_folder: str = "Brazil", debug: bool = False):
+    def download_country(
+        self,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        base_folder: str = "Brazil",
+        debug: bool = False,
+    ):
         for state in self.__states:
             folder = "{}/{}".format(base_folder, state)
             Path(folder).mkdir(parents=True, exist_ok=True)
 
-            details = self.download_state(state=state, folder=folder, debug=debug)
+            details = self.download_state(
+                state=state, output_format=output_format, folder=folder, debug=debug
+            )
 
             if isinstance(details, dict):
                 # store log file with failed codes

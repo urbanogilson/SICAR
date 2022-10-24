@@ -48,3 +48,11 @@ class FailedToDownloadShapefileException(Exception):
     def __init__(self, message: str = "Failed to download shapefile!!"):
         self.message = message
         super().__init__(self.message)
+
+
+class FailedToDownloadCsvException(Exception):
+    """Exception raised when the csv download failed."""
+
+    def __init__(self, message: str = "Failed to download csv!!"):
+        self.message = message
+        super().__init__(self.message)
