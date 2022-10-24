@@ -1,4 +1,5 @@
 import requests
+from enum import Enum
 import random
 from urllib.parse import urlencode
 import re
@@ -22,6 +23,9 @@ from SICAR.drivers import Captcha, Tesseract
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+class Mode(str, Enum):
+    SHAPEFILE = 'shapefile'
+    CSV = 'csv'
 
 class Sicar:
     """
@@ -224,7 +228,7 @@ class Sicar:
         )
 
         if not response.ok:
-            raise FailedToDownloadCSVException()
+            raise FailedToDownloadCsvException()
 
         path = Path(
             os.path.join(
@@ -246,7 +250,7 @@ class Sicar:
         return path
 
     def download_city_code(
-        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
+        self, city_code: str, tries: int = 25, mode: str = Mode.SHAPEFILE, folder: str = "temp", debug: bool = False
     ):
         Path(folder).mkdir(parents=True, exist_ok=True)
         captcha = ""
@@ -260,11 +264,14 @@ class Sicar:
                 if len(captcha) == 5:
                     if debug:
                         print(
-                            "Try {} - Requesting shape file with captcha: {}".format(
-                                tries, captcha
+                            "Try {} - Requesting {} with captcha: {}".format(
+                                tries, mode, captcha
                             )
                         )
-
+                    if mode is Mode.CSV:
+                        return self._download_csv(
+                            city_code=city_code, captcha=captcha, folder=folder
+                        )
                     return self._download_shapefile(
                         city_code=city_code, captcha=captcha, folder=folder
                     )
@@ -322,40 +329,3 @@ class Sicar:
                 # store log file with failed codes
                 with open(folder + "/failed_codes.txt", "w") as f:
                     print(details, file=f)
-
-    def download_city_csv(
-        self, city_code: str, tries: int = 25, folder: str = "temp", debug: bool = False
-    ):
-        Path(folder).mkdir(parents=True, exist_ok=True)
-        captcha = ""
-
-        while tries > 0:
-            try:
-                captcha = self.__driver._get_captcha(
-                    self._download_captcha(folder=folder)
-                )
-
-                if len(captcha) == 5:
-                    if debug:
-                        print(
-                            "Try {} - Requesting csv file with captcha: {}".format(
-                                tries, captcha
-                            )
-                        )
-
-                    return self._download_csv(
-                        city_code=city_code, captcha=captcha, folder=folder
-                    )
-                else:
-                    if debug:
-                        print("Invalid Captcha: {}".format(captcha))
-
-                    time.sleep(0.75 + random.random() + random.random())
-
-            except Exception:
-                if debug:
-                    print("Try {} - Incorret captcha: {} :-(".format(tries, captcha))
-                tries -= 1
-                time.sleep(1 + random.random() + random.random())
-
-        return False
