@@ -2,9 +2,9 @@ from distutils.core import setup
 
 setup(
     name="SICAR",
-    version="0.3.1",
+    version="0.4.0",
     author="Gilson Urbano",
-    author_email="gilson@gilsonurbano.com",
+    author_email="hello@gilsonurbano.com",
     packages=["SICAR", "SICAR.drivers", "SICAR.tests"],
     url="https://github.com/urbanogilson/SICAR",
     license="https://github.com/urbanogilson/SICAR/blob/main/LICENSE",
