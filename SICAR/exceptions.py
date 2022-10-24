@@ -50,7 +50,7 @@ class FailedToDownloadShapefileException(Exception):
         super().__init__(self.message)
 
 class FailedToDownloadCsvException(Exception):
-    """Exception raised when the shapefile download failed."""
+    """Exception raised when the csv download failed."""
 
     def __init__(self, message: str = "Failed to download csv!!"):
         self.message = message
