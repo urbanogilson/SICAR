@@ -11,7 +11,9 @@ from SICAR.drivers.captcha import Captcha
 
 class Paddle(Captcha):
     def __init__(self):
-        self.ocr = PaddleOCR(use_angle_cls=False, lang="en", use_space_char=False)
+        self.ocr = PaddleOCR(
+            use_angle_cls=False, lang="en", use_space_char=False, show_log=False
+        )
 
     def _get_captcha(self, captcha: Path) -> str:
         return re.sub(
