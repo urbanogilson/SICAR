@@ -161,7 +161,7 @@ Contributions are always welcome!
 
 ## Feedback
 
-If you have any feedback, please reach me at gilson@gilsonurbano.com
+If you have any feedback, please reach me at hello@gilsonurbano.com
 
 ## License
 

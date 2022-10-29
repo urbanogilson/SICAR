@@ -12,7 +12,7 @@ class TestTesseractDriver(unittest.TestCase):
     def test_get_captcha(self):
         self.assertEqual(
             self._driver._get_captcha(
-                Path("SICAR/tests/captchas/{}.png".format(self._captcha))
+                Path(f"SICAR/tests/captchas/{self._captcha}.png")
             ),
             self._captcha,
         )
