@@ -29,6 +29,6 @@
 			]
 		}
 	},
-	"postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "/usr/local/bin/python -m pip install --upgrade pip && pip3 install --user -r requirements.txt && pip install setuptools --upgrade",
 	"remoteUser": "vscode"
 }
