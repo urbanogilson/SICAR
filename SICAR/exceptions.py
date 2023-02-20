@@ -23,7 +23,7 @@ class UrlNotOkException(Exception):
 
 
 class StateCodeNotValidException(Exception):
-    """Exception raised when the input state is not a brazian state code.
+    """Exception raised when the input state is not a brazilian state code.
 
     Attributes:
         state -- state code which caused the error

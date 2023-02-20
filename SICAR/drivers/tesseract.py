@@ -30,7 +30,6 @@ class Tesseract(Captcha):
         return image
 
     def _process_captcha(self, captcha: Path):
-
         captcha_jpg = self._png_to_jpg(captcha)
 
         img = cv2.cvtColor(cv2.imread(str(captcha_jpg), -1), cv2.COLOR_BGR2GRAY)
