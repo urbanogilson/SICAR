@@ -9,8 +9,8 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Welcome! Your issue will be analyzed as soon as possible. Hopefully, we can find a solution to the problem together, please try to provide as much information as possible to help us identify and fix the bug or improve the repository.'
-        pr-message: 'Welcome! Your PR will be reviewed and confidently pushed to the main branch as soon as possible.'
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "Welcome! Your issue will be analyzed as soon as possible. Hopefully, we can find a solution to the problem together, please try to provide as much information as possible to help us identify and fix the bug or improve the repository."
+          pr-message: "Welcome! Your PR will be reviewed and confidently pushed to the main branch as soon as possible."
