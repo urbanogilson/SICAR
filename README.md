@@ -108,7 +108,7 @@ car.download_cities(cities_codes={'Belo Horizonte': '3106200'}, folder='SICAR/ci
 Install SICAR with pip and include Paddle dependencies
 
 ```bash
-pip install git+https://github.com/urbanogilson/SICAR[PADDLE]
+pip install 'SICAR[PADDLE] @  git+https://github.com/urbanogilson/SICAR'
 ```
 
 ```python
