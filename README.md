@@ -12,11 +12,12 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 ## Features
 
 - Get cities-codes by state code
-- Download city (Shapefile or csv) by code
-- Download lists of cities (Shapefile) by code
-- Download all cities (Shapefile) in a state by code
-- Download the entire country (Shapefile)
-- Tesseract, and PaddleOCR drivers to automatically detect captcha
+- Download Shapefile or CSV
+- Download city by code
+- Download lists of cities by code
+- Download all cities in a state by code
+- Download the entire country
+- Tesseract, and PaddleOCR (Optional) drivers to automatically detect captcha
 - Manual driver to automate the download process
 
 ## Installation
@@ -29,9 +30,9 @@ pip install git+https://github.com/urbanogilson/SICAR
 
 Prerequisite:
 
-Install [Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info how to install the engine on Linux, Mac OSX and Windows).
+[Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info how to install the engine on Linux, Mac OSX and Windows).
 
-Install [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional info how to install the engine on Linux, Mac OSX and Windows).
+Optional: [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional info how to install the engine on Linux, Mac OSX and Windows).
 
 If you don't want to install dependencies on your computer or don't know how to install them, we strongly recommend [Google Colab](#run-with-google-colab).
 
@@ -104,6 +105,12 @@ car.download_cities(cities_codes={'Belo Horizonte': '3106200'}, folder='SICAR/ci
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
+Install SICAR with pip and include Paddle dependencies
+
+```bash
+pip install 'SICAR[PADDLE] @  git+https://github.com/urbanogilson/SICAR'
+```
+
 ```python
 from SICAR import Sicar
 from SICAR.drivers import Paddle
@@ -148,6 +155,8 @@ docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
 
 ## Roadmap
 
+- [ ] Download city by name
+- [x] Make Paddle driver optional
 - [x] Add support to download csv files
 
 ## Contributing
