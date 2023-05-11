@@ -1,4 +1,4 @@
-ARG VARIANT="3.8"
+ARG VARIANT="3.10"
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
 # Install additional OS packages.
