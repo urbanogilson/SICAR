@@ -4,5 +4,8 @@ Drivers
 
 from SICAR.drivers.captcha import Captcha
 from SICAR.drivers.tesseract import Tesseract
-from SICAR.drivers.paddle import Paddle
+try:
+    from SICAR.drivers.paddle import Paddle
+except ImportError:
+    pass
 from SICAR.drivers.manual import Manual
