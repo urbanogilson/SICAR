@@ -8,6 +8,8 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 [![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Tests](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/urbanogilson/SICAR/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/github-code-scanning/codeql)
 
 ## Features
 
