@@ -9,7 +9,7 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Tests](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml)
-[![CodeQL](https://github.com/urbanogilson/SICAR/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/github-code-scanning/codeql)
+![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)
 
 ## Features
 
