@@ -132,23 +132,36 @@ Using Google Colab, you don't need to install the dependencies on your computer 
 
 ### Run with Docker
 
-Update the entry point file [./examples/docker.py](./examples/docker.py) to download data based on your needs.
-
-Generate docker image
+Pull Image from Docker Hub [urbanogilson/sicar](https://hub.docker.com/r/urbanogilson/sicar)
 
 ```sh
-# using the docker build script
-./docker-build.sh
+docker pull urbanogilson/sicar:latest
 ```
 
-Run to download all data defined in the [./examples/docker.py](./examples/docker.py) entry point to an external directory.
-
-Make an external directory to store the downloaded data, /my/local/data/dir, and use a volume parameter in the run command to point to it.
+Run the downloaded Docker Image using an entrypoint (file) from your machine (host)
 
 ```sh
-# run the docker image in detached mode
-docker run -d --rm -v /my/local/data/dir:/data softwarevale/download-sicar:v0.1
+docker run -i -v $(pwd):/sicar urbanogilson/sicar:test -<./examples/docker.py
 ```
+
+Note: Update the entry point file [./examples/docker.py](./examples/docker.py) or create a new one to download data based on your needs.
+
+or pass a script through `STDIN`
+
+```sh
+docker run -i -v $(pwd):/sicar urbanogilson/sicar:test -<<EOF
+from SICAR import Sicar
+from SICAR.drivers import Paddle
+
+car = Sicar(email="name@domain.com", driver=Paddle)
+
+car.download_state(state='MG', folder='MG')
+EOF
+```
+
+Note: Using `$(pwd)` the container will save the download data into the current folder.
+
+Optional: Make an external directory to store the downloaded data and use a volume parameter in the run command to point to it.
 
 ## Acknowledgements
 

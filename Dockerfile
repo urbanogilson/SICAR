@@ -1,21 +1,16 @@
-FROM python:3
+ARG VARIANT="3.10"
+FROM python:${VARIANT}
 
-WORKDIR /usr/src/app
-
-RUN apt-get update -y
-
-RUN apt-get install -y tesseract-ocr
-
-RUN apt-get install -y python3-opencv
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install tesseract-ocr python3-opencv
 
 RUN pip install --upgrade pip
 
-RUN pip install --no-cache-dir git+https://github.com/urbanogilson/SICAR
+RUN pip install 'SICAR[PADDLE] @  git+https://github.com/urbanogilson/SICAR'
 
-COPY . .
+WORKDIR /sicar
 
-VOLUME [ "/data" ]
+# Download PaddleOCR models
+RUN echo 'from paddleocr import PaddleOCR\nPaddleOCR(lang="en")' | python
 
-RUN pip list
-
-CMD [ "python", "./examples/docker.py" ]
+ENTRYPOINT ["python"]

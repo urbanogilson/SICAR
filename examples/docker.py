@@ -1,10 +1,10 @@
 from SICAR import Sicar
-from SICAR.drivers import Tesseract
+from SICAR.drivers import Paddle
 
 # from SICAR.drivers import Paddle
 
 # Create Sicar instance
-car = Sicar(email="sicar@sicar.com", driver=Tesseract)
+car = Sicar(email="sicar@sicar.com", driver=Paddle)
 # car = Sicar(email="sicar@sicar.com", driver=Paddle)
 
 # Download all shapefiles (cities) in Roraima state
