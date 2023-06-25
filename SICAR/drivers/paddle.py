@@ -1,21 +1,49 @@
 from paddleocr import PaddleOCR
-from pathlib import Path
-import matplotlib.image as mpimg
 import itertools
 import re
-import cv2
-import numpy as np
-
+from PIL import Image
 from SICAR.drivers.captcha import Captcha
 
 
 class Paddle(Captcha):
+    """
+    Implementation of the Captcha driver using PaddleOCR.
+
+    This driver utilizes PaddleOCR to extract text from captcha images.
+
+    Note:
+        This driver requires the paddlepaddle and paddleocr libraries to be installed.
+    """
+
     def __init__(self):
+        """
+        Initializes the PaddleOCR instance.
+
+        Note:
+            The `use_angle_cls` parameter is set to False to disable text angle detection.
+            The `lang` parameter is set to "en" to specify the English language.
+            The `use_space_char` parameter is set to False to disable space character output.
+            The `show_log` parameter is set to False to suppress PaddleOCR's logging messages.
+        """
         self.ocr = PaddleOCR(
             use_angle_cls=False, lang="en", use_space_char=False, show_log=False
         )
 
-    def _get_captcha(self, captcha: Path) -> str:
+    def get_captcha(self, captcha: Image) -> str:
+        """
+        Extracts text from the provided captcha image.
+
+        Parameters:
+            captcha (Image): The captcha image.
+
+        Returns:
+            str: The extracted text from the captcha.
+
+        Note:
+            This method processes the captcha image, improves its quality, and uses PaddleOCR's ocr method to perform
+            optical character recognition. The extracted text is then cleaned using regular expressions to remove
+            non-alphanumeric characters.
+        """
         return re.sub(
             "[^A-Za-z0-9]+",
             "",
@@ -25,22 +53,3 @@ class Paddle(Captcha):
                 )
             )[0][0],
         )
-
-    def _improve_image(self, image):
-        _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU + 2)
-        image = cv2.dilate(image, np.ones((3, 2), np.uint8), iterations=1)
-        image = cv2.erode(image, np.ones((4, 1), np.uint8), iterations=2)
-        image = cv2.dilate(image, np.ones((3, 1), np.uint8), iterations=2)
-        image = cv2.erode(image, np.ones((2, 1), np.uint8), iterations=2)
-        return image
-
-    def _process_captcha(self, captcha: Path):
-        captcha_jpg = self._png_to_jpg(captcha)
-
-        img = cv2.cvtColor(cv2.imread(str(captcha_jpg), -1), cv2.COLOR_BGR2GRAY)
-
-        res = self._improve_image(img)
-
-        mpimg.imsave(captcha_jpg, res, cmap="gray")
-
-        return res

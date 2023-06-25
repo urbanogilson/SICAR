@@ -1,58 +1,118 @@
 class EmailNotValidException(Exception):
-    """Exception raised for errors in the input email.
+    """
+    Exception raised when an invalid email is encountered.
 
     Attributes:
-        email -- email address which caused the error
+        email (str): The invalid email address.
     """
 
     def __init__(self, email: str):
+        """
+        Initializes an instance of EmailNotValidException.
+
+        Parameters:
+            email (str): The invalid email address.
+
+        Returns:
+            None
+        """
         self.email = email
-        super().__init__("Email {} not valid!".format(self.email))
+        super().__init__(f"Email {self.email} not valid!")
 
 
 class UrlNotOkException(Exception):
-    """Exception raised when the input url is not ok.
+    """
+    Exception raised when a URL is inaccessible or returns an error.
 
     Attributes:
-        url -- url address which caused the error
+        url (str): The problematic URL.
     """
 
     def __init__(self, url: str):
+        """
+        Initializes an instance of UrlNotOkException.
+
+        Parameters:
+            url (str): The problematic URL.
+
+        Returns:
+            None
+        """
         self.url = url
-        super().__init__("Oh no! Failed to access {}!".format(self.url))
+        super().__init__(f"Oh no! Failed to access {self.url}!")
 
 
 class StateCodeNotValidException(Exception):
-    """Exception raised when the input state is not a brazilian state code.
+    """
+    Exception raised when an invalid state code is encountered.
 
     Attributes:
-        state -- state code which caused the error
+        state (str): The invalid state code.
     """
 
     def __init__(self, state: str):
+        """
+        Initializes an instance of StateCodeNotValidException.
+
+        Parameters:
+            state (str): The invalid state code.
+
+        Returns:
+            None
+        """
         self.state = state
-        super().__init__("State code {} not valid!".format(self.state))
+        super().__init__(f"State code {self.state} not valid!")
 
 
 class FailedToDownloadCaptchaException(Exception):
-    """Exception raised when the captcha download failed."""
+    """
+    Exception raised when downloading a captcha fails.
+    """
 
-    def __init__(self, message: str = "Failed to download captcha!"):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self):
+        """
+        Initializes an instance of FailedToDownloadCaptchaException.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__("Failed to download captcha!")
 
 
 class FailedToDownloadShapefileException(Exception):
-    """Exception raised when the shapefile download failed."""
+    """
+    Exception raised when downloading a shapefile fails.
+    """
 
-    def __init__(self, message: str = "Failed to download shapefile!!"):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self):
+        """
+        Initializes an instance of FailedToDownloadShapefileException.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__("Failed to download shapefile!")
 
 
 class FailedToDownloadCsvException(Exception):
-    """Exception raised when the csv download failed."""
+    """
+    Exception raised when downloading a CSV fails.
+    """
 
-    def __init__(self, message: str = "Failed to download csv!!"):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self):
+        """
+        Initializes an instance of FailedToDownloadCsvException.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__("Failed to download CSV!")

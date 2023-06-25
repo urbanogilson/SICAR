@@ -1,78 +1,291 @@
-import requests
-from enum import Enum
-import random
-from urllib.parse import urlencode
-import re
-import shutil
-from pathlib import Path
-import time
-from html import unescape
-from tqdm import tqdm
+# import requests
+
+# import random
+# from urllib.parse import urlencode
+# import re
+# import shutil
+# from pathlib import Path
+# import time
+# from html import unescape
+# from tqdm import tqdm
+
+# import os
+# from requests.packages.urllib3.exceptions import InsecureRequestWarning
+# from SICAR.exceptions import (
+#     FailedToDownloadCaptchaException,
+#     FailedToDownloadShapefileException,
+#     FailedToDownloadCsvException,
+#     EmailNotValidException,
+#     StateCodeNotValidException,
+#     UrlNotOkException,
+# )
+# from SICAR.drivers import Captcha, Tesseract
+
+# requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+# class Sicar:
+#     """
+#     Sicar
+#     """
+
+#     def __init__(
+#         self,
+#         driver: Captcha = Tesseract,
+#         email: str = "sicar@sicar.com",
+#         headers: Dict = None,
+#     ):
+#         self.__driver = driver()
+#         self.__email = self._validate_email(email)
+#         self._create_session(headers)
+#         self._get(self.__base_url)
+
+
+#     def _download_shapefile(
+#         self,
+#         city_code: str,
+#         captcha: str,
+#         folder: str = "shapefile",
+#         chunk_size: int = 2048,
+#     ) -> Path:
+#         response = self._get(
+#             "{}?{}".format(
+#                 self.__shapefile_url,
+#                 urlencode(
+#                     {
+#                         "municipio[id]": city_code,
+#                         "email": self.__email,
+#                         "captcha": captcha,
+#                     }
+#                 ),
+#             ),
+#             stream=True,
+#         )
+
+#         if not response.ok:
+#             raise FailedToDownloadShapefileException()
+
+#         path = Path(
+#             os.path.join(
+#                 folder, response.headers.get("filename", "SHAPE_{}".format(city_code))
+#             )
+#         ).with_suffix(".zip")
+
+#         with open(path, "wb") as fd:
+#             for chunk in tqdm(
+#                 iterable=response.iter_content(chunk_size),
+#                 total=float(response.headers.get("Content-Length", 0)) / chunk_size,
+#                 unit="KB",
+#                 unit_scale=True,
+#                 unit_divisor=1024,
+#                 desc="Downloading shapefile city code {}".format(city_code),
+#             ):
+#                 fd.write(chunk)
+
+#         return path
+
+#     def _download_csv(
+#         self,
+#         city_code: str,
+#         captcha: str,
+#         folder: str = "csv",
+#         chunk_size: int = 2048,
+#     ) -> Path:
+#         response = self._get(
+#             "{}?{}".format(
+#                 self.__csv_url,
+#                 urlencode(
+#                     {
+#                         "municipio[id]": city_code,
+#                         "email": self.__email,
+#                         "captcha": captcha,
+#                     }
+#                 ),
+#             ),
+#             stream=True,
+#         )
+
+#         if not response.ok:
+#             raise FailedToDownloadCsvException()
+
+#         path = Path(
+#             os.path.join(
+#                 folder, response.headers.get("filename", "CSV_{}".format(city_code))
+#             )
+#         ).with_suffix(".csv")
+
+#         with open(path, "wb") as fd:
+#             for chunk in tqdm(
+#                 iterable=response.iter_content(chunk_size),
+#                 total=float(response.headers.get("Content-Length", 0)) / chunk_size,
+#                 unit="KB",
+#                 unit_scale=True,
+#                 unit_divisor=1024,
+#                 desc="Downloading csv city code {}".format(city_code),
+#             ):
+#                 fd.write(chunk)
+
+#         return path
+
+#     def download_city_code(
+#         self,
+#         city_code: str,
+#         tries: int = 25,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         folder: str = "temp",
+#         debug: bool = False,
+#     ) -> Path:
+#         Path(folder).mkdir(parents=True, exist_ok=True)
+#         captcha = ""
+
+#         while tries > 0:
+#             try:
+#                 captcha = self.__driver._get_captcha(
+#                     self._download_captcha(folder=folder)
+#                 )
+
+#                 if len(captcha) == 5:
+#                     if debug:
+#                         print(
+#                             "Try {} - Requesting {} with captcha: {}".format(
+#                                 tries, output_format, captcha
+#                             )
+#                         )
+#                     if output_format is OutputFormat.CSV:
+#                         return self._download_csv(
+#                             city_code=city_code, captcha=captcha, folder=folder
+#                         )
+#                     return self._download_shapefile(
+#                         city_code=city_code, captcha=captcha, folder=folder
+#                     )
+#                 else:
+#                     if debug:
+#                         print("Invalid Captcha: {}".format(captcha))
+
+#                     time.sleep(0.75 + random.random() + random.random())
+
+#             except Exception:
+#                 if debug:
+#                     print("Try {} - Incorrect captcha: {} :-(".format(tries, captcha))
+#                 tries -= 1
+#                 time.sleep(1 + random.random() + random.random())
+
+#         return False
+
+#     def download_cities(
+#         self,
+#         cities_codes: dict,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         tries: int = 25,
+#         folder: str = "temp",
+#         debug: bool = False,
+#     ):
+#         failed = {}
+
+#         for city, code in cities_codes.items():
+#             if not self.download_city_code(
+#                 city_code=code,
+#                 output_format=output_format,
+#                 tries=tries,
+#                 folder=folder,
+#                 debug=debug,
+#             ):
+#                 failed[city] = code
+
+#         return failed if len(failed) else True
+
+#     def download_state(
+#         self,
+#         state: str,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         tries: int = 25,
+#         folder: str = None,
+#         debug: bool = False,
+#     ):
+#         cities_codes = self.get_cities_codes(state=state)
+
+#         return self.download_cities(
+#             cities_codes=cities_codes,
+#             output_format=output_format,
+#             tries=tries,
+#             folder=folder if type(folder) is str else state,
+#             debug=debug,
+#         )
+
+#     def download_country(
+#         self,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         base_folder: str = "Brazil",
+#         debug: bool = False,
+#     ):
+#         for state in self.__states:
+#             folder = "{}/{}".format(base_folder, state)
+#             Path(folder).mkdir(parents=True, exist_ok=True)
+
+#             details = self.download_state(
+#                 state=state, output_format=output_format, folder=folder, debug=debug
+#             )
+
+#             if isinstance(details, dict):
+#                 # store log file with failed codes
+#                 with open(folder + "/failed_codes.txt", "w") as f:
+#                     print(details, file=f)
+
+
+from SICAR.url import Url
+from SICAR.output_format import OutputFormat
+from SICAR.drivers import Captcha, Tesseract
+
 from typing import Dict
-import os
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 from SICAR.exceptions import (
+    EmailNotValidException,
+    UrlNotOkException,
+    StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
     FailedToDownloadCsvException,
-    EmailNotValidException,
-    StateCodeNotValidException,
-    UrlNotOkException,
 )
-from SICAR.drivers import Captcha, Tesseract
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+import requests
+import re
+import random
+from urllib.parse import urlencode
+from html import unescape
+from PIL import Image
+import io
+from SICAR.state import State
+
+import shutil
+import tempfile
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+import shutil
+from pathlib import Path
+import time
+
+# import time
+# from html import unescape
+from tqdm import tqdm
+
+import os
 
 
-class OutputFormat(str, Enum):
-    SHAPEFILE = "shapefile"
-    CSV = "csv"
-
-
-class Sicar:
+class Sicar(Url):
     """
-    Sicar
+    Class representing the Sicar system.
+
+    Sicar is a system for managing environmental rural properties in Brazil.
+
+    It inherits from the Url class to provide access to URLs related to the Sicar system.
+
+    Attributes:
+        driver (Captcha): The driver used for handling captchas. Default is Tesseract.
+        email (str): The personal email for communication or identification purposes. Default is "sicar@sicar.com".
+        headers (Dict): Additional headers for HTTP requests. Default is None.
+
     """
-
-    __base_url = "https://car.gov.br/publico/imoveis/index"
-
-    __downloads_url = "https://car.gov.br/publico/municipios/downloads"
-
-    __csv_url = "https://car.gov.br/publico/municipios/csv"
-
-    __capctha_url = "https://car.gov.br/publico/municipios/captcha"
-
-    __shapefile_url = "https://car.gov.br/publico/municipios/shapefile"
-
-    __states = [
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
-    ]
 
     def __init__(
         self,
@@ -80,38 +293,36 @@ class Sicar:
         email: str = "sicar@sicar.com",
         headers: Dict = None,
     ):
-        self.__driver = driver()
-        self.__email = self._validate_email(email)
-        self._create_session(headers)
-        self._get(self.__base_url)
+        """
+        Initializes an instance of the Sicar class.
 
-    def __str__(self):
-        return "SICAR - {}".format(self.__email)
+        Parameters:
+            driver (Captcha): The driver used for handling captchas. Default is Tesseract.
+            email (str): The personal email for communication or identification purposes. Default is "sicar@sicar.com".
+            headers (Dict): Additional headers for HTTP requests. Default is None.
 
-    def get_base_url(self) -> str:
-        return self.__base_url
-
-    def _get(self, url: str, *args, **kwargs):
-        response = self.__session.get(url, verify=False, *args, **kwargs)
-
-        if not response.ok:
-            raise UrlNotOkException(url)
-
-        return response
-
-    def _validate_email(self, email: str) -> str:
-        if not re.search(
-            r"^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$", email
-        ):
-            raise EmailNotValidException(email)
-
-        return email
+        Returns:
+            None
+        """
+        self._driver = driver()
+        self._email = self._validate_email(email)
+        self._create_session(headers=headers)
+        # self._get(self._INDEX)
 
     def _create_session(self, headers: Dict = None):
-        self.__session = requests.Session()
-        self.__session.headers.update(
+        """
+        Creates a new session for making HTTP requests.
+
+        Parameters:
+            headers (Dict): Additional headers for the session. Default is None.
+
+        Returns:
+            None
+        """
+        self._session = requests.Session()
+        self._session.headers.update(
             headers
-            if type(headers) is dict
+            if isinstance(headers, dict)
             else {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56",
                 "Accept-Encoding": "gzip, deflate, br",
@@ -119,38 +330,91 @@ class Sicar:
             }
         )
 
-    def get_cities_codes(self, state: str = "AM") -> Dict:
-        """Get cities and codes by state
+    def _validate_email(self, email: str) -> str:
+        """
+        Validates the format of an email address.
 
-        Args:
-            state (str, optional): A brazilian state code. Defaults to "AM".
-
-        Raises:
-            Exception: StateCodeNotValidException.
+        Parameters:
+            email (str): The email address to validate.
 
         Returns:
-            dict: Cities and codes by state
-        """
-        state = state.upper()
+            str: The validated email address.
 
-        if state not in self.__states:
-            raise StateCodeNotValidException(state)
+        Raises:
+            EmailNotValidException: If the email address format is not valid.
+        """
+        if not re.search(
+            r"^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$", email
+        ):
+            raise EmailNotValidException(email)
+
+        return email
+
+    def _get(self, url: str, *args, **kwargs):
+        """
+        Sends a GET request to the specified URL using the session.
+
+        Parameters:
+            url (str): The URL to send the GET request to.
+            *args: Variable-length positional arguments.
+            **kwargs: Variable-length keyword arguments.
+
+        Returns:
+            requests.Response: The response from the GET request.
+
+        Raises:
+            UrlNotOkException: If the response from the GET request is not OK (status code is not 200).
+
+        Note:
+            The SSL certificate verification is disabled by default using `verify=False`. This allows connections to servers
+            with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
+            security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
+            certificate authority, you can remove the `verify=False` parameter to enable SSL certificate verification by
+            default.
+        """
+        response = self._session.get(url, verify=False, *args, **kwargs)
+
+        if not response.ok:
+            raise UrlNotOkException(url)
+
+        return response
+
+    def get_cities_codes(self, state: State | str) -> Dict:
+        """
+        Retrieves the codes of cities in a given state.
+
+        Parameters:
+            state (Union[State, str]): The state or state code to retrieve the cities for.
+
+        Returns:
+            Dict: A dictionary mapping city names to their corresponding codes.
+
+        Raises:
+            StateCodeNotValidException: If the state code is not valid.
+
+        Note:
+            If `state` is provided as a string, it will be converted to the corresponding State enum value. The state code
+            must be valid, or a StateCodeNotValidException will be raised.
+        """
+        if isinstance(state, str):
+            try:
+                state = State(state.upper())
+            except ValueError as error:
+                raise StateCodeNotValidException(state) from error
 
         cities_codes = re.findall(
             r'(?<=data-municipio=")(.*)(?=")',
             self._get(
-                "{}?{}".format(self.__downloads_url, urlencode({"sigla": state}))
+                "{}?{}".format(self._DOWNLOADS, urlencode({"sigla": state.value}))
             ).text,
         )
 
         return dict(zip(list(map(unescape, cities_codes[0::3])), cities_codes[1::3]))
 
-    def _download_captcha(
-        self, filename: str = "captcha", folder: str = "temp"
-    ) -> Path:
+    def _download_captcha(self) -> Image:
         response = self._get(
             "{}?{}".format(
-                self.__capctha_url, urlencode({"id": int(random.random() * 1000000)})
+                self._CAPTCHA, urlencode({"id": int(random.random() * 1000000)})
             ),
             stream=True,
         )
@@ -158,199 +422,74 @@ class Sicar:
         if not response.ok:
             raise FailedToDownloadCaptchaException()
 
-        path = Path(os.path.join(folder, filename)).with_suffix(".png")
-
-        with open(path, "wb") as out_file:
-            shutil.copyfileobj(response.raw, out_file)
-
-        return path
+        return Image.open(io.BytesIO(response.content))
 
     def _download_shapefile(
         self,
-        city_code: str,
+        city_code: str | int,
         captcha: str,
-        folder: str = "shapefile",
-        chunk_size: int = 2048,
+        folder: str,
+        chunk_size: int = 1024,
     ) -> Path:
-        response = self._get(
-            "{}?{}".format(
-                self.__shapefile_url,
-                urlencode(
-                    {
-                        "municipio[id]": city_code,
-                        "email": self.__email,
-                        "captcha": captcha,
-                    }
-                ),
-            ),
-            stream=True,
+        query = urlencode(
+            {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
         )
+        response = self._get(f"{self._SHAPEFILE}?{query}", stream=True)
 
         if not response.ok:
             raise FailedToDownloadShapefileException()
 
-        path = Path(
-            os.path.join(
-                folder, response.headers.get("filename", "SHAPE_{}".format(city_code))
-            )
-        ).with_suffix(".zip")
+        path = Path(os.path.join(folder, f"SHAPE_{city_code}")).with_suffix(".zip")
+
+        total_size = int(response.headers.get("Content-Length", 0))
 
         with open(path, "wb") as fd:
-            for chunk in tqdm(
-                iterable=response.iter_content(chunk_size),
-                total=float(response.headers.get("Content-Length", 0)) / chunk_size,
-                unit="KB",
-                unit_scale=True,
-                unit_divisor=1024,
-                desc="Downloading shapefile city code {}".format(city_code),
-            ):
-                fd.write(chunk)
+            with tqdm(total=total_size, unit="iB", unit_scale=True) as progress_bar:
+                for chunk in response.iter_content(chunk_size=chunk_size):
+                    fd.write(chunk)
+                    progress_bar.update(len(chunk))
 
-        return path
-
-    def _download_csv(
-        self,
-        city_code: str,
-        captcha: str,
-        folder: str = "csv",
-        chunk_size: int = 2048,
-    ) -> Path:
-        response = self._get(
-            "{}?{}".format(
-                self.__csv_url,
-                urlencode(
-                    {
-                        "municipio[id]": city_code,
-                        "email": self.__email,
-                        "captcha": captcha,
-                    }
-                ),
-            ),
-            stream=True,
-        )
-
-        if not response.ok:
-            raise FailedToDownloadCsvException()
-
-        path = Path(
-            os.path.join(
-                folder, response.headers.get("filename", "CSV_{}".format(city_code))
-            )
-        ).with_suffix(".csv")
-
-        with open(path, "wb") as fd:
-            for chunk in tqdm(
-                iterable=response.iter_content(chunk_size),
-                total=float(response.headers.get("Content-Length", 0)) / chunk_size,
-                unit="KB",
-                unit_scale=True,
-                unit_divisor=1024,
-                desc="Downloading csv city code {}".format(city_code),
-            ):
-                fd.write(chunk)
-
-        return path
+        return Path
 
     def download_city_code(
         self,
-        city_code: str,
+        city_code: str | int,
         tries: int = 25,
         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        folder: str = "temp",
+        folder: Path | str = Path("temp"),
+        chunk_size: int = 1024,
         debug: bool = False,
-    ) -> Path:
+    ) -> Path | bool:
         Path(folder).mkdir(parents=True, exist_ok=True)
-        captcha = ""
 
         while tries > 0:
             try:
-                captcha = self.__driver._get_captcha(
-                    self._download_captcha(folder=folder)
-                )
+                captcha = self._driver.get_captcha(self._download_captcha())
 
                 if len(captcha) == 5:
                     if debug:
                         print(
-                            "Try {} - Requesting {} with captcha: {}".format(
-                                tries, output_format, captcha
-                            )
+                            f"[{tries:02d}] - Requesting city '{city_code}' in '{output_format}' format with captcha '{captcha}'"
                         )
-                    if output_format is OutputFormat.CSV:
-                        return self._download_csv(
-                            city_code=city_code, captcha=captcha, folder=folder
-                        )
+
                     return self._download_shapefile(
-                        city_code=city_code, captcha=captcha, folder=folder
+                        city_code=city_code,
+                        captcha=captcha,
+                        folder=folder,
+                        chunk_size=chunk_size,
                     )
                 else:
                     if debug:
-                        print("Invalid Captcha: {}".format(captcha))
+                        print(f"[{tries:02d}] - Invalid captcha '{captcha}' format")
 
-                    time.sleep(0.75 + random.random() + random.random())
+                    time.sleep(random.random() + random.random())
 
             except Exception:
                 if debug:
-                    print("Try {} - Incorrect captcha: {} :-(".format(tries, captcha))
+                    print(
+                        f"[{tries:02d}] - Request city '{city_code}' in '{output_format}' format failed due to invalid captcha '{captcha}'"
+                    )
                 tries -= 1
-                time.sleep(1 + random.random() + random.random())
+                time.sleep(0.5 + random.random() + random.random())
 
         return False
-
-    def download_cities(
-        self,
-        cities_codes: dict,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        tries: int = 25,
-        folder: str = "temp",
-        debug: bool = False,
-    ):
-        failed = {}
-
-        for city, code in cities_codes.items():
-            if not self.download_city_code(
-                city_code=code,
-                output_format=output_format,
-                tries=tries,
-                folder=folder,
-                debug=debug,
-            ):
-                failed[city] = code
-
-        return failed if len(failed) else True
-
-    def download_state(
-        self,
-        state: str,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        tries: int = 25,
-        folder: str = None,
-        debug: bool = False,
-    ):
-        cities_codes = self.get_cities_codes(state=state)
-
-        return self.download_cities(
-            cities_codes=cities_codes,
-            output_format=output_format,
-            tries=tries,
-            folder=folder if type(folder) is str else state,
-            debug=debug,
-        )
-
-    def download_country(
-        self,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        base_folder: str = "Brazil",
-        debug: bool = False,
-    ):
-        for state in self.__states:
-            folder = "{}/{}".format(base_folder, state)
-            Path(folder).mkdir(parents=True, exist_ok=True)
-
-            details = self.download_state(
-                state=state, output_format=output_format, folder=folder, debug=debug
-            )
-
-            if isinstance(details, dict):
-                # store log file with failed codes
-                with open(folder + "/failed_codes.txt", "w") as f:
-                    print(details, file=f)

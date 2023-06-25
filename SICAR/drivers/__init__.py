@@ -9,4 +9,3 @@ try:
     from SICAR.drivers.paddle import Paddle
 except ImportError:
     pass
-from SICAR.drivers.manual import Manual
