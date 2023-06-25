@@ -431,6 +431,26 @@ class Sicar(Url):
         folder: str,
         chunk_size: int = 1024,
     ) -> Path:
+        """
+        Downloads the shapefile for the specified city code.
+
+        Parameters:
+            city_code (str | int): The code of the city for which to download the shapefile.
+            captcha (str): The captcha value for verification.
+            folder (str): The folder path where the shapefile will be saved.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+
+        Returns:
+            Path: The path to the downloaded shapefile.
+
+        Raises:
+            FailedToDownloadShapefileException: If the shapefile download fails.
+
+        Note:
+            This method performs the shapefile download by making a GET request to the shapefile URL with the specified
+            city code and captcha. The response is then streamed and saved to a file in chunks. A progress bar is displayed
+            during the download. The downloaded file path is returned.
+        """
         query = urlencode(
             {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
         )
@@ -460,7 +480,29 @@ class Sicar(Url):
         chunk_size: int = 1024,
         debug: bool = False,
     ) -> Path | bool:
+        """
+        Download the shapefile or other output format for the specified city code.
+
+        Parameters:
+            city_code (str | int): The code of the city for which to download the data.
+            tries (int, optional): The number of attempts to download the data. Defaults to 25.
+            output_format (OutputFormat, optional): The desired output format. Defaults to OutputFormat.SHAPEFILE.
+            folder (Path | str, optional): The folder path where the downloaded data will be saved. Defaults to "temp".
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            debug (bool, optional): Whether to print debug information. Defaults to False.
+
+        Returns:
+            Path | bool: The path to the downloaded data if successful, or False if download fails.
+
+        Note:
+            This method attempts to download the shapefile or other output format for the specified city code.
+            It tries multiple times, using a captcha for verification. The downloaded data is saved to the specified folder.
+            The method returns the path to the downloaded data if successful, or False if the download fails after the specified number of tries.
+        """
         Path(folder).mkdir(parents=True, exist_ok=True)
+
+        captcha = ""
+        info = f"city '{city_code}' in '{output_format}' format"
 
         while tries > 0:
             try:
@@ -469,7 +511,7 @@ class Sicar(Url):
                 if len(captcha) == 5:
                     if debug:
                         print(
-                            f"[{tries:02d}] - Requesting city '{city_code}' in '{output_format}' format with captcha '{captcha}'"
+                            f"[{tries:02d}] - Requesting {info} with captcha '{captcha}'"
                         )
 
                     return self._download_shapefile(
@@ -478,18 +520,19 @@ class Sicar(Url):
                         folder=folder,
                         chunk_size=chunk_size,
                     )
-                else:
-                    if debug:
-                        print(f"[{tries:02d}] - Invalid captcha '{captcha}' format")
-
-                    time.sleep(random.random() + random.random())
-
-            except Exception:
-                if debug:
+                elif debug:
                     print(
-                        f"[{tries:02d}] - Request city '{city_code}' in '{output_format}' format failed due to invalid captcha '{captcha}'"
+                        f"[{tries:02d}] - Invalid captcha '{captcha}' to request {info}"
                     )
+
+            except FailedToDownloadCaptchaException as error:
+                if debug:
+                    print(f"[{tries:02d}] - {error} When requesting {info}")
+            except FailedToDownloadShapefileException as error:
+                if debug:
+                    print(f"[{tries:02d}] - {error} When requesting {info}")
+            finally:
                 tries -= 1
-                time.sleep(0.5 + random.random() + random.random())
+                time.sleep(random.random() + random.random())
 
         return False
