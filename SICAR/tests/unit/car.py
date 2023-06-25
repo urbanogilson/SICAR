@@ -21,7 +21,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
-    FailedToDownloadCsvException
+    FailedToDownloadCsvException,
 )
 from SICAR.drivers import Captcha
 from SICAR.state import State
@@ -206,9 +206,7 @@ class SicarTestCase(unittest.TestCase):
     @patch("builtins.open", new_callable=MagicMock)
     @patch.object(Path, "__init__", return_value=None)
     @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
-    def test_download_csv_success(
-        self, mock_tqdm, mock_path, mock_open, mock_get
-    ):
+    def test_download_csv_success(self, mock_tqdm, mock_path, mock_open, mock_get):
         city_code = "123"
         captcha = "abc123"
         folder = "csvs"
