@@ -21,6 +21,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadShapefileException,
+    FailedToDownloadCsvException
 )
 from SICAR.drivers import Captcha
 from SICAR.state import State
@@ -200,6 +201,48 @@ class SicarTestCase(unittest.TestCase):
 
         with self.assertRaises(FailedToDownloadShapefileException):
             sicar._download_shapefile(city_code, captcha, folder, chunk_size)
+
+    @patch.object(Sicar, "_get")
+    @patch("builtins.open", new_callable=MagicMock)
+    @patch.object(Path, "__init__", return_value=None)
+    @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
+    def test_download_csv_success(
+        self, mock_tqdm, mock_path, mock_open, mock_get
+    ):
+        city_code = "123"
+        captcha = "abc123"
+        folder = "csvs"
+        response_mock = MagicMock()
+        response_mock.ok = True
+        response_mock.headers.get.return_value = "filename.zip"
+        response_mock.iter_content.return_value = [b"chunk1", b"chunk2"]
+        response_mock.headers.get.return_value = 4096
+        mock_get.return_value = response_mock
+        mock_open.return_value.__enter__.return_value = MagicMock()
+        sicar = Sicar(driver=self.mocked_captcha)
+        result = sicar._download_csv(city_code, captcha, folder)
+        mock_get.assert_called_once_with(
+            r"https://car.gov.br/publico/municipios/csv?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
+            stream=True,
+        )
+        mock_path.assert_called_once_with(f"{folder}/CSV_{city_code}")
+        mock_open.assert_called_once_with(
+            PosixPath(f"{folder}/CSV_{city_code}.csv"), "wb"
+        )
+        mock_open.return_value.__enter__.return_value.write.assert_called()
+        self.assertEqual(result, Path)
+
+    def test_download_csv_failed_response(self):
+        city_code = "12345"
+        captcha = "captcha_code"
+        folder = "csvs"
+        chunk_size = 1024
+
+        sicar = Sicar(driver=self.mocked_captcha)
+        sicar._get = MagicMock(return_value=MagicMock(ok=False))
+
+        with self.assertRaises(FailedToDownloadCsvException):
+            sicar._download_csv(city_code, captcha, folder, chunk_size)
 
     @patch("pathlib.Path.mkdir")
     def test_download_city_code_valid_captcha(self, mock_mkdir):

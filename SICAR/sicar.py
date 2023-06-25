@@ -1,243 +1,25 @@
-# import requests
-
-# import random
-# from urllib.parse import urlencode
-# import re
-# import shutil
-# from pathlib import Path
-# import time
-# from html import unescape
-# from tqdm import tqdm
-
-# import os
-# from requests.packages.urllib3.exceptions import InsecureRequestWarning
-# from SICAR.exceptions import (
-#     FailedToDownloadCaptchaException,
-#     FailedToDownloadShapefileException,
-#     FailedToDownloadCsvException,
-#     EmailNotValidException,
-#     StateCodeNotValidException,
-#     UrlNotOkException,
-# )
-# from SICAR.drivers import Captcha, Tesseract
-
-# requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-
-# class Sicar:
-#     """
-#     Sicar
-#     """
-
-#     def __init__(
-#         self,
-#         driver: Captcha = Tesseract,
-#         email: str = "sicar@sicar.com",
-#         headers: Dict = None,
-#     ):
-#         self.__driver = driver()
-#         self.__email = self._validate_email(email)
-#         self._create_session(headers)
-#         self._get(self.__base_url)
-
-
-#     def _download_shapefile(
-#         self,
-#         city_code: str,
-#         captcha: str,
-#         folder: str = "shapefile",
-#         chunk_size: int = 2048,
-#     ) -> Path:
-#         response = self._get(
-#             "{}?{}".format(
-#                 self.__shapefile_url,
-#                 urlencode(
-#                     {
-#                         "municipio[id]": city_code,
-#                         "email": self.__email,
-#                         "captcha": captcha,
-#                     }
-#                 ),
-#             ),
-#             stream=True,
-#         )
-
-#         if not response.ok:
-#             raise FailedToDownloadShapefileException()
-
-#         path = Path(
-#             os.path.join(
-#                 folder, response.headers.get("filename", "SHAPE_{}".format(city_code))
-#             )
-#         ).with_suffix(".zip")
-
-#         with open(path, "wb") as fd:
-#             for chunk in tqdm(
-#                 iterable=response.iter_content(chunk_size),
-#                 total=float(response.headers.get("Content-Length", 0)) / chunk_size,
-#                 unit="KB",
-#                 unit_scale=True,
-#                 unit_divisor=1024,
-#                 desc="Downloading shapefile city code {}".format(city_code),
-#             ):
-#                 fd.write(chunk)
-
-#         return path
-
-#     def _download_csv(
-#         self,
-#         city_code: str,
-#         captcha: str,
-#         folder: str = "csv",
-#         chunk_size: int = 2048,
-#     ) -> Path:
-#         response = self._get(
-#             "{}?{}".format(
-#                 self.__csv_url,
-#                 urlencode(
-#                     {
-#                         "municipio[id]": city_code,
-#                         "email": self.__email,
-#                         "captcha": captcha,
-#                     }
-#                 ),
-#             ),
-#             stream=True,
-#         )
-
-#         if not response.ok:
-#             raise FailedToDownloadCsvException()
-
-#         path = Path(
-#             os.path.join(
-#                 folder, response.headers.get("filename", "CSV_{}".format(city_code))
-#             )
-#         ).with_suffix(".csv")
-
-#         with open(path, "wb") as fd:
-#             for chunk in tqdm(
-#                 iterable=response.iter_content(chunk_size),
-#                 total=float(response.headers.get("Content-Length", 0)) / chunk_size,
-#                 unit="KB",
-#                 unit_scale=True,
-#                 unit_divisor=1024,
-#                 desc="Downloading csv city code {}".format(city_code),
-#             ):
-#                 fd.write(chunk)
-
-#         return path
-
-#     def download_city_code(
-#         self,
-#         city_code: str,
-#         tries: int = 25,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         folder: str = "temp",
-#         debug: bool = False,
-#     ) -> Path:
-#         Path(folder).mkdir(parents=True, exist_ok=True)
-#         captcha = ""
-
-#         while tries > 0:
-#             try:
-#                 captcha = self.__driver._get_captcha(
-#                     self._download_captcha(folder=folder)
-#                 )
-
-#                 if len(captcha) == 5:
-#                     if debug:
-#                         print(
-#                             "Try {} - Requesting {} with captcha: {}".format(
-#                                 tries, output_format, captcha
-#                             )
-#                         )
-#                     if output_format is OutputFormat.CSV:
-#                         return self._download_csv(
-#                             city_code=city_code, captcha=captcha, folder=folder
-#                         )
-#                     return self._download_shapefile(
-#                         city_code=city_code, captcha=captcha, folder=folder
-#                     )
-#                 else:
-#                     if debug:
-#                         print("Invalid Captcha: {}".format(captcha))
-
-#                     time.sleep(0.75 + random.random() + random.random())
-
-#             except Exception:
-#                 if debug:
-#                     print("Try {} - Incorrect captcha: {} :-(".format(tries, captcha))
-#                 tries -= 1
-#                 time.sleep(1 + random.random() + random.random())
-
-#         return False
-
-#     def download_cities(
-#         self,
-#         cities_codes: dict,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         tries: int = 25,
-#         folder: str = "temp",
-#         debug: bool = False,
-#     ):
-#         failed = {}
-
-#         for city, code in cities_codes.items():
-#             if not self.download_city_code(
-#                 city_code=code,
-#                 output_format=output_format,
-#                 tries=tries,
-#                 folder=folder,
-#                 debug=debug,
-#             ):
-#                 failed[city] = code
-
-#         return failed if len(failed) else True
-
-#     def download_state(
-#         self,
-#         state: str,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         tries: int = 25,
-#         folder: str = None,
-#         debug: bool = False,
-#     ):
-#         cities_codes = self.get_cities_codes(state=state)
-
-#         return self.download_cities(
-#             cities_codes=cities_codes,
-#             output_format=output_format,
-#             tries=tries,
-#             folder=folder if type(folder) is str else state,
-#             debug=debug,
-#         )
-
-#     def download_country(
-#         self,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         base_folder: str = "Brazil",
-#         debug: bool = False,
-#     ):
-#         for state in self.__states:
-#             folder = "{}/{}".format(base_folder, state)
-#             Path(folder).mkdir(parents=True, exist_ok=True)
-
-#             details = self.download_state(
-#                 state=state, output_format=output_format, folder=folder, debug=debug
-#             )
-
-#             if isinstance(details, dict):
-#                 # store log file with failed codes
-#                 with open(folder + "/failed_codes.txt", "w") as f:
-#                     print(details, file=f)
-
-
-from SICAR.url import Url
-from SICAR.output_format import OutputFormat
-from SICAR.drivers import Captcha, Tesseract
-
+import io
+import os
+import re
+import time
+import random
+import requests
+from PIL import Image
+from tqdm import tqdm
 from typing import Dict
+from pathlib import Path
+from html import unescape
+from urllib.parse import urlencode
 
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+from SICAR.drivers import Captcha, Tesseract
+from SICAR.output_format import OutputFormat
+from SICAR.state import State
+from SICAR.url import Url
 from SICAR.exceptions import (
     EmailNotValidException,
     UrlNotOkException,
@@ -246,30 +28,6 @@ from SICAR.exceptions import (
     FailedToDownloadShapefileException,
     FailedToDownloadCsvException,
 )
-
-import requests
-import re
-import random
-from urllib.parse import urlencode
-from html import unescape
-from PIL import Image
-import io
-from SICAR.state import State
-
-import shutil
-import tempfile
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-
-import shutil
-from pathlib import Path
-import time
-
-# import time
-# from html import unescape
-from tqdm import tqdm
-
-import os
 
 
 class Sicar(Url):
@@ -468,7 +226,52 @@ class Sicar(Url):
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
+        return Path
 
+    def _download_csv(
+        self,
+        city_code: str | int,
+        captcha: str,
+        folder: str,
+        chunk_size: int = 1024,
+    ) -> Path:
+        """
+        Download the CSV file for the specified city code.
+
+        Parameters:
+            city_code (str | int): The code of the city for which to download the CSV file.
+            captcha (str): The captcha value for verification.
+            folder (str): The folder path where the downloaded CSV file will be saved.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+
+        Returns:
+            Path: The path to the downloaded CSV file.
+
+        Raises:
+            FailedToDownloadCsvException: If the CSV file fails to download.
+
+        Note:
+            This method downloads the CSV file for the specified city code, using the provided captcha for verification.
+            The downloaded CSV file is saved to the specified folder.
+            The method returns the path to the downloaded CSV file.
+        """
+        query = urlencode(
+            {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
+        )
+        response = self._get(f"{self._CSV}?{query}", stream=True)
+
+        if not response.ok:
+            raise FailedToDownloadCsvException()
+
+        path = Path(os.path.join(folder, f"CSV_{city_code}")).with_suffix(".csv")
+
+        total_size = int(response.headers.get("Content-Length", 0))
+
+        with open(path, "wb") as fd:
+            with tqdm(total=total_size, unit="iB", unit_scale=True) as progress_bar:
+                for chunk in response.iter_content(chunk_size=chunk_size):
+                    fd.write(chunk)
+                    progress_bar.update(len(chunk))
         return Path
 
     def download_city_code(
@@ -536,3 +339,63 @@ class Sicar(Url):
                 time.sleep(random.random() + random.random())
 
         return False
+
+
+#     def download_cities(
+#         self,
+#         cities_codes: dict,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         tries: int = 25,
+#         folder: str = "temp",
+#         debug: bool = False,
+#     ):
+#         failed = {}
+
+#         for city, code in cities_codes.items():
+#             if not self.download_city_code(
+#                 city_code=code,
+#                 output_format=output_format,
+#                 tries=tries,
+#                 folder=folder,
+#                 debug=debug,
+#             ):
+#                 failed[city] = code
+
+#         return failed if len(failed) else True
+
+#     def download_state(
+#         self,
+#         state: str,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         tries: int = 25,
+#         folder: str = None,
+#         debug: bool = False,
+#     ):
+#         cities_codes = self.get_cities_codes(state=state)
+
+#         return self.download_cities(
+#             cities_codes=cities_codes,
+#             output_format=output_format,
+#             tries=tries,
+#             folder=folder if type(folder) is str else state,
+#             debug=debug,
+#         )
+
+#     def download_country(
+#         self,
+#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
+#         base_folder: str = "Brazil",
+#         debug: bool = False,
+#     ):
+#         for state in self.__states:
+#             folder = "{}/{}".format(base_folder, state)
+#             Path(folder).mkdir(parents=True, exist_ok=True)
+
+#             details = self.download_state(
+#                 state=state, output_format=output_format, folder=folder, debug=debug
+#             )
+
+#             if isinstance(details, dict):
+#                 # store log file with failed codes
+#                 with open(folder + "/failed_codes.txt", "w") as f:
+#                     print(details, file=f)
