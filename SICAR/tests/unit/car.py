@@ -10,6 +10,7 @@ from PIL import Image
 from pathlib import Path, PosixPath
 from tqdm import tqdm
 from urllib.parse import urlencode
+import sys
 
 from SICAR.sicar import Sicar
 from SICAR.output_format import OutputFormat
@@ -33,6 +34,11 @@ class MockCaptcha(Captcha):
 class SicarTestCase(unittest.TestCase):
     def setUp(self):
         self.mocked_captcha = MockCaptcha
+        self.stdout = io.StringIO()
+        sys.stdout = self.stdout
+
+    def tearDown(self):
+        sys.stdout = sys.__stdout__
 
     def test_create_sicar_instance_with_valid_email(self):
         sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
@@ -156,7 +162,7 @@ class SicarTestCase(unittest.TestCase):
     @patch.object(Sicar, "_get")
     @patch("builtins.open", new_callable=MagicMock)
     @patch.object(Path, "__init__", return_value=None)
-    @patch("tqdm.tqdm")
+    @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
     def test_download_shapefile_success(
         self, mock_tqdm, mock_path, mock_open, mock_get
     ):
