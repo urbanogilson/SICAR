@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import MagicMock, patch, ANY, call
 from PIL import Image
 import numpy as np
 import cv2
@@ -34,7 +34,7 @@ class CaptchaTests(unittest.TestCase):
                 named_temp_png,
                 named_temp_jpg,
             ],
-        ), patch("matplotlib.image.imread") as imread_mock, patch(
+        ) as mock_tempfile, patch("matplotlib.image.imread") as imread_mock, patch(
             "matplotlib.image.imsave"
         ) as imsave_mock, patch(
             "cv2.imread"
@@ -47,6 +47,11 @@ class CaptchaTests(unittest.TestCase):
 
             captcha_image.save.assert_called_once_with("temp.png")
 
+            self.assertEqual(mock_tempfile.call_count, 2)
+            self.assertEqual(
+                mock_tempfile.call_args_list,
+                [call(suffix=".png"), call(suffix=".jpg")],
+            )
             imsave_mock.assert_called_once_with(
                 "temp.jpg",
                 ANY,  # np array is ambiguous
@@ -54,7 +59,7 @@ class CaptchaTests(unittest.TestCase):
                 vmin=0,
                 vmax=255,
             )
-
+            imread_mock.assert_called_once()
             cv2_imread_mock.assert_called_once_with("temp.jpg", -1)
 
             np.testing.assert_array_equal(result, np.array([[0, 255], [255, 0]]))
