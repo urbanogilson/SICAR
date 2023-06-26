@@ -12,8 +12,8 @@ from tqdm import tqdm
 from urllib.parse import urlencode
 import sys
 
-from SICAR.sicar import Sicar
-from SICAR.output_format import OutputFormat
+from SICAR import Sicar
+from SICAR import OutputFormat
 from SICAR.url import Url
 from SICAR.exceptions import (
     EmailNotValidException,
@@ -24,7 +24,7 @@ from SICAR.exceptions import (
     FailedToDownloadCsvException,
 )
 from SICAR.drivers import Captcha
-from SICAR.state import State
+from SICAR import State
 
 
 class MockCaptcha(Captcha):
@@ -45,6 +45,11 @@ class SicarTestCase(unittest.TestCase):
         sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
         self.assertIsInstance(sicar, Sicar)
         self.assertEqual(sicar._email, "valid@example.com")
+
+    def test_ocr_driver_integration(self):
+        sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
+        captcha_image = Image.new("RGB", (10, 10))
+        self.assertEqual(sicar._driver.get_captcha(captcha_image), "mocked_captcha")
 
     def test_create_sicar_instance_with_invalid_email(self):
         with self.assertRaises(EmailNotValidException):
@@ -197,7 +202,7 @@ class SicarTestCase(unittest.TestCase):
         chunk_size = 1024
 
         sicar = Sicar(driver=self.mocked_captcha)
-        sicar._get = MagicMock(return_value=MagicMock(ok=False))
+        sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
 
         with self.assertRaises(FailedToDownloadShapefileException):
             sicar._download_shapefile(city_code, captcha, folder, chunk_size)
@@ -237,7 +242,7 @@ class SicarTestCase(unittest.TestCase):
         chunk_size = 1024
 
         sicar = Sicar(driver=self.mocked_captcha)
-        sicar._get = MagicMock(return_value=MagicMock(ok=False))
+        sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
 
         with self.assertRaises(FailedToDownloadCsvException):
             sicar._download_csv(city_code, captcha, folder, chunk_size)

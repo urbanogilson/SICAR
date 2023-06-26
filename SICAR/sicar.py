@@ -212,10 +212,11 @@ class Sicar(Url):
         query = urlencode(
             {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
         )
-        response = self._get(f"{self._SHAPEFILE}?{query}", stream=True)
 
-        if not response.ok:
-            raise FailedToDownloadShapefileException()
+        try:
+            response = self._get(f"{self._SHAPEFILE}?{query}", stream=True)
+        except UrlNotOkException as error:
+            raise FailedToDownloadShapefileException() from error
 
         path = Path(os.path.join(folder, f"SHAPE_{city_code}")).with_suffix(".zip")
 
@@ -258,10 +259,11 @@ class Sicar(Url):
         query = urlencode(
             {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
         )
-        response = self._get(f"{self._CSV}?{query}", stream=True)
 
-        if not response.ok:
-            raise FailedToDownloadCsvException()
+        try:
+            response = self._get(f"{self._CSV}?{query}", stream=True)
+        except UrlNotOkException as error:
+            raise FailedToDownloadCsvException() from error
 
         path = Path(os.path.join(folder, f"CSV_{city_code}")).with_suffix(".csv")
 

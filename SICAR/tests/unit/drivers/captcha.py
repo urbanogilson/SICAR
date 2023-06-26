@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch, ANY
 from PIL import Image
 import numpy as np
 import cv2
-from SICAR.drivers.captcha import Captcha
+from SICAR.drivers import Captcha
 import numpy as np
 
 

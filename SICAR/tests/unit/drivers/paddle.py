@@ -1,7 +1,7 @@
 import unittest
 from PIL import Image
 from unittest.mock import patch, MagicMock
-from SICAR.drivers.paddle import Paddle
+from SICAR.drivers import Paddle
 import paddleocr
 
 

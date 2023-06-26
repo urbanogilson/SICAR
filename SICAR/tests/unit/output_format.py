@@ -1,5 +1,5 @@
 import unittest
-from SICAR.output_format import OutputFormat
+from SICAR import OutputFormat
 
 
 class OutputFormatTestCase(unittest.TestCase):

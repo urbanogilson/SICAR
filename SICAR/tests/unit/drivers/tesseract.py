@@ -1,7 +1,7 @@
 import unittest
 from PIL import Image
 from unittest.mock import patch, MagicMock
-from SICAR.drivers.tesseract import Tesseract
+from SICAR.drivers import Tesseract
 
 
 class TesseractTest(unittest.TestCase):

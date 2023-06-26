@@ -1,5 +1,5 @@
 import unittest
-from SICAR.state import State
+from SICAR import State
 
 
 class StateTestCase(unittest.TestCase):
