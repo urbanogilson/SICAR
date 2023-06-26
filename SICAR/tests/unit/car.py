@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 from typing import Dict
 import re
 import requests
@@ -262,7 +262,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_shapefile = mock_download_shapefile
 
         result = sicar.download_city_code(
-            city_code, tries, output_format, folder, chunk_size, debug=False
+            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -298,7 +298,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_shapefile = mock_download_shapefile
 
         result = sicar.download_city_code(
-            city_code, tries, output_format, folder, chunk_size, debug=False
+            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -317,7 +317,7 @@ class SicarTestCase(unittest.TestCase):
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._get = MagicMock(return_value=MagicMock(ok=False))
         sicar.download_city_code(
-            "12345", 25, OutputFormat.SHAPEFILE, "temp", 1024, debug=True
+            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
         )
 
     @patch("time.sleep", return_value=None)
@@ -336,7 +336,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_shapefile = mock_download_shapefile
 
         sicar.download_city_code(
-            "12345", 25, OutputFormat.SHAPEFILE, "temp", 1024, debug=True
+            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
         )
 
     @patch("time.sleep", return_value=None)
@@ -352,5 +352,56 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_shapefile = mock_download_shapefile
 
         sicar.download_city_code(
-            "12345", 25, OutputFormat.SHAPEFILE, "temp", 1024, debug=True
+            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
         )
+
+    @patch("SICAR.sicar.Sicar.download_city_code")
+    def test_download_cities_success(self, mock_download_city_code):
+        cities_codes = {"City1": "123", "City2": "456"}
+        tries = 25
+        output_format = OutputFormat.SHAPEFILE
+        folder = "temp"
+        chunk_size = 1024
+        debug = False
+        mock_download_city_code.side_effect = (
+            lambda city_code, output_format, folder, tries, debug, chunk_size: Path(
+                f"{city_code}.zip"
+            )
+        )
+
+        sicar = Sicar(driver=self.mocked_captcha)
+
+        result = sicar.download_cities(
+            cities_codes,
+            output_format,
+            folder,
+            tries,
+            debug=debug,
+            chunk_size=chunk_size,
+        )
+
+        expected_result = {
+            ("City1", "123"): Path("123.zip"),
+            ("City2", "456"): Path("456.zip"),
+        }
+        self.assertEqual(result, expected_result)
+
+        expected_calls = [
+            call(
+                city_code="123",
+                output_format=output_format,
+                folder=folder,
+                tries=tries,
+                debug=debug,
+                chunk_size=chunk_size,
+            ),
+            call(
+                city_code="456",
+                output_format=output_format,
+                folder=folder,
+                tries=tries,
+                debug=debug,
+                chunk_size=chunk_size,
+            ),
+        ]
+        mock_download_city_code.assert_has_calls(expected_calls)

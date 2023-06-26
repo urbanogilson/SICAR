@@ -277,11 +277,11 @@ class Sicar(Url):
     def download_city_code(
         self,
         city_code: str | int,
-        tries: int = 25,
         output_format: OutputFormat = OutputFormat.SHAPEFILE,
         folder: Path | str = Path("temp"),
-        chunk_size: int = 1024,
+        tries: int = 25,
         debug: bool = False,
+        chunk_size: int = 1024,
     ) -> Path | bool:
         """
         Download the shapefile or other output format for the specified city code.
@@ -340,62 +340,112 @@ class Sicar(Url):
 
         return False
 
+    def download_cities(
+        self,
+        cities_codes: Dict,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        folder: Path | str = Path("temp"),
+        tries: int = 25,
+        debug: bool = False,
+        chunk_size: int = 1024,
+    ) -> Dict:
+        """
+        Download shapefiles or CSVs for multiple cities.
 
-#     def download_cities(
-#         self,
-#         cities_codes: dict,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         tries: int = 25,
-#         folder: str = "temp",
-#         debug: bool = False,
-#     ):
-#         failed = {}
+        Parameters:
+            cities_codes (Dict): A dictionary mapping city names to their corresponding codes.
+            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
+            folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'temp'.
+            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
+            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
-#         for city, code in cities_codes.items():
-#             if not self.download_city_code(
-#                 city_code=code,
-#                 output_format=output_format,
-#                 tries=tries,
-#                 folder=folder,
-#                 debug=debug,
-#             ):
-#                 failed[city] = code
+        Returns:
+            Dict: A dictionary containing the results of the download operation.
+                The keys are tuples of city name and code, and the values are the paths to the downloaded files.
+                If a download fails for a city, the corresponding value will be False.
+        """
+        result = {}
+        for city, code in cities_codes.items():
+            result[(city, code)] = self.download_city_code(
+                city_code=code,
+                output_format=output_format,
+                folder=folder,
+                tries=tries,
+                debug=debug,
+                chunk_size=chunk_size,
+            )
+        return result
 
-#         return failed if len(failed) else True
+    def download_state(
+        self,
+        state: State | str,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        folder: Path | str = Path("temp"),
+        tries: int = 25,
+        debug: bool = False,
+        chunk_size: int = 1024,
+    ):
+        """
+        Download shapefiles or CSVs for a state.
 
-#     def download_state(
-#         self,
-#         state: str,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         tries: int = 25,
-#         folder: str = None,
-#         debug: bool = False,
-#     ):
-#         cities_codes = self.get_cities_codes(state=state)
+        Parameters:
+            state (State | str): The state for which to download the files. It can be either a `State` enum value or a string representing the state's abbreviation.
+            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
+            folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'temp'.
+            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
+            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
-#         return self.download_cities(
-#             cities_codes=cities_codes,
-#             output_format=output_format,
-#             tries=tries,
-#             folder=folder if type(folder) is str else state,
-#             debug=debug,
-#         )
+        Returns:
+            Dict: A dictionary containing the results of the download operation.
+                The keys are tuples of city name and code, and the values are the paths to the downloaded files.
+                If a download fails for a city, the corresponding value will be False.
+        """
+        cities_codes = self.get_cities_codes(state=state)
 
-#     def download_country(
-#         self,
-#         output_format: OutputFormat = OutputFormat.SHAPEFILE,
-#         base_folder: str = "Brazil",
-#         debug: bool = False,
-#     ):
-#         for state in self.__states:
-#             folder = "{}/{}".format(base_folder, state)
-#             Path(folder).mkdir(parents=True, exist_ok=True)
+        return self.download_cities(
+            cities_codes=cities_codes,
+            output_format=output_format,
+            folder=folder,
+            tries=tries,
+            debug=debug,
+            chunk_size=chunk_size,
+        )
 
-#             details = self.download_state(
-#                 state=state, output_format=output_format, folder=folder, debug=debug
-#             )
+    def download_country(
+        self,
+        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        folder: Path | str = Path("brazil"),
+        tries: int = 25,
+        debug: bool = False,
+        chunk_size: int = 1024,
+    ):
+        """
+        Download shapefiles or CSVs for the entire country.
 
-#             if isinstance(details, dict):
-#                 # store log file with failed codes
-#                 with open(folder + "/failed_codes.txt", "w") as f:
-#                     print(details, file=f)
+        Parameters:
+            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
+            folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'brazil'.
+            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
+            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+
+        Returns:
+            Dict: A dictionary containing the results of the download operation.
+                The keys are the state abbreviations, and the values are dictionaries representing the results of downloading each state.
+                Each state's dictionary follows the same structure as the result of the `download_state` method.
+                If a download fails for a city within a state, the corresponding value will be False.
+        """
+        result = {}
+        for state in State:
+            Path(os.path.join(folder, f"{state}")).mkdir(parents=True, exist_ok=True)
+
+            result[str(state)] = self.download_state(
+                state=state,
+                output_format=output_format,
+                folder=folder,
+                tries=tries,
+                debug=debug,
+                chunk_size=chunk_size,
+            )
