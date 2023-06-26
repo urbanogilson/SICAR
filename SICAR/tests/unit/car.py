@@ -193,7 +193,7 @@ class SicarTestCase(unittest.TestCase):
             PosixPath(f"{folder}/SHAPE_{city_code}.zip"), "wb"
         )
         mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, Path)
+        self.assertEqual(result, PosixPath(f"{folder}/SHAPE_{city_code}.zip"))
 
     def test_download_shapefile_failed_response(self):
         city_code = "12345"
@@ -233,7 +233,7 @@ class SicarTestCase(unittest.TestCase):
             PosixPath(f"{folder}/CSV_{city_code}.csv"), "wb"
         )
         mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, Path)
+        self.assertEqual(result, PosixPath(f"{folder}/CSV_{city_code}.csv"))
 
     def test_download_csv_failed_response(self):
         city_code = "12345"

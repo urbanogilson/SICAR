@@ -227,7 +227,7 @@ class Sicar(Url):
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
-        return Path
+        return path
 
     def _download_csv(
         self,
@@ -274,7 +274,7 @@ class Sicar(Url):
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
-        return Path
+        return path
 
     def download_city_code(
         self,
