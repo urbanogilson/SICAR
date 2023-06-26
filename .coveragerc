@@ -1,0 +1,8 @@
+[run]
+source = SICAR
+omit = SICAR/tests/integration/*
+
+[report]
+fail_under = 95
+ignore_errors = False
+show_missing = True
