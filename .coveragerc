@@ -6,3 +6,5 @@ omit = SICAR/tests/integration/*
 fail_under = 95
 ignore_errors = False
 show_missing = True
+exclude_lines =
+    except ImportError\:

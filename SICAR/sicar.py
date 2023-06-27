@@ -319,6 +319,14 @@ class Sicar(Url):
                             f"[{tries:02d}] - Requesting {info} with captcha '{captcha}'"
                         )
 
+                    if output_format is OutputFormat.CSV:
+                        return self._download_csv(
+                            city_code=city_code,
+                            captcha=captcha,
+                            folder=folder,
+                            chunk_size=chunk_size,
+                        )
+
                     return self._download_shapefile(
                         city_code=city_code,
                         captcha=captcha,

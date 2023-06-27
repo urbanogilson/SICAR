@@ -31,3 +31,8 @@ class PaddleTestCase(unittest.TestCase):
         re_mock.assert_called_once_with("[^A-Za-z0-9]+", "", "ABC123")
 
         self.assertEqual(result, re_mock.return_value)
+
+    @patch("paddleocr.PaddleOCR", side_effect=ImportError)
+    def test_paddle_import_failure(self, paddle_mock):
+        with self.assertRaises(ImportError):
+            paddleocr.PaddleOCR()

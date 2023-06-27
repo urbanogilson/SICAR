@@ -283,6 +283,41 @@ class SicarTestCase(unittest.TestCase):
         self.assertEqual(result, Path("shapefile.zip"))
 
     @patch("pathlib.Path.mkdir")
+    def test_download_city_code_valid_captcha_csv_format(self, mock_mkdir):
+        # Mock city code, tries, output format, folder, and chunk size
+        city_code = "12345"
+        tries = 25
+        output_format = OutputFormat.CSV
+        folder = "temp"
+        chunk_size = 1024
+
+        sicar = Sicar(driver=self.mocked_captcha)
+        mock_download_captcha = MagicMock(return_value=Image.Image)
+        sicar._download_captcha = mock_download_captcha
+
+        mock_get_captcha = MagicMock(return_value="ABCDE")
+        sicar._driver.get_captcha = mock_get_captcha
+
+        mock_download_csv = MagicMock(return_value=Path("shapefile.csv"))
+        sicar._download_csv = mock_download_csv
+
+        result = sicar.download_city_code(
+            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
+        )
+
+        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
+        mock_download_captcha.assert_called_once()
+
+        mock_get_captcha.assert_called_once_with(mock_download_captcha.return_value)
+
+        mock_download_csv.assert_called_once_with(
+            city_code=city_code, captcha="ABCDE", folder=folder, chunk_size=chunk_size
+        )
+
+        self.assertIsInstance(result, Path)
+        self.assertEqual(result, Path("shapefile.csv"))
+
+    @patch("pathlib.Path.mkdir")
     @patch("time.sleep", return_value=None)
     def test_download_city_code_invalid_captcha(self, mock_time, mock_mkdir):
         # Mock city code, tries, output format, folder, and chunk size
@@ -410,3 +445,78 @@ class SicarTestCase(unittest.TestCase):
             ),
         ]
         mock_download_city_code.assert_has_calls(expected_calls)
+
+    @patch("SICAR.sicar.Sicar.get_cities_codes")
+    @patch("SICAR.sicar.Sicar.download_cities")
+    def test_download_state(self, mock_download_cities, mock_get_cities_codes):
+        sicar = Sicar(driver=self.mocked_captcha)
+        state = State.MG
+        output_format = OutputFormat.SHAPEFILE
+        folder = "/path/to/folder"
+        tries = 25
+        debug = False
+        chunk_size = 1024
+
+        mock_get_cities_codes.return_value = {"City1": "123", "City2": "456"}
+
+        mock_download_cities.return_value = {
+            ("City1", "123"): Path("123.zip"),
+            ("City2", "456"): Path("456.zip"),
+        }
+
+        result = sicar.download_state(
+            state, output_format, folder, tries, debug, chunk_size
+        )
+
+        self.assertEqual(
+            result,
+            {("City1", "123"): Path("123.zip"), ("City2", "456"): Path("456.zip")},
+        )
+
+        mock_get_cities_codes.assert_called_once_with(state=state)
+
+        expected_calls = [
+            call(
+                cities_codes={"City1": "123", "City2": "456"},
+                output_format=output_format,
+                folder=folder,
+                tries=tries,
+                debug=debug,
+                chunk_size=chunk_size,
+            )
+        ]
+        mock_download_cities.assert_has_calls(expected_calls)
+
+    @patch("SICAR.sicar.Sicar.download_state")
+    @patch("pathlib.Path.mkdir")
+    def test_download_country(self, mock_mkdir, mock_download_state):
+        sicar = Sicar(driver=self.mocked_captcha)
+        output_format = OutputFormat.SHAPEFILE
+        folder = "/path/to/folder"
+        tries = 25
+        debug = False
+        chunk_size = 1024
+
+        mock_download_state.return_value = {
+            ("City1", "123"): Path("/path/to/123.zip"),
+            ("City2", "456"): Path("/path/to/456.zip"),
+        }
+
+        sicar.download_country(output_format, folder, tries, debug, chunk_size)
+
+        expected_calls = {"path": [], "download_state": []}
+        for state in State:
+            expected_calls["path"].append(call(parents=True, exist_ok=True))
+            expected_calls["download_state"].append(
+                call(
+                    state=state,
+                    output_format=output_format,
+                    folder=folder,
+                    tries=tries,
+                    debug=debug,
+                    chunk_size=chunk_size,
+                )
+            )
+
+        mock_mkdir.assert_has_calls(expected_calls["path"])
+        mock_download_state.assert_has_calls(expected_calls["download_state"])
