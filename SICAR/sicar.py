@@ -178,12 +178,17 @@ class Sicar(Url):
         return dict(zip(list(map(unescape, cities_codes[0::3])), cities_codes[1::3]))
 
     def _download_captcha(self) -> Image:
-        response = self._get(
-            "{}?{}".format(
-                self._CAPTCHA, urlencode({"id": int(random.random() * 1000000)})
-            ),
-            stream=True,
-        )
+        """
+        Downloads a captcha image from the SICAR system.
+
+        Returns:
+            Image: The captcha image.
+
+        Raises:
+            FailedToDownloadCaptchaException: If the captcha image fails to download.
+        """
+        url = f"{self._CAPTCHA}?{urlencode({'id': int(random.random() * 1000000)})}"
+        response = self._get(url, stream=True)
 
         if not response.ok:
             raise FailedToDownloadCaptchaException()
