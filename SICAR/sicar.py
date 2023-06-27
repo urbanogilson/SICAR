@@ -231,7 +231,12 @@ class Sicar(Url):
         total_size = int(response.headers.get("Content-Length", 0))
 
         with open(path, "wb") as fd:
-            with tqdm(total=total_size, unit="iB", unit_scale=True) as progress_bar:
+            with tqdm(
+                total=total_size,
+                unit="iB",
+                unit_scale=True,
+                desc=f"Downloading Shapefile for city with code '{city_code}'",
+            ) as progress_bar:
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
@@ -278,7 +283,12 @@ class Sicar(Url):
         total_size = int(response.headers.get("Content-Length", 0))
 
         with open(path, "wb") as fd:
-            with tqdm(total=total_size, unit="iB", unit_scale=True) as progress_bar:
+            with tqdm(
+                total=total_size,
+                unit="iB",
+                unit_scale=True,
+                desc=f"Downloading CSV  file for city with code '{city_code}'",
+            ) as progress_bar:
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
