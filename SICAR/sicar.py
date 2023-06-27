@@ -11,11 +11,6 @@ from pathlib import Path
 from html import unescape
 from urllib.parse import urlencode
 
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-
 from SICAR.drivers import Captcha, Tesseract
 from SICAR.output_format import OutputFormat
 from SICAR.state import State
@@ -29,6 +24,10 @@ from SICAR.exceptions import (
     FailedToDownloadCsvException,
 )
 
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 
 class Sicar(Url):
     """
@@ -39,10 +38,8 @@ class Sicar(Url):
     It inherits from the Url class to provide access to URLs related to the Sicar system.
 
     Attributes:
-        driver (Captcha): The driver used for handling captchas. Default is Tesseract.
-        email (str): The personal email for communication or identification purposes. Default is "sicar@sicar.com".
-        headers (Dict): Additional headers for HTTP requests. Default is None.
-
+        _driver (Captcha): The driver used for handling captchas. Default is Tesseract.
+        _email (str): The personal email for communication or identification purposes.
     """
 
     def __init__(
@@ -65,7 +62,7 @@ class Sicar(Url):
         self._driver = driver()
         self._email = self._validate_email(email)
         self._create_session(headers=headers)
-        # self._get(self._INDEX)
+        self._initialize_cookies()
 
     def _create_session(self, headers: Dict = None):
         """
@@ -87,6 +84,17 @@ class Sicar(Url):
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             }
         )
+
+    def _initialize_cookies(self):
+        """
+        Initializes cookies by making the initial request and accepting any redirections.
+
+        This method is intended to be called in the constructor to set up the session cookies.
+
+        Returns:
+            None
+        """
+        self._get(self._INDEX)
 
     def _validate_email(self, email: str) -> str:
         """
@@ -337,11 +345,11 @@ class Sicar(Url):
                     print(
                         f"[{tries:02d}] - Invalid captcha '{captcha}' to request {info}"
                     )
-
-            except FailedToDownloadCaptchaException as error:
-                if debug:
-                    print(f"[{tries:02d}] - {error} When requesting {info}")
-            except FailedToDownloadShapefileException as error:
+            except (
+                FailedToDownloadCaptchaException,
+                FailedToDownloadShapefileException,
+                FailedToDownloadCsvException,
+            ) as error:
                 if debug:
                     print(f"[{tries:02d}] - {error} When requesting {info}")
             finally:

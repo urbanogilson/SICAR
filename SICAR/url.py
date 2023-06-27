@@ -11,7 +11,7 @@ class Url:
         _SHAPEFILE (str): URL for downloading shapefile resources related to municipalities.
     """
 
-    _BASE = "https://car.gov.br/publico"
+    _BASE = "https://www.car.gov.br/publico"
     _INDEX = f"{_BASE}/imoveis/index"
     _DOWNLOADS = f"{_BASE}/municipios/downloads"
     _CSV = f"{_BASE}/municipios/csv"

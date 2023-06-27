@@ -37,9 +37,19 @@ class SicarTestCase(unittest.TestCase):
         self.mocked_captcha = MockCaptcha
         self.stdout = io.StringIO()
         sys.stdout = self.stdout
+        self.mock_initialize_cookies = patch("SICAR.sicar.Sicar._initialize_cookies")
+        self.mock_initialize_cookies.start()
 
     def tearDown(self):
         sys.stdout = sys.__stdout__
+        self.mock_initialize_cookies.stop()
+
+    @patch.object(Sicar, "_get")
+    def test_initialize_cookies(self, mock_get):
+        self.mock_initialize_cookies.stop()
+        Sicar(driver=self.mocked_captcha, email="valid@example.com")
+        mock_get.assert_called_once_with("https://www.car.gov.br/publico/imoveis/index")
+        self.mock_initialize_cookies.start()
 
     def test_create_sicar_instance_with_valid_email(self):
         sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
@@ -109,7 +119,7 @@ class SicarTestCase(unittest.TestCase):
         cities_codes = sicar.get_cities_codes(State.AC)
 
         sicar._get.assert_called_once_with(
-            "https://car.gov.br/publico/municipios/downloads?sigla=AC"
+            "https://www.car.gov.br/publico/municipios/downloads?sigla=AC"
         )
 
         self.assertEqual(cities_codes, {"CityA": "123", "CityB": "456"})
@@ -123,7 +133,7 @@ class SicarTestCase(unittest.TestCase):
         cities_codes = sicar.get_cities_codes("AC")
 
         sicar._get.assert_called_once_with(
-            "https://car.gov.br/publico/municipios/downloads?sigla=AC"
+            "https://www.car.gov.br/publico/municipios/downloads?sigla=AC"
         )
 
         self.assertEqual(cities_codes, {"CityA": "123", "CityB": "456"})
@@ -150,7 +160,7 @@ class SicarTestCase(unittest.TestCase):
         captcha_image = sicar._download_captcha()
 
         sicar._get.assert_called_once_with(
-            f"https://car.gov.br/publico/municipios/captcha?id={int(random.random() * 1000000)}",
+            f"https://www.car.gov.br/publico/municipios/captcha?id={int(random.random() * 1000000)}",
             stream=True,
         )
         Image.open.assert_called_once()
@@ -185,7 +195,7 @@ class SicarTestCase(unittest.TestCase):
         sicar = Sicar(driver=self.mocked_captcha)
         result = sicar._download_shapefile(city_code, captcha, folder)
         mock_get.assert_called_once_with(
-            r"https://car.gov.br/publico/municipios/shapefile?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
+            r"https://www.car.gov.br/publico/municipios/shapefile?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
             stream=True,
         )
         mock_path.assert_called_once_with(f"{folder}/SHAPE_{city_code}")
@@ -225,7 +235,7 @@ class SicarTestCase(unittest.TestCase):
         sicar = Sicar(driver=self.mocked_captcha)
         result = sicar._download_csv(city_code, captcha, folder)
         mock_get.assert_called_once_with(
-            r"https://car.gov.br/publico/municipios/csv?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
+            r"https://www.car.gov.br/publico/municipios/csv?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
             stream=True,
         )
         mock_path.assert_called_once_with(f"{folder}/CSV_{city_code}")
@@ -377,6 +387,25 @@ class SicarTestCase(unittest.TestCase):
 
         sicar.download_city_code(
             "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
+        )
+
+    @patch("time.sleep", return_value=None)
+    def test_download_city_code_invalid_captcha_failed_to_download_csv_exception(
+        self, mock_time
+    ):
+        sicar = Sicar(driver=self.mocked_captcha)
+        mock_download_captcha = MagicMock(return_value=Image.Image)
+        sicar._download_captcha = mock_download_captcha
+
+        mock_get_captcha = MagicMock(return_value="ABCDE")
+        sicar._driver.get_captcha = mock_get_captcha
+
+        mock_download_csv = MagicMock()
+        mock_download_csv.side_effect = FailedToDownloadCsvException()
+        sicar._download_csv = mock_download_csv
+
+        sicar.download_city_code(
+            "12345", OutputFormat.CSV, "temp", 25, chunk_size=1024, debug=True
         )
 
     @patch("time.sleep", return_value=None)
