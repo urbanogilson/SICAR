@@ -6,7 +6,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 RUN pip install --upgrade pip
 
-RUN pip install 'SICAR[PADDLE] @  git+https://github.com/urbanogilson/SICAR'
+RUN pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
 
 WORKDIR /sicar
 

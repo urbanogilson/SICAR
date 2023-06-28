@@ -1,0 +1,43 @@
+[project]
+name = "SICAR"
+version = "0.6.0"
+authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
+description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+dependencies = [
+    "requests>=2.27.1",
+    "urllib3>=1.26.15",
+    "pytesseract==0.3.10",
+    "opencv-python>=4.6.0.66",
+    "numpy>=1.22.4",
+    "tqdm>=4.65.0",
+    "matplotlib>=3.7.1",
+]
+
+[project.optional-dependencies]
+paddle = ["paddlepaddle==2.5.0rc0", "paddleocr==2.6.1.3"]
+dev = ["coverage", "interrogate", "black", "coveralls"]
+all = ["SICAR[paddle,dev]"]
+
+[project.urls]
+"Homepage" = "https://github.com/urbanogilson/SICAR"
+"Bug Tracker" = "https://github.com/urbanogilson/SICAR/issues"
+
+[tool.setuptools]
+packages = ["SICAR", "SICAR.drivers"]
+
+[tool.interrogate]
+exclude = ["SICAR/tests*", "examples/*"]
+verbose = 2
+generate-badge = ".github"
+
+[tool.coverage.run]
+source = ["SICAR"]
+omit = ["SICAR/tests/integration/*"]
+
+[tool.coverage.report]
+show_missing = true
+ignore_errors = false
+fail_under = 100
+exclude_lines = ["except ImportError:"]

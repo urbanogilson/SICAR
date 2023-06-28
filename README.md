@@ -4,12 +4,12 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Badges
 
-[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
-[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
+[![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
+[![Coverage Status](https://coveralls.io/repos/github/urbanogilson/SICAR/badge.svg?branch=main)](https://coveralls.io/github/urbanogilson/SICAR?branch=main)
+[![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
 ## Features
 
@@ -110,7 +110,7 @@ car.download_cities(cities_codes={'Belo Horizonte': '3106200'}, folder='SICAR/ci
 Install SICAR with pip and include Paddle dependencies
 
 ```bash
-pip install 'SICAR[PADDLE] @  git+https://github.com/urbanogilson/SICAR'
+pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
 ```
 
 ```python

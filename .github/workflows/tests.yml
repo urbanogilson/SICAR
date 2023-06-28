@@ -22,15 +22,27 @@ jobs:
           pip install black
           black --check --verbose ./SICAR/
 
+      - name: Run interrogate
+        run: |
+          pip install interrogate
+          interrogate
+
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install tesseract-ocr python3-opencv
+          sudo apt-get -y install tesseract-ocr python3-opencv --no-install-recommends --no-upgrade --show-progress
 
       - name: Install requirements
-        run: pip install -r requirements.txt
+        run: pip install --editable .[all]
 
-      - name: Run tests
+      - name: Run unit tests
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          coverage run -m unittest SICAR/tests/*.py
-          coverage report -m -i
+          coverage run --rcfile=pyproject.toml -m unittest SICAR/tests/unit/*.py SICAR/tests/unit/drivers/*.py
+          coverage report
+          coveralls
+
+      - name: Run integration tests
+        run: |
+          python -m unittest SICAR/tests/integration/*.py
