@@ -1,8 +1,20 @@
+"""
+Tesseract OCR Driver Module.
+
+This module provides an implementation of the Captcha driver using Tesseract OCR.
+The Tesseract driver utilizes Tesseract OCR to extract text from captcha images.
+
+Note:
+    This driver requires the pytesseract library and Tesseract OCR to be installed.
+
+Classes:
+    Tesseract: Implementation of the Captcha driver using Tesseract OCR.
+"""
+
 import re
 import pytesseract
-import cv2
-import numpy as np
 from PIL import Image
+
 from SICAR.drivers.captcha import Captcha
 
 
@@ -32,7 +44,7 @@ class Tesseract(Captcha):
 
     def get_captcha(self, captcha: Image) -> str:
         """
-        Extracts text from the provided captcha image.
+        Extract text from the provided captcha image.
 
         Parameters:
             captcha (Image): The captcha image.

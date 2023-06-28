@@ -1,3 +1,12 @@
+"""
+Captcha Abstract Base Class.
+
+This class represents an abstract base class for a Captcha.
+
+Classes:
+    Captcha: Abstract base class representing a Captcha.
+"""
+
 from abc import ABC, abstractmethod
 import tempfile
 from PIL import Image
@@ -33,7 +42,7 @@ class Captcha(ABC):
 
     def _png_to_jpg(self, captcha: Image) -> np.ndarray:
         """
-        Converts a PNG image to a JPEG image represented as a NumPy array.
+        Convert a PNG image to a JPEG image represented as a NumPy array.
 
         Parameters:
             captcha (Image): The PNG image to convert.
@@ -63,7 +72,7 @@ class Captcha(ABC):
 
     def _improve_image(self, image: np.ndarray):
         """
-        Applies image enhancement operations to improve OCR results.
+        Apply image enhancement operations to improve OCR results.
 
         Parameters:
             image (np.ndarray): The input image as a NumPy array.
@@ -84,7 +93,7 @@ class Captcha(ABC):
 
     def _process_captcha(self, captcha: Image):
         """
-        Processes the captcha image to enhance its quality for OCR.
+        Process the captcha image to enhance its quality for OCR.
 
         Parameters:
             captcha (Image): The captcha image.

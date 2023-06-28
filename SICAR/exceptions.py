@@ -1,3 +1,18 @@
+"""
+Custom Exception Classes Module.
+
+This module provides custom exception classes for specific error conditions.
+
+Classes:
+    EmailNotValidException: Exception raised when an invalid email is encountered.
+    UrlNotOkException: Exception raised when a URL is inaccessible or returns an error.
+    StateCodeNotValidException: Exception raised when an invalid state code is encountered.
+    FailedToDownloadCaptchaException: Exception raised when downloading a captcha fails.
+    FailedToDownloadShapefileException: Exception raised when downloading a shapefile fails.
+    FailedToDownloadCsvException: Exception raised when downloading a CSV fails.
+"""
+
+
 class EmailNotValidException(Exception):
     """
     Exception raised when an invalid email is encountered.
@@ -8,7 +23,7 @@ class EmailNotValidException(Exception):
 
     def __init__(self, email: str):
         """
-        Initializes an instance of EmailNotValidException.
+        Initialize an instance of EmailNotValidException.
 
         Parameters:
             email (str): The invalid email address.
@@ -30,7 +45,7 @@ class UrlNotOkException(Exception):
 
     def __init__(self, url: str):
         """
-        Initializes an instance of UrlNotOkException.
+        Initialize an instance of UrlNotOkException.
 
         Parameters:
             url (str): The problematic URL.
@@ -52,7 +67,7 @@ class StateCodeNotValidException(Exception):
 
     def __init__(self, state: str):
         """
-        Initializes an instance of StateCodeNotValidException.
+        Initialize an instance of StateCodeNotValidException.
 
         Parameters:
             state (str): The invalid state code.
@@ -65,13 +80,11 @@ class StateCodeNotValidException(Exception):
 
 
 class FailedToDownloadCaptchaException(Exception):
-    """
-    Exception raised when downloading a captcha fails.
-    """
+    """Exception raised when downloading a captcha fails."""
 
     def __init__(self):
         """
-        Initializes an instance of FailedToDownloadCaptchaException.
+        Initialize an instance of FailedToDownloadCaptchaException.
 
         Parameters:
             None
@@ -83,13 +96,11 @@ class FailedToDownloadCaptchaException(Exception):
 
 
 class FailedToDownloadShapefileException(Exception):
-    """
-    Exception raised when downloading a shapefile fails.
-    """
+    """Exception raised when downloading a shapefile fails."""
 
     def __init__(self):
         """
-        Initializes an instance of FailedToDownloadShapefileException.
+        Initialize an instance of FailedToDownloadShapefileException.
 
         Parameters:
             None
@@ -101,13 +112,11 @@ class FailedToDownloadShapefileException(Exception):
 
 
 class FailedToDownloadCsvException(Exception):
-    """
-    Exception raised when downloading a CSV fails.
-    """
+    """Exception raised when downloading a CSV fails."""
 
     def __init__(self):
         """
-        Initializes an instance of FailedToDownloadCsvException.
+        Initialize an instance of FailedToDownloadCsvException.
 
         Parameters:
             None

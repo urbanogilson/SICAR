@@ -35,7 +35,6 @@ generate-badge = ".github"
 [tool.coverage.run]
 source = ["SICAR"]
 omit = ["SICAR/tests/integration/*"]
-command_line = "-m unittest SICAR/tests/unit/*.py SICAR/tests/unit/drivers/*.py"
 
 [tool.coverage.report]
 show_missing = true

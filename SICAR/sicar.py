@@ -1,3 +1,12 @@
+"""
+SICAR Class Module.
+
+This module defines a class representing the Sicar system for managing environmental rural properties in Brazil.
+
+Classes:
+    Sicar: Class representing the Sicar system.
+"""
+
 import io
 import os
 import re
@@ -49,7 +58,7 @@ class Sicar(Url):
         headers: Dict = None,
     ):
         """
-        Initializes an instance of the Sicar class.
+        Initialize an instance of the Sicar class.
 
         Parameters:
             driver (Captcha): The driver used for handling captchas. Default is Tesseract.
@@ -66,7 +75,7 @@ class Sicar(Url):
 
     def _create_session(self, headers: Dict = None):
         """
-        Creates a new session for making HTTP requests.
+        Create a new session for making HTTP requests.
 
         Parameters:
             headers (Dict): Additional headers for the session. Default is None.
@@ -87,7 +96,7 @@ class Sicar(Url):
 
     def _initialize_cookies(self):
         """
-        Initializes cookies by making the initial request and accepting any redirections.
+        Initialize cookies by making the initial request and accepting any redirections.
 
         This method is intended to be called in the constructor to set up the session cookies.
 
@@ -98,7 +107,7 @@ class Sicar(Url):
 
     def _validate_email(self, email: str) -> str:
         """
-        Validates the format of an email address.
+        Validate the format of an email address.
 
         Parameters:
             email (str): The email address to validate.
@@ -118,7 +127,7 @@ class Sicar(Url):
 
     def _get(self, url: str, *args, **kwargs):
         """
-        Sends a GET request to the specified URL using the session.
+        Send a GET request to the specified URL using the session.
 
         Parameters:
             url (str): The URL to send the GET request to.
@@ -147,7 +156,7 @@ class Sicar(Url):
 
     def get_cities_codes(self, state: State | str) -> Dict:
         """
-        Retrieves the codes of cities in a given state.
+        Retrieve the codes of cities in a given state.
 
         Parameters:
             state (Union[State, str]): The state or state code to retrieve the cities for.
@@ -179,7 +188,7 @@ class Sicar(Url):
 
     def _download_captcha(self) -> Image:
         """
-        Downloads a captcha image from the SICAR system.
+        Download a captcha image from the SICAR system.
 
         Returns:
             Image: The captcha image.
@@ -203,7 +212,7 @@ class Sicar(Url):
         chunk_size: int = 1024,
     ) -> Path:
         """
-        Downloads the shapefile for the specified city code.
+        Download the shapefile for the specified city code.
 
         Parameters:
             city_code (str | int): The code of the city for which to download the shapefile.

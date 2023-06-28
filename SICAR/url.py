@@ -1,3 +1,20 @@
+"""
+URL Class Module.
+
+This module defines a class representing CAR URLs for various resources.
+
+Classes:
+    Url: Class representing CAR URLs for various resources.
+        Attributes:
+            _BASE (str): Base URL for the website.
+            _INDEX (str): URL for the index of properties.
+            _DOWNLOADS (str): URL for downloading shapefile files related to municipalities.
+            _CSV (str): URL for downloading CSV files related to municipalities.
+            _CAPTCHA (str): URL for CAPTCHA-related resources.
+            _SHAPEFILE (str): URL for downloading shapefile resources related to municipalities.
+"""
+
+
 class Url:
     """
     Class representing CAR URLs for various resources.

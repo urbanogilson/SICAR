@@ -1,7 +1,21 @@
+"""
+PaddleOCR Driver Module.
+
+This module provides an implementation of the Captcha driver using PaddleOCR.
+The Paddle driver utilizes PaddleOCR to extract text from captcha images.
+
+Note:
+    This driver requires the paddlepaddle and paddleocr libraries to be installed.
+
+Classes:
+    Paddle: Implementation of the Captcha driver using PaddleOCR.
+"""
+
 from paddleocr import PaddleOCR
 import itertools
 import re
 from PIL import Image
+
 from SICAR.drivers.captcha import Captcha
 
 
@@ -9,7 +23,7 @@ class Paddle(Captcha):
     """
     Implementation of the Captcha driver using PaddleOCR.
 
-    This driver utilizes PaddleOCR to extract text from captcha images.
+    This driver utializes PaddleOCR to extract text from captcha images.
 
     Note:
         This driver requires the paddlepaddle and paddleocr libraries to be installed.
@@ -17,7 +31,7 @@ class Paddle(Captcha):
 
     def __init__(self):
         """
-        Initializes the PaddleOCR instance.
+        Initialize the PaddleOCR instance.
 
         Note:
             The `use_angle_cls` parameter is set to False to disable text angle detection.
@@ -31,7 +45,7 @@ class Paddle(Captcha):
 
     def get_captcha(self, captcha: Image) -> str:
         """
-        Extracts text from the provided captcha image.
+        Extract text from the provided captcha image.
 
         Parameters:
             captcha (Image): The captcha image.
