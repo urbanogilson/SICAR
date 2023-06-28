@@ -7,9 +7,9 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 [![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml/badge.svg)](https://github.com/urbanogilson/SICAR/actions/workflows/tests.yml)
-[![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
+[![Coverage Status](https://coveralls.io/repos/github/urbanogilson/SICAR/badge.svg?branch=v0.6-dev)](https://coveralls.io/github/urbanogilson/SICAR?branch=v0.6-dev)
+[![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
 ## Features
 

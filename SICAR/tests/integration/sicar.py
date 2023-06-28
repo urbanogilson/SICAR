@@ -19,12 +19,14 @@ class TestSicarBase(unittest.TestCase):
 
     def test_download_city_by_code_shapefile(self):
         self.assertIsInstance(
-            self._car.download_city_code("3120870"),
+            self._car.download_city_code("3120870", debug=True),
             Path,
         )
 
     def test_download_city_by_code_csv(self):
         self.assertIsInstance(
-            self._car.download_city_code("3120870", output_format=OutputFormat.CSV),
+            self._car.download_city_code(
+                "3120870", output_format=OutputFormat.CSV, debug=True
+            ),
             Path,
         )
