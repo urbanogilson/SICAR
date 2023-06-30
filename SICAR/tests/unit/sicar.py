@@ -160,11 +160,23 @@ class SicarTestCase(unittest.TestCase):
         captcha_image = sicar._download_captcha()
 
         sicar._get.assert_called_once_with(
-            f"https://www.car.gov.br/publico/municipios/captcha?id={int(random.random() * 1000000)}",
-            stream=True,
+            f"https://www.car.gov.br/publico/municipios/captcha?id={int(random.random() * 1000000)}"
         )
         Image.open.assert_called_once()
         self.assertEqual(captcha_image, mock_image)
+
+    @patch("random.random", lambda: 0.1)
+    def test_download_captcha_invalid_image(self):
+        mock_response = MagicMock()
+        mock_response.ok = True
+        mock_response.content = b"invalid_captcha_image"
+        sicar = Sicar(driver=self.mocked_captcha)
+        sicar._get = MagicMock(return_value=mock_response)
+
+        with self.assertRaises(FailedToDownloadCaptchaException):
+            sicar._download_captcha()
+
+        sicar._get.assert_called_once()
 
     def test_download_captcha_failure(self):
         sicar = Sicar(driver=self.mocked_captcha)

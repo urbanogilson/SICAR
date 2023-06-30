@@ -1,6 +1,6 @@
 [project]
 name = "SICAR"
-version = "0.6.0"
+version = "0.6.1"
 authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
 description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
 requires-python = ">=3.8"

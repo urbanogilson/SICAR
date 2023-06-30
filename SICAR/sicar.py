@@ -13,7 +13,7 @@ import re
 import time
 import random
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
@@ -197,12 +197,17 @@ class Sicar(Url):
             FailedToDownloadCaptchaException: If the captcha image fails to download.
         """
         url = f"{self._CAPTCHA}?{urlencode({'id': int(random.random() * 1000000)})}"
-        response = self._get(url, stream=True)
+        response = self._get(url)
 
         if not response.ok:
             raise FailedToDownloadCaptchaException()
 
-        return Image.open(io.BytesIO(response.content))
+        try:
+            captcha = Image.open(io.BytesIO(response.content))
+        except UnidentifiedImageError as error:
+            raise FailedToDownloadCaptchaException() from error
+
+        return captcha
 
     def _download_shapefile(
         self,
