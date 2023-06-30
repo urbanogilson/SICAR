@@ -20,7 +20,6 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 - Download all cities in a state by code
 - Download the entire country
 - Tesseract, and PaddleOCR (Optional) drivers to automatically detect captcha
-- Manual driver to automate the download process
 
 ## Installation
 
@@ -32,9 +31,9 @@ pip install git+https://github.com/urbanogilson/SICAR
 
 Prerequisite:
 
-[Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info how to install the engine on Linux, Mac OSX and Windows).
+[Google Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (additional info on how to install the engine on Linux, Mac OSX, and Windows).
 
-Optional: [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional info how to install the engine on Linux, Mac OSX and Windows).
+Optional: [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional info on how to install the engine on Linux, Mac OSX, and Windows).
 
 If you don't want to install dependencies on your computer or don't know how to install them, we strongly recommend [Google Colab](#run-with-google-colab).
 
@@ -70,7 +69,7 @@ pprint.pprint(cities_codes)
 # Download 'Alto Alegre': '1400050'
 car.download_city_code('1400050', folder='Roraima')
 
-# Download in csv format
+# Download in CSV format
 from SICAR import OutputFormat
 car.download_city_code('1400050', output_format = OutputFormat.CSV, folder='Roraima')
 
@@ -88,7 +87,7 @@ car.download_state(state='RR', folder='RR')
 
 ### OCR drivers
 
-[Optical character recognition (OCR)](https://en.wikipedia.org/wiki/Optical_character_recognition) drivers are used to recognize characters in captcha.
+[Optical character recognition (OCR)](https://en.wikipedia.org/wiki/Optical_character_recognition) drivers are used to recognize characters in a captcha.
 
 We currently have two options for automating the download process.
 
@@ -138,10 +137,10 @@ Pull Image from Docker Hub [urbanogilson/sicar](https://hub.docker.com/r/urbanog
 docker pull urbanogilson/sicar:latest
 ```
 
-Run the downloaded Docker Image using an entrypoint (file) from your machine (host)
+Run the downloaded Docker Image using an entry point (file) from your machine (host)
 
 ```sh
-docker run -i -v $(pwd):/sicar urbanogilson/sicar:test -<./examples/docker.py
+docker run -i -v $(pwd):/sicar urbanogilson/sicar:latest -<./examples/docker.py
 ```
 
 Note: Update the entry point file [./examples/docker.py](./examples/docker.py) or create a new one to download data based on your needs.
@@ -149,7 +148,7 @@ Note: Update the entry point file [./examples/docker.py](./examples/docker.py) o
 or pass a script through `STDIN`
 
 ```sh
-docker run -i -v $(pwd):/sicar urbanogilson/sicar:test -<<EOF
+docker run -i -v $(pwd):/sicar urbanogilson/sicar:latest -<<EOF
 from SICAR import Sicar
 from SICAR.drivers import Paddle
 
@@ -172,7 +171,7 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 - [ ] Download city by name
 - [x] Make Paddle driver optional
-- [x] Add support to download csv files
+- [x] Add support to download CSV files
 
 ## Contributing
 
