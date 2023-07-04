@@ -1,6 +1,14 @@
 name: Lint
 
-on: [push]
+on:
+  push:
+    tags-ignore:
+      - "**"
+    paths-ignore:
+      - '.devcontainer/**'
+      - '.github/**'
+      - 'examples/**'
+      - 'README.md'
 
 jobs:
   lint:

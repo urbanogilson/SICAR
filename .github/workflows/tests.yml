@@ -1,6 +1,19 @@
 name: Tests
 
-on: [pull_request, push, workflow_dispatch]
+on:
+  pull_request:
+  push:
+    tags-ignore:
+      - "**"
+    paths-ignore:
+      - '.devcontainer/**'
+      - '.github/**'
+      - 'examples/**'
+      - 'README.md'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   tests:
