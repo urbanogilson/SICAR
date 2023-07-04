@@ -255,7 +255,7 @@ class SicarTestCase(unittest.TestCase):
         folder = "csvs"
         response_mock = MagicMock()
         response_mock.ok = True
-        response_mock.headers= {
+        response_mock.headers = {
             "Content-Type": "text/csv",
             "Content-Length": 4096,
         }
