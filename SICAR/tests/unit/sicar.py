@@ -199,9 +199,11 @@ class SicarTestCase(unittest.TestCase):
         folder = "shapefiles"
         response_mock = MagicMock()
         response_mock.ok = True
-        response_mock.headers.get.return_value = "filename.zip"
+        response_mock.headers = {
+            "Content-Type": "application/zip",
+            "Content-Length": 4096,
+        }
         response_mock.iter_content.return_value = [b"chunk1", b"chunk2"]
-        response_mock.headers.get.return_value = 4096
         mock_get.return_value = response_mock
         mock_open.return_value.__enter__.return_value = MagicMock()
         sicar = Sicar(driver=self.mocked_captcha)
@@ -229,6 +231,20 @@ class SicarTestCase(unittest.TestCase):
         with self.assertRaises(FailedToDownloadShapefileException):
             sicar._download_shapefile(city_code, captcha, folder, chunk_size)
 
+    def test_download_shapefile_fails_on_html_response(self):
+        city_code = "12345"
+        captcha = "captcha_code"
+        folder = "shapefiles"
+        chunk_size = 1024
+
+        sicar = Sicar(driver=self.mocked_captcha)
+        sicar._session.get = MagicMock(
+            return_value=MagicMock(ok=True, headers={"Content-Type": "text/html"})
+        )
+
+        with self.assertRaises(FailedToDownloadShapefileException):
+            sicar._download_shapefile(city_code, captcha, folder, chunk_size)
+
     @patch.object(Sicar, "_get")
     @patch("builtins.open", new_callable=MagicMock)
     @patch.object(Path, "__init__", return_value=None)
@@ -239,9 +255,11 @@ class SicarTestCase(unittest.TestCase):
         folder = "csvs"
         response_mock = MagicMock()
         response_mock.ok = True
-        response_mock.headers.get.return_value = "filename.zip"
+        response_mock.headers = {
+            "Content-Type": "text/csv",
+            "Content-Length": 4096,
+        }
         response_mock.iter_content.return_value = [b"chunk1", b"chunk2"]
-        response_mock.headers.get.return_value = 4096
         mock_get.return_value = response_mock
         mock_open.return_value.__enter__.return_value = MagicMock()
         sicar = Sicar(driver=self.mocked_captcha)
@@ -265,6 +283,20 @@ class SicarTestCase(unittest.TestCase):
 
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
+
+        with self.assertRaises(FailedToDownloadCsvException):
+            sicar._download_csv(city_code, captcha, folder, chunk_size)
+
+    def test_download_csv_fails_on_html_response(self):
+        city_code = "12345"
+        captcha = "captcha_code"
+        folder = "csvs"
+        chunk_size = 1024
+
+        sicar = Sicar(driver=self.mocked_captcha)
+        sicar._session.get = MagicMock(
+            return_value=MagicMock(ok=True, headers={"Content-Type": "text/html"})
+        )
 
         with self.assertRaises(FailedToDownloadCsvException):
             sicar._download_csv(city_code, captcha, folder, chunk_size)

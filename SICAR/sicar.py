@@ -245,13 +245,18 @@ class Sicar(Url):
         except UrlNotOkException as error:
             raise FailedToDownloadShapefileException() from error
 
-        path = Path(os.path.join(folder, f"SHAPE_{city_code}")).with_suffix(".zip")
+        content_length = int(response.headers.get("Content-Length", 0))
 
-        total_size = int(response.headers.get("Content-Length", 0))
+        content_type = response.headers.get("Content-Type", "")
+
+        if content_length == 0 or not content_type.startswith("application/zip"):
+            raise FailedToDownloadShapefileException()
+
+        path = Path(os.path.join(folder, f"SHAPE_{city_code}")).with_suffix(".zip")
 
         with open(path, "wb") as fd:
             with tqdm(
-                total=total_size,
+                total=content_length,
                 unit="iB",
                 unit_scale=True,
                 desc=f"Downloading Shapefile for city with code '{city_code}'",
@@ -297,13 +302,18 @@ class Sicar(Url):
         except UrlNotOkException as error:
             raise FailedToDownloadCsvException() from error
 
-        path = Path(os.path.join(folder, f"CSV_{city_code}")).with_suffix(".csv")
+        content_length = int(response.headers.get("Content-Length", 0))
 
-        total_size = int(response.headers.get("Content-Length", 0))
+        content_type = response.headers.get("Content-Type", "")
+
+        if content_length == 0 or not content_type.startswith("text/csv"):
+            raise FailedToDownloadCsvException()
+
+        path = Path(os.path.join(folder, f"CSV_{city_code}")).with_suffix(".csv")
 
         with open(path, "wb") as fd:
             with tqdm(
-                total=total_size,
+                total=content_length,
                 unit="iB",
                 unit_scale=True,
                 desc=f"Downloading CSV  file for city with code '{city_code}'",
