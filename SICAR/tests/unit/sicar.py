@@ -231,7 +231,7 @@ class SicarTestCase(unittest.TestCase):
         with self.assertRaises(FailedToDownloadShapefileException):
             sicar._download_shapefile(city_code, captcha, folder, chunk_size)
 
-    def test_download_shapefile_html_response(self):
+    def test_download_shapefile_fails_on_html_response(self):
         city_code = "12345"
         captcha = "captcha_code"
         folder = "shapefiles"
@@ -287,7 +287,7 @@ class SicarTestCase(unittest.TestCase):
         with self.assertRaises(FailedToDownloadCsvException):
             sicar._download_csv(city_code, captcha, folder, chunk_size)
 
-    def test_download_csv_html_response(self):
+    def test_download_csv_fails_on_html_response(self):
         city_code = "12345"
         captcha = "captcha_code"
         folder = "csvs"
