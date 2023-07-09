@@ -37,6 +37,11 @@ Optional: [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) (additional inf
 
 If you don't want to install dependencies on your computer or don't know how to install them, we strongly recommend [Google Colab](#run-with-google-colab).
 
+## Documentation
+
+- [SICAR package - API](https://gilsonurbano.com/sicar-api/)
+- [SICAR package - What is? Why?](https://gilsonurbano.com/posts/sicar/)
+
 ## Usage/Examples
 
 ```python
