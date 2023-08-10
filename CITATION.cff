@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: SICAR Package
+type: software
+authors:
+  - family-names: Urbano
+    given-names: Gilson
+    email: hello@gilsonurbano.com
+url: 'https://github.com/urbanogilson/SICAR'
+license: MIT
