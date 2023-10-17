@@ -1,6 +1,6 @@
 [project]
 name = "SICAR"
-version = "0.6.2"
+version = "0.6.3"
 authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
 description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
 requires-python = ">=3.8"
@@ -23,6 +23,10 @@ all = ["SICAR[paddle,dev]"]
 [project.urls]
 "Homepage" = "https://github.com/urbanogilson/SICAR"
 "Bug Tracker" = "https://github.com/urbanogilson/SICAR/issues"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["SICAR", "SICAR.drivers"]
