@@ -38,7 +38,7 @@ If you don't want to install dependencies on your computer or don't know how to 
 
 - [SICAR package - API](https://gilsonurbano.com/sicar-api/)
 - [SICAR package - What is? Why?](https://gilsonurbano.com/posts/sicar/)
-- [Data dictionary](#data-dictionary).
+- [Data dictionary](#data-dictionary)
 
 ## Usage/Examples
 
