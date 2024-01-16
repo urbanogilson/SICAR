@@ -47,7 +47,7 @@ from SICAR import Sicar, State, Polygon
 # Create Sicar instance
 car = Sicar()
 
-# Download APPS polygon for PA state
+# Download APPS polygon for the PA state
 car.download_state(State.PA, Polygon.APPS)
 ```
 
@@ -115,12 +115,12 @@ or pass a script through `STDIN`
 
 ```sh
 docker run -i -v $(pwd):/sicar urbanogilson/sicar:latest -<<EOF
-from SICAR import Sicar
+from SICAR import Sicar, State, Polygon
 from SICAR.drivers import Paddle
 
-car = Sicar(email="name@domain.com", driver=Paddle)
+car = Sicar(driver=Paddle)
 
-car.download_state(state='MG', folder='MG')
+car.download_state(state='MG', polygon=Polygon.CONSOLIDATED_AREA, folder='MG')
 EOF
 ```
 

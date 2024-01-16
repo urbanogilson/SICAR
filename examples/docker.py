@@ -1,14 +1,12 @@
-from SICAR import Sicar
-from SICAR.drivers import Paddle
-
-# from SICAR.drivers import Paddle
+from SICAR import Sicar, Polygon, State
+from SICAR.drivers import Paddle, Tesseract
 
 # Create Sicar instance
-car = Sicar(email="sicar@sicar.com", driver=Paddle)
-# car = Sicar(email="sicar@sicar.com", driver=Paddle)
+car = Sicar(driver=Tesseract)
+# car = Sicar(driver=Paddle)
 
-# Download all shapefiles (cities) in Roraima state
-car.download_state(state="RR", folder="data/Roraima", debug=True)
+# Download APPS polygons for the Roraima state 
+car.download_state(state=State.RR, polygon=Polygon.APPS, folder="data/Roraima", debug=True)
 
-# Download all shapefiles (cities) in Brazil
-# car.download_country(base_folder="/Brazil")
+# Download APPS polygons for all states in Brazil
+# car.download_country(polygon=Polygon.APPS, folder="/Brazil")
