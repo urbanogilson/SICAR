@@ -38,6 +38,7 @@ If you don't want to install dependencies on your computer or don't know how to 
 
 - [SICAR package - API](https://gilsonurbano.com/sicar-api/)
 - [SICAR package - What is? Why?](https://gilsonurbano.com/posts/sicar/)
+- [Data dictionary](#data-dictionary).
 
 ## Usage/Examples
 
@@ -127,6 +128,20 @@ EOF
 Note: Using `$(pwd)` the container will save the download data into the current folder.
 
 Optional: Make an external directory to store the downloaded data and use a volume parameter in the run command to point to it.
+
+## Data dictionary
+
+| **Attribute** | **Description**                                              |
+|---------------|--------------------------------------------------------------|
+| cod_estado    | Unit of the Federation in which the registration is located. |
+| municipio     | Municipality in which the registration is located. |
+| num_area      | Gross area of the rural property or the subject that makes up the registry, in hectare. |
+| cod_imovel    | Registration number in the Rural Environmental Registry (CAR). |
+| ind_status    | Status of registration in CAR, according to Normative Instruction no. 2, of May 6, 2014, of the Ministry of the Environment (https://www.car.gov.br/leis/IN_CAR.pdf), and the Resolution No. 3, of August 27, 2018, of the Brazilian Forest Service (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), being AT - Active; PE - Pending; SU - Suspended; and CA - Cancelled. |
+| des_condic    | Condition in which the registration is in the analysis flow by the competent body. |
+| ind_tipo      | Type of Rural Property, being IRU - Rural Property; AST - Agrarian Reform Settlements; PCT - Traditional Territory of Traditional Peoples and Communities. |
+| mod_fiscal    | Number of rural property tax modules. |
+| nom_tema      | Name of the theme that makes up the registration (Permanent Preservation Area, Path, Remnant of Native Vegetation, Restricted Use Area, Administrative Easement, Legal Reserve, Hydrography, Wetlands, Consolidated Rural Area, Areas with Altitude Higher than 1800 meters, Areas with Slopes Higher than 45 degrees, Hilltops, Plateau Edges, Fallow Areas, Mangroves and Restinga). |
 
 ## Acknowledgements
 
