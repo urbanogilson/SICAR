@@ -9,8 +9,7 @@ class TestSicarBase(unittest.TestCase):
         self._car = Sicar()
 
     def test_download_state(self):
-        # self.assertIsInstance(
-        #     self._car.download_state(State.AL, Polygon.HYDROGRAPHY, debug=True),
-        #     Path,
-        # )
-        pass
+        self.assertIsInstance(
+            self._car.download_state(State.RR, Polygon.AREA_FALL, debug=True),
+            Path,
+        )
