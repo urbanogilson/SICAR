@@ -13,11 +13,8 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Features
 
-- Get cities-codes by state code
-- Download Shapefile or CSV
-- Download city by code
-- Download lists of cities by code
-- Download all cities in a state by code
+- Download polygon
+- Download state
 - Download the entire country
 - Tesseract, and PaddleOCR (Optional) drivers to automatically detect captcha
 
@@ -45,49 +42,13 @@ If you don't want to install dependencies on your computer or don't know how to 
 ## Usage/Examples
 
 ```python
-from SICAR import Sicar
-import pprint
+from SICAR import Sicar, State, Polygon
 
 # Create Sicar instance
-car = Sicar(email = "name@domain.com")
+car = Sicar()
 
-# Get cities codes in Roraima state
-cities_codes = car.get_cities_codes(state='RR')
-
-pprint.pprint(cities_codes)
-# {'Alto Alegre': '1400050',
-#  'Amajari': '1400027',
-#  'Boa Vista': '1400100',
-#  'Bonfim': '1400159',
-#  'Cantá': '1400175',
-#  'Caracaraí': '1400209',
-#  'Caroebe': '1400233',
-#  'Iracema': '1400282',
-#  'Mucajaí': '1400308',
-#  'Normandia': '1400407',
-#  'Pacaraima': '1400456',
-#  'Rorainópolis': '1400472',
-#  'São João da Baliza': '1400506',
-#  'São Luiz': '1400605',
-#  'Uiramutã': '1400704'}
-
-# Download 'Alto Alegre': '1400050'
-car.download_city_code('1400050', folder='Roraima')
-
-# Download in CSV format
-from SICAR import OutputFormat
-car.download_city_code('1400050', output_format = OutputFormat.CSV, folder='Roraima')
-
-# Download specific cities
-cities_codes = {
-    'São Gabriel da Cachoeira': '1303809',
-    'São Paulo de Olivença': '1303908'
-}
-
-car.download_cities(cities_codes=cities_codes, folder='cities')
-
-# Download all cities in Roraima state
-car.download_state(state='RR', folder='RR')
+# Download APPS polygon for PA state
+car.download_state(State.PA, Polygon.APPS)
 ```
 
 ### OCR drivers
@@ -99,14 +60,14 @@ We currently have two options for automating the download process.
 #### [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (Default)
 
 ```python
-from SICAR import Sicar
+from SICAR import Sicar, State, Polygon
 from SICAR.drivers import Tesseract
 
 # Create Sicar instance using Tesseract OCR
-car = Sicar(email="name@domain.com", driver=Tesseract)
+car = Sicar(driver=Tesseract)
 
-# Download a city
-car.download_cities(cities_codes={'Belo Horizonte': '3106200'}, folder='SICAR/cities')
+# Download a state
+car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder='SICAR/SP')
 ```
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
@@ -118,14 +79,14 @@ pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
 ```
 
 ```python
-from SICAR import Sicar
+from SICAR import Sicar, State, Polygon
 from SICAR.drivers import Paddle
 
 # Create Sicar instance using PaddleOCR
-car = Sicar(email="name@domain.com", driver=Paddle)
+car = Sicar(driver=Paddle)
 
-# Download a city
-car.download_cities(cities_codes={'Balneário Camboriú': '4202008'}, folder='SICAR/cities')
+# Download a state
+car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder='SICAR/AM')
 ```
 
 ### Run with Google Colab
@@ -174,9 +135,7 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Roadmap
 
-- [ ] Download city by name
-- [x] Make Paddle driver optional
-- [x] Add support to download CSV files
+- [ ] Upload to pypi registry 
 
 ## Contributing
 

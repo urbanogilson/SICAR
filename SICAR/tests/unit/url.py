@@ -1,28 +1,15 @@
 import unittest
-from SICAR.url import Url
+from SICAR import Polygon
 
 
-class UrlTestCase(unittest.TestCase):
-    def test_base_url(self):
-        self.assertEqual(Url._BASE, "https://www.car.gov.br/publico")
-
-    def test_index_url(self):
-        self.assertEqual(Url._INDEX, "https://www.car.gov.br/publico/imoveis/index")
-
-    def test_downloads_url(self):
-        self.assertEqual(
-            Url._DOWNLOADS, "https://www.car.gov.br/publico/municipios/downloads"
-        )
-
-    def test_csv_url(self):
-        self.assertEqual(Url._CSV, "https://www.car.gov.br/publico/municipios/csv")
-
-    def test_captcha_url(self):
-        self.assertEqual(
-            Url._CAPTCHA, "https://www.car.gov.br/publico/municipios/captcha"
-        )
-
-    def test_shapefile_url(self):
-        self.assertEqual(
-            Url._SHAPEFILE, "https://www.car.gov.br/publico/municipios/shapefile"
-        )
+class PolygonTestCase(unittest.TestCase):
+    def test_enum_values(self):
+        self.assertEqual(Polygon.AREA_PROPERTY, "AREA_IMOVEL")
+        self.assertEqual(Polygon.APPS, "APPS")
+        self.assertEqual(Polygon.NATIVE_VEGETATION, "VEGETACAO_NATIVA")
+        self.assertEqual(Polygon.CONSOLIDATED_AREA, "AREA_CONSOLIDADA")
+        self.assertEqual(Polygon.AREA_FALL, "AREA_POUSIO")
+        self.assertEqual(Polygon.HYDROGRAPHY, "HIDROGRAFIA")
+        self.assertEqual(Polygon.RESTRICTED_USE, "USO_RESTRITO")
+        self.assertEqual(Polygon.ADMINISTRATIVE_SERVICE, "SERVIDAO_ADMINISTRATIVA")
+        self.assertEqual(Polygon.LEGAL_RESERVE, "RESERVA_LEGAL")

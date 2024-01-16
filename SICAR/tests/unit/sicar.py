@@ -13,15 +13,13 @@ from urllib.parse import urlencode
 import sys
 
 from SICAR import Sicar
-from SICAR import OutputFormat
 from SICAR.url import Url
 from SICAR.exceptions import (
     EmailNotValidException,
     UrlNotOkException,
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
-    FailedToDownloadShapefileException,
-    FailedToDownloadCsvException,
+
 )
 from SICAR.drivers import Captcha
 from SICAR import State
@@ -47,23 +45,14 @@ class SicarTestCase(unittest.TestCase):
     @patch.object(Sicar, "_get")
     def test_initialize_cookies(self, mock_get):
         self.mock_initialize_cookies.stop()
-        Sicar(driver=self.mocked_captcha, email="valid@example.com")
+        Sicar(driver=self.mocked_captcha)
         mock_get.assert_called_once_with("https://www.car.gov.br/publico/imoveis/index")
         self.mock_initialize_cookies.start()
 
-    def test_create_sicar_instance_with_valid_email(self):
-        sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
-        self.assertIsInstance(sicar, Sicar)
-        self.assertEqual(sicar._email, "valid@example.com")
-
     def test_ocr_driver_integration(self):
-        sicar = Sicar(driver=self.mocked_captcha, email="valid@example.com")
+        sicar = Sicar(driver=self.mocked_captcha)
         captcha_image = Image.new("RGB", (10, 10))
         self.assertEqual(sicar._driver.get_captcha(captcha_image), "mocked_captcha")
-
-    def test_create_sicar_instance_with_invalid_email(self):
-        with self.assertRaises(EmailNotValidException):
-            Sicar(driver=self.mocked_captcha, email="invalid_email")
 
     @patch("requests.Session")
     def test_create_session_with_custom_headers(self, mock_session):
@@ -85,18 +74,6 @@ class SicarTestCase(unittest.TestCase):
             }
         )
 
-    def test_validate_email_with_valid_email(self):
-        sicar = Sicar(driver=self.mocked_captcha)
-        email = "valid@example.com"
-        validated_email = sicar._validate_email(email)
-        self.assertEqual(validated_email, email)
-
-    def test_validate_email_with_invalid_email(self):
-        sicar = Sicar(driver=self.mocked_captcha)
-        invalid_email = "invalid_email"
-        with self.assertRaises(EmailNotValidException):
-            sicar._validate_email(invalid_email)
-
     def test_get_with_successful_response(self):
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._session.get = MagicMock(return_value=MagicMock(ok=True))
@@ -109,43 +86,6 @@ class SicarTestCase(unittest.TestCase):
         sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
         with self.assertRaises(UrlNotOkException):
             sicar._get("https://example.com")
-
-    def test_get_cities_codes_with_valid_state_enum(self):
-        mock_response = MagicMock()
-        mock_response.text = 'data-municipio="CityA"\ndata-municipio="123"\ndata-municipio="123"\ndata-municipio="CityB"\ndata-municipio="456"\ndata-municipio="456"\n'
-        sicar = Sicar(driver=self.mocked_captcha)
-        sicar._get = MagicMock(return_value=mock_response)
-
-        cities_codes = sicar.get_cities_codes(State.AC)
-
-        sicar._get.assert_called_once_with(
-            "https://www.car.gov.br/publico/municipios/downloads?sigla=AC"
-        )
-
-        self.assertEqual(cities_codes, {"CityA": "123", "CityB": "456"})
-
-    def test_get_cities_codes_with_valid_state_string(self):
-        mock_response = MagicMock()
-        mock_response.text = 'data-municipio="CityA"\ndata-municipio="123"\ndata-municipio="123"\ndata-municipio="CityB"\ndata-municipio="456"\ndata-municipio="456"\n'
-        sicar = Sicar(driver=self.mocked_captcha)
-        sicar._get = MagicMock(return_value=mock_response)
-
-        cities_codes = sicar.get_cities_codes("AC")
-
-        sicar._get.assert_called_once_with(
-            "https://www.car.gov.br/publico/municipios/downloads?sigla=AC"
-        )
-
-        self.assertEqual(cities_codes, {"CityA": "123", "CityB": "456"})
-
-    def test_get_cities_codes_with_invalid_state_code(self):
-        sicar = Sicar(driver=self.mocked_captcha)
-        sicar._get = MagicMock(side_effect=UrlNotOkException)
-
-        with self.assertRaises(StateCodeNotValidException):
-            sicar.get_cities_codes("INVALID")
-
-        sicar._get.assert_not_called()
 
     @patch("random.random", lambda: 0.1)
     def test_download_captcha_success(self):
@@ -160,7 +100,7 @@ class SicarTestCase(unittest.TestCase):
         captcha_image = sicar._download_captcha()
 
         sicar._get.assert_called_once_with(
-            f"https://www.car.gov.br/publico/municipios/captcha?id={int(random.random() * 1000000)}"
+            f"https://www.car.gov.br/publico/municipios/ReCaptcha?id={int(random.random() * 1000000)}"
         )
         Image.open.assert_called_once()
         self.assertEqual(captcha_image, mock_image)

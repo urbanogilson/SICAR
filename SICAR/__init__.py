@@ -2,4 +2,4 @@
 
 from SICAR.sicar import Sicar
 from SICAR.state import State
-from SICAR.output_format import OutputFormat
+from SICAR.polygon import Polygon
