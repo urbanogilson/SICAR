@@ -8,10 +8,8 @@ Classes:
         Attributes:
             _BASE (str): Base URL for the website.
             _INDEX (str): URL for the index of properties.
-            _DOWNLOADS (str): URL for downloading shapefile files related to municipalities.
-            _CSV (str): URL for downloading CSV files related to municipalities.
-            _CAPTCHA (str): URL for CAPTCHA-related resources.
-            _SHAPEFILE (str): URL for downloading shapefile resources related to municipalities.
+            _DOWNLOAD_BASE (str): URL for downloading polygon files related to states.
+            _RECAPTCHA (str): URL for CAPTCHA-related resources.
 """
 
 
@@ -22,15 +20,11 @@ class Url:
     Attributes:
         _BASE (str): Base URL for the website.
         _INDEX (str): URL for the index of properties.
-        _DOWNLOADS (str): URL for downloading shapefile files related to municipalities.
-        _CSV (str): URL for downloading CSV files related to municipalities.
-        _CAPTCHA (str): URL for CAPTCHA-related resources.
-        _SHAPEFILE (str): URL for downloading shapefile resources related to municipalities.
+        _DOWNLOAD_BASE (str): URL for downloading polygon files related to states.
+        _RECAPTCHA (str): URL for CAPTCHA-related resources.
     """
 
     _BASE = "https://www.car.gov.br/publico"
     _INDEX = f"{_BASE}/imoveis/index"
-    _DOWNLOADS = f"{_BASE}/municipios/downloads"
-    _CSV = f"{_BASE}/municipios/csv"
-    _CAPTCHA = f"{_BASE}/municipios/captcha"
-    _SHAPEFILE = f"{_BASE}/municipios/shapefile"
+    _DOWNLOAD_BASE = f"{_BASE}/estados/downloadBase"
+    _RECAPTCHA = f"{_BASE}/municipios/ReCaptcha"

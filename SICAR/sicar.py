@@ -17,20 +17,18 @@ from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
-from html import unescape
 from urllib.parse import urlencode
 
 from SICAR.drivers import Captcha, Tesseract
-from SICAR.output_format import OutputFormat
 from SICAR.state import State
 from SICAR.url import Url
+from SICAR.polygon import Polygon
 from SICAR.exceptions import (
-    EmailNotValidException,
     UrlNotOkException,
+    PolygonNotValidException,
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
-    FailedToDownloadShapefileException,
-    FailedToDownloadCsvException,
+    FailedToDownloadPolygonException,
 )
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -48,13 +46,11 @@ class Sicar(Url):
 
     Attributes:
         _driver (Captcha): The driver used for handling captchas. Default is Tesseract.
-        _email (str): The personal email for communication or identification purposes.
     """
 
     def __init__(
         self,
         driver: Captcha = Tesseract,
-        email: str = "sicar@sicar.com",
         headers: Dict = None,
     ):
         """
@@ -62,14 +58,12 @@ class Sicar(Url):
 
         Parameters:
             driver (Captcha): The driver used for handling captchas. Default is Tesseract.
-            email (str): The personal email for communication or identification purposes. Default is "sicar@sicar.com".
             headers (Dict): Additional headers for HTTP requests. Default is None.
 
         Returns:
             None
         """
         self._driver = driver()
-        self._email = self._validate_email(email)
         self._create_session(headers=headers)
         self._initialize_cookies()
 
@@ -105,26 +99,6 @@ class Sicar(Url):
         """
         self._get(self._INDEX)
 
-    def _validate_email(self, email: str) -> str:
-        """
-        Validate the format of an email address.
-
-        Parameters:
-            email (str): The email address to validate.
-
-        Returns:
-            str: The validated email address.
-
-        Raises:
-            EmailNotValidException: If the email address format is not valid.
-        """
-        if not re.search(
-            r"^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$", email
-        ):
-            raise EmailNotValidException(email)
-
-        return email
-
     def _get(self, url: str, *args, **kwargs):
         """
         Send a GET request to the specified URL using the session.
@@ -154,38 +128,6 @@ class Sicar(Url):
 
         return response
 
-    def get_cities_codes(self, state: State | str) -> Dict:
-        """
-        Retrieve the codes of cities in a given state.
-
-        Parameters:
-            state (Union[State, str]): The state or state code to retrieve the cities for.
-
-        Returns:
-            Dict: A dictionary mapping city names to their corresponding codes.
-
-        Raises:
-            StateCodeNotValidException: If the state code is not valid.
-
-        Note:
-            If `state` is provided as a string, it will be converted to the corresponding State enum value. The state code
-            must be valid, or a StateCodeNotValidException will be raised.
-        """
-        if isinstance(state, str):
-            try:
-                state = State(state.upper())
-            except ValueError as error:
-                raise StateCodeNotValidException(state) from error
-
-        cities_codes = re.findall(
-            r'(?<=data-municipio=")(.*)(?=")',
-            self._get(
-                "{}?{}".format(self._DOWNLOADS, urlencode({"sigla": state.value}))
-            ).text,
-        )
-
-        return dict(zip(list(map(unescape, cities_codes[0::3])), cities_codes[1::3]))
-
     def _download_captcha(self) -> Image:
         """
         Download a captcha image from the SICAR system.
@@ -196,7 +138,7 @@ class Sicar(Url):
         Raises:
             FailedToDownloadCaptchaException: If the captcha image fails to download.
         """
-        url = f"{self._CAPTCHA}?{urlencode({'id': int(random.random() * 1000000)})}"
+        url = f"{self._RECAPTCHA}?{urlencode({'id': int(random.random() * 1000000)})}"
         response = self._get(url)
 
         if not response.ok:
@@ -209,152 +151,112 @@ class Sicar(Url):
 
         return captcha
 
-    def _download_shapefile(
+    def _download_polygon(
         self,
-        city_code: str | int,
+        state: State,
+        polygon: Polygon,
         captcha: str,
         folder: str,
         chunk_size: int = 1024,
     ) -> Path:
         """
-        Download the shapefile for the specified city code.
+        Download polygon for the specified state.
 
         Parameters:
-            city_code (str | int): The code of the city for which to download the shapefile.
+            state (State | str): The state for which to download the files. It can be either a `State` enum value or a string representing the state's abbreviation.
+            polygon (Polygon | str): The polygon to download.
             captcha (str): The captcha value for verification.
-            folder (str): The folder path where the shapefile will be saved.
+            folder (str): The folder path where the polygon will be saved.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
         Returns:
-            Path: The path to the downloaded shapefile.
+            Path: The path to the downloaded polygon.
 
         Raises:
-            FailedToDownloadShapefileException: If the shapefile download fails.
+            FailedToDownloadPolygonException: If the polygon download fails.
 
         Note:
-            This method performs the shapefile download by making a GET request to the shapefile URL with the specified
-            city code and captcha. The response is then streamed and saved to a file in chunks. A progress bar is displayed
+            This method performs the polygon download by making a GET request to the polygon URL with the specified
+            state code and captcha. The response is then streamed and saved to a file in chunks. A progress bar is displayed
             during the download. The downloaded file path is returned.
         """
+
         query = urlencode(
-            {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
+            {"idEstado": state.value, "tipoBase": polygon.value, "ReCaptcha": captcha}
         )
 
         try:
-            response = self._get(f"{self._SHAPEFILE}?{query}", stream=True)
+            response = self._get(f"{self._DOWNLOAD_BASE}?{query}", stream=True)
         except UrlNotOkException as error:
-            raise FailedToDownloadShapefileException() from error
+            raise FailedToDownloadPolygonException() from error
 
         content_length = int(response.headers.get("Content-Length", 0))
 
         content_type = response.headers.get("Content-Type", "")
 
         if content_length == 0 or not content_type.startswith("application/zip"):
-            raise FailedToDownloadShapefileException()
+            raise FailedToDownloadPolygonException()
 
-        path = Path(os.path.join(folder, f"SHAPE_{city_code}")).with_suffix(".zip")
-
-        with open(path, "wb") as fd:
-            with tqdm(
-                total=content_length,
-                unit="iB",
-                unit_scale=True,
-                desc=f"Downloading Shapefile for city with code '{city_code}'",
-            ) as progress_bar:
-                for chunk in response.iter_content(chunk_size=chunk_size):
-                    fd.write(chunk)
-                    progress_bar.update(len(chunk))
-        return path
-
-    def _download_csv(
-        self,
-        city_code: str | int,
-        captcha: str,
-        folder: str,
-        chunk_size: int = 1024,
-    ) -> Path:
-        """
-        Download the CSV file for the specified city code.
-
-        Parameters:
-            city_code (str | int): The code of the city for which to download the CSV file.
-            captcha (str): The captcha value for verification.
-            folder (str): The folder path where the downloaded CSV file will be saved.
-            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
-
-        Returns:
-            Path: The path to the downloaded CSV file.
-
-        Raises:
-            FailedToDownloadCsvException: If the CSV file fails to download.
-
-        Note:
-            This method downloads the CSV file for the specified city code, using the provided captcha for verification.
-            The downloaded CSV file is saved to the specified folder.
-            The method returns the path to the downloaded CSV file.
-        """
-        query = urlencode(
-            {"municipio[id]": city_code, "email": self._email, "captcha": captcha}
+        path = Path(os.path.join(folder, f"{state.value}_{polygon.value}")).with_suffix(
+            ".zip"
         )
 
-        try:
-            response = self._get(f"{self._CSV}?{query}", stream=True)
-        except UrlNotOkException as error:
-            raise FailedToDownloadCsvException() from error
-
-        content_length = int(response.headers.get("Content-Length", 0))
-
-        content_type = response.headers.get("Content-Type", "")
-
-        if content_length == 0 or not content_type.startswith("text/csv"):
-            raise FailedToDownloadCsvException()
-
-        path = Path(os.path.join(folder, f"CSV_{city_code}")).with_suffix(".csv")
-
         with open(path, "wb") as fd:
             with tqdm(
                 total=content_length,
                 unit="iB",
                 unit_scale=True,
-                desc=f"Downloading CSV  file for city with code '{city_code}'",
+                desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
             ) as progress_bar:
                 for chunk in response.iter_content(chunk_size=chunk_size):
                     fd.write(chunk)
                     progress_bar.update(len(chunk))
         return path
 
-    def download_city_code(
+    def download_state(
         self,
-        city_code: str | int,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        state: State | str,
+        polygon: Polygon | str,
         folder: Path | str = Path("temp"),
         tries: int = 25,
         debug: bool = False,
         chunk_size: int = 1024,
     ) -> Path | bool:
         """
-        Download the shapefile or other output format for the specified city code.
+        Download the polygon or other output format for the specified state.
 
         Parameters:
-            city_code (str | int): The code of the city for which to download the data.
-            tries (int, optional): The number of attempts to download the data. Defaults to 25.
-            output_format (OutputFormat, optional): The desired output format. Defaults to OutputFormat.SHAPEFILE.
+            state (State | str): The state for which to download the files. It can be either a `State` enum value or a string representing the state's abbreviation.
+            polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded data will be saved. Defaults to "temp".
-            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            tries (int, optional): The number of attempts to download the data. Defaults to 25.
             debug (bool, optional): Whether to print debug information. Defaults to False.
+            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
         Returns:
             Path | bool: The path to the downloaded data if successful, or False if download fails.
 
         Note:
-            This method attempts to download the shapefile or other output format for the specified city code.
+            This method attempts to download the polygon for the specified state.
             It tries multiple times, using a captcha for verification. The downloaded data is saved to the specified folder.
             The method returns the path to the downloaded data if successful, or False if the download fails after the specified number of tries.
         """
+        if isinstance(state, str):
+            try:
+                state = State(state.upper())
+            except ValueError as error:
+                raise StateCodeNotValidException(state) from error
+
+        if isinstance(polygon, str):
+            try:
+                polygon = Polygon(polygon.upper())
+            except ValueError as error:
+                raise PolygonNotValidException(polygon) from error
+
         Path(folder).mkdir(parents=True, exist_ok=True)
 
         captcha = ""
-        info = f"city '{city_code}' in '{output_format}' format"
+        info = f"'{polygon.value}' for '{state.value}'"
 
         while tries > 0:
             try:
@@ -366,16 +268,9 @@ class Sicar(Url):
                             f"[{tries:02d}] - Requesting {info} with captcha '{captcha}'"
                         )
 
-                    if output_format is OutputFormat.CSV:
-                        return self._download_csv(
-                            city_code=city_code,
-                            captcha=captcha,
-                            folder=folder,
-                            chunk_size=chunk_size,
-                        )
-
-                    return self._download_shapefile(
-                        city_code=city_code,
+                    return self._download_polygon(
+                        state=state,
+                        polygon=polygon,
                         captcha=captcha,
                         folder=folder,
                         chunk_size=chunk_size,
@@ -386,8 +281,7 @@ class Sicar(Url):
                     )
             except (
                 FailedToDownloadCaptchaException,
-                FailedToDownloadShapefileException,
-                FailedToDownloadCsvException,
+                FailedToDownloadPolygonException,
             ) as error:
                 if debug:
                     print(f"[{tries:02d}] - {error} When requesting {info}")
@@ -397,94 +291,21 @@ class Sicar(Url):
 
         return False
 
-    def download_cities(
-        self,
-        cities_codes: Dict,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        folder: Path | str = Path("temp"),
-        tries: int = 25,
-        debug: bool = False,
-        chunk_size: int = 1024,
-    ) -> Dict:
-        """
-        Download shapefiles or CSVs for multiple cities.
-
-        Parameters:
-            cities_codes (Dict): A dictionary mapping city names to their corresponding codes.
-            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
-            folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'temp'.
-            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
-            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
-            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
-
-        Returns:
-            Dict: A dictionary containing the results of the download operation.
-                The keys are tuples of city name and code, and the values are the paths to the downloaded files.
-                If a download fails for a city, the corresponding value will be False.
-        """
-        result = {}
-        for city, code in cities_codes.items():
-            result[(city, code)] = self.download_city_code(
-                city_code=code,
-                output_format=output_format,
-                folder=folder,
-                tries=tries,
-                debug=debug,
-                chunk_size=chunk_size,
-            )
-        return result
-
-    def download_state(
-        self,
-        state: State | str,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
-        folder: Path | str = Path("temp"),
-        tries: int = 25,
-        debug: bool = False,
-        chunk_size: int = 1024,
-    ):
-        """
-        Download shapefiles or CSVs for a state.
-
-        Parameters:
-            state (State | str): The state for which to download the files. It can be either a `State` enum value or a string representing the state's abbreviation.
-            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
-            folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'temp'.
-            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
-            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
-            chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
-
-        Returns:
-            Dict: A dictionary containing the results of the download operation.
-                The keys are tuples of city name and code, and the values are the paths to the downloaded files.
-                If a download fails for a city, the corresponding value will be False.
-        """
-        cities_codes = self.get_cities_codes(state=state)
-
-        return self.download_cities(
-            cities_codes=cities_codes,
-            output_format=output_format,
-            folder=folder,
-            tries=tries,
-            debug=debug,
-            chunk_size=chunk_size,
-        )
-
     def download_country(
         self,
-        output_format: OutputFormat = OutputFormat.SHAPEFILE,
+        polygon: Polygon | str,
         folder: Path | str = Path("brazil"),
         tries: int = 25,
         debug: bool = False,
         chunk_size: int = 1024,
     ):
         """
-        Download shapefiles or CSVs for the entire country.
+        Download polygon for the entire country.
 
         Parameters:
-            output_format (OutputFormat, optional): The format of the files to download. Defaults to OutputFormat.SHAPEFILE.
+            polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'brazil'.
-            tries (int, optional): The number of download attempts allowed per city. Defaults to 25.
+            tries (int, optional): The number of download attempts allowed per state. Defaults to 25.
             debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
@@ -492,7 +313,7 @@ class Sicar(Url):
             Dict: A dictionary containing the results of the download operation.
                 The keys are the state abbreviations, and the values are dictionaries representing the results of downloading each state.
                 Each state's dictionary follows the same structure as the result of the `download_state` method.
-                If a download fails for a city within a state, the corresponding value will be False.
+                If a download fails for a state the corresponding value will be False.
         """
         result = {}
         for state in State:
@@ -500,7 +321,7 @@ class Sicar(Url):
 
             result[str(state)] = self.download_state(
                 state=state,
-                output_format=output_format,
+                polygon=polygon,
                 folder=folder,
                 tries=tries,
                 debug=debug,

@@ -4,35 +4,11 @@ Custom Exception Classes Module.
 This module provides custom exception classes for specific error conditions.
 
 Classes:
-    EmailNotValidException: Exception raised when an invalid email is encountered.
     UrlNotOkException: Exception raised when a URL is inaccessible or returns an error.
     StateCodeNotValidException: Exception raised when an invalid state code is encountered.
     FailedToDownloadCaptchaException: Exception raised when downloading a captcha fails.
-    FailedToDownloadShapefileException: Exception raised when downloading a shapefile fails.
-    FailedToDownloadCsvException: Exception raised when downloading a CSV fails.
+    FailedToDownloadPolygonException: Exception raised when downloading a polygon fails.
 """
-
-
-class EmailNotValidException(Exception):
-    """
-    Exception raised when an invalid email is encountered.
-
-    Attributes:
-        email (str): The invalid email address.
-    """
-
-    def __init__(self, email: str):
-        """
-        Initialize an instance of EmailNotValidException.
-
-        Parameters:
-            email (str): The invalid email address.
-
-        Returns:
-            None
-        """
-        self.email = email
-        super().__init__(f"Email {self.email} not valid!")
 
 
 class UrlNotOkException(Exception):
@@ -79,6 +55,28 @@ class StateCodeNotValidException(Exception):
         super().__init__(f"State code {self.state} not valid!")
 
 
+class PolygonNotValidException(Exception):
+    """
+    Exception raised when an invalid polygon is encountered.
+
+    Attributes:
+        polygon (str): The invalid polygon.
+    """
+
+    def __init__(self, polygon: str):
+        """
+        Initialize an instance of PolygonNotValidException.
+
+        Parameters:
+            polygon (str): The invalid polygon.
+
+        Returns:
+            None
+        """
+        self.polygon = polygon
+        super().__init__(f"Polygon {self.polygon} not valid!")
+
+
 class FailedToDownloadCaptchaException(Exception):
     """Exception raised when downloading a captcha fails."""
 
@@ -95,12 +93,12 @@ class FailedToDownloadCaptchaException(Exception):
         super().__init__("Failed to download captcha!")
 
 
-class FailedToDownloadShapefileException(Exception):
-    """Exception raised when downloading a shapefile fails."""
+class FailedToDownloadPolygonException(Exception):
+    """Exception raised when downloading a polygon fails."""
 
     def __init__(self):
         """
-        Initialize an instance of FailedToDownloadShapefileException.
+        Initialize an instance of FailedToDownloadPolygonException.
 
         Parameters:
             None
@@ -108,20 +106,4 @@ class FailedToDownloadShapefileException(Exception):
         Returns:
             None
         """
-        super().__init__("Failed to download shapefile!")
-
-
-class FailedToDownloadCsvException(Exception):
-    """Exception raised when downloading a CSV fails."""
-
-    def __init__(self):
-        """
-        Initialize an instance of FailedToDownloadCsvException.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
-        super().__init__("Failed to download CSV!")
+        super().__init__("Failed to download polygon!")
