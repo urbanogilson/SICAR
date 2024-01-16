@@ -1,28 +1,22 @@
 import unittest
 from unittest.mock import MagicMock, patch, call
-from typing import Dict
-import re
-import requests
 import random
-from urllib.parse import quote
 import io
 from PIL import Image
 from pathlib import Path, PosixPath
-from tqdm import tqdm
-from urllib.parse import urlencode
 import sys
 
 from SICAR import Sicar
-from SICAR.url import Url
+from SICAR.state import State
+from SICAR.polygon import Polygon
+from SICAR.drivers import Captcha
 from SICAR.exceptions import (
-    EmailNotValidException,
+    PolygonNotValidException,
     UrlNotOkException,
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
-
+    FailedToDownloadPolygonException,
 )
-from SICAR.drivers import Captcha
-from SICAR import State
 
 
 class MockCaptcha(Captcha):
@@ -131,12 +125,11 @@ class SicarTestCase(unittest.TestCase):
     @patch("builtins.open", new_callable=MagicMock)
     @patch.object(Path, "__init__", return_value=None)
     @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
-    def test_download_shapefile_success(
-        self, mock_tqdm, mock_path, mock_open, mock_get
-    ):
-        city_code = "123"
+    def test_download_polygon_success(self, mock_tqdm, mock_path, mock_open, mock_get):
+        state = State.MG
+        polygon = Polygon.APPS
         captcha = "abc123"
-        folder = "shapefiles"
+        folder = "polygons"
         response_mock = MagicMock()
         response_mock.ok = True
         response_mock.headers = {
@@ -147,90 +140,36 @@ class SicarTestCase(unittest.TestCase):
         mock_get.return_value = response_mock
         mock_open.return_value.__enter__.return_value = MagicMock()
         sicar = Sicar(driver=self.mocked_captcha)
-        result = sicar._download_shapefile(city_code, captcha, folder)
+        result = sicar._download_polygon(state, polygon, captcha, folder)
         mock_get.assert_called_once_with(
-            r"https://www.car.gov.br/publico/municipios/shapefile?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
+            r"https://www.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
             stream=True,
         )
-        mock_path.assert_called_once_with(f"{folder}/SHAPE_{city_code}")
+        mock_path.assert_called_once_with(f"{folder}/{state}_{polygon.value}")
         mock_open.assert_called_once_with(
-            PosixPath(f"{folder}/SHAPE_{city_code}.zip"), "wb"
+            PosixPath(f"{folder}/{state}_{polygon.value}.zip"), "wb"
         )
         mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, PosixPath(f"{folder}/SHAPE_{city_code}.zip"))
+        self.assertEqual(result, PosixPath(f"{folder}/{state}_{polygon.value}.zip"))
 
-    def test_download_shapefile_failed_response(self):
-        city_code = "12345"
-        captcha = "captcha_code"
-        folder = "shapefiles"
-        chunk_size = 1024
-
-        sicar = Sicar(driver=self.mocked_captcha)
-        sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
-
-        with self.assertRaises(FailedToDownloadShapefileException):
-            sicar._download_shapefile(city_code, captcha, folder, chunk_size)
-
-    def test_download_shapefile_fails_on_html_response(self):
-        city_code = "12345"
-        captcha = "captcha_code"
-        folder = "shapefiles"
-        chunk_size = 1024
-
-        sicar = Sicar(driver=self.mocked_captcha)
-        sicar._session.get = MagicMock(
-            return_value=MagicMock(ok=True, headers={"Content-Type": "text/html"})
-        )
-
-        with self.assertRaises(FailedToDownloadShapefileException):
-            sicar._download_shapefile(city_code, captcha, folder, chunk_size)
-
-    @patch.object(Sicar, "_get")
-    @patch("builtins.open", new_callable=MagicMock)
-    @patch.object(Path, "__init__", return_value=None)
-    @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
-    def test_download_csv_success(self, mock_tqdm, mock_path, mock_open, mock_get):
-        city_code = "123"
+    def test_download_polygon_failed_response(self):
+        state = State.MG
+        polygon = Polygon.APPS
         captcha = "abc123"
-        folder = "csvs"
-        response_mock = MagicMock()
-        response_mock.ok = True
-        response_mock.headers = {
-            "Content-Type": "text/csv",
-            "Content-Length": 4096,
-        }
-        response_mock.iter_content.return_value = [b"chunk1", b"chunk2"]
-        mock_get.return_value = response_mock
-        mock_open.return_value.__enter__.return_value = MagicMock()
-        sicar = Sicar(driver=self.mocked_captcha)
-        result = sicar._download_csv(city_code, captcha, folder)
-        mock_get.assert_called_once_with(
-            r"https://www.car.gov.br/publico/municipios/csv?municipio%5Bid%5D=123&email=sicar%40sicar.com&captcha=abc123",
-            stream=True,
-        )
-        mock_path.assert_called_once_with(f"{folder}/CSV_{city_code}")
-        mock_open.assert_called_once_with(
-            PosixPath(f"{folder}/CSV_{city_code}.csv"), "wb"
-        )
-        mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, PosixPath(f"{folder}/CSV_{city_code}.csv"))
-
-    def test_download_csv_failed_response(self):
-        city_code = "12345"
-        captcha = "captcha_code"
-        folder = "csvs"
+        folder = "polygons"
         chunk_size = 1024
 
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._session.get = MagicMock(return_value=MagicMock(ok=False))
 
-        with self.assertRaises(FailedToDownloadCsvException):
-            sicar._download_csv(city_code, captcha, folder, chunk_size)
+        with self.assertRaises(FailedToDownloadPolygonException):
+            sicar._download_polygon(state, polygon, captcha, folder, chunk_size)
 
-    def test_download_csv_fails_on_html_response(self):
-        city_code = "12345"
-        captcha = "captcha_code"
-        folder = "csvs"
+    def test_download_polygon_fails_on_html_response(self):
+        state = State.MG
+        polygon = Polygon.APPS
+        captcha = "abc123"
+        folder = "polygons"
         chunk_size = 1024
 
         sicar = Sicar(driver=self.mocked_captcha)
@@ -238,15 +177,14 @@ class SicarTestCase(unittest.TestCase):
             return_value=MagicMock(ok=True, headers={"Content-Type": "text/html"})
         )
 
-        with self.assertRaises(FailedToDownloadCsvException):
-            sicar._download_csv(city_code, captcha, folder, chunk_size)
+        with self.assertRaises(FailedToDownloadPolygonException):
+            sicar._download_polygon(state, polygon, captcha, folder, chunk_size)
 
     @patch("pathlib.Path.mkdir")
-    def test_download_city_code_valid_captcha(self, mock_mkdir):
-        # Mock city code, tries, output format, folder, and chunk size
-        city_code = "12345"
+    def test_download_state_valid_captcha(self, mock_mkdir):
+        state = State.MG
+        polygon = Polygon.APPS
         tries = 25
-        output_format = OutputFormat.SHAPEFILE
         folder = "temp"
         chunk_size = 1024
 
@@ -257,11 +195,11 @@ class SicarTestCase(unittest.TestCase):
         mock_get_captcha = MagicMock(return_value="ABCDE")
         sicar._driver.get_captcha = mock_get_captcha
 
-        mock_download_shapefile = MagicMock(return_value=Path("shapefile.zip"))
-        sicar._download_shapefile = mock_download_shapefile
+        mock_download_polygon = MagicMock(return_value=Path("polygon.zip"))
+        sicar._download_polygon = mock_download_polygon
 
-        result = sicar.download_city_code(
-            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
+        result = sicar.download_state(
+            state, polygon, folder, tries, debug=False, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -269,55 +207,23 @@ class SicarTestCase(unittest.TestCase):
 
         mock_get_captcha.assert_called_once_with(mock_download_captcha.return_value)
 
-        mock_download_shapefile.assert_called_once_with(
-            city_code=city_code, captcha="ABCDE", folder=folder, chunk_size=chunk_size
+        mock_download_polygon.assert_called_once_with(
+            state=state,
+            polygon=polygon,
+            captcha="ABCDE",
+            folder=folder,
+            chunk_size=chunk_size,
         )
 
         self.assertIsInstance(result, Path)
-        self.assertEqual(result, Path("shapefile.zip"))
-
-    @patch("pathlib.Path.mkdir")
-    def test_download_city_code_valid_captcha_csv_format(self, mock_mkdir):
-        # Mock city code, tries, output format, folder, and chunk size
-        city_code = "12345"
-        tries = 25
-        output_format = OutputFormat.CSV
-        folder = "temp"
-        chunk_size = 1024
-
-        sicar = Sicar(driver=self.mocked_captcha)
-        mock_download_captcha = MagicMock(return_value=Image.Image)
-        sicar._download_captcha = mock_download_captcha
-
-        mock_get_captcha = MagicMock(return_value="ABCDE")
-        sicar._driver.get_captcha = mock_get_captcha
-
-        mock_download_csv = MagicMock(return_value=Path("shapefile.csv"))
-        sicar._download_csv = mock_download_csv
-
-        result = sicar.download_city_code(
-            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
-        )
-
-        mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
-        mock_download_captcha.assert_called_once()
-
-        mock_get_captcha.assert_called_once_with(mock_download_captcha.return_value)
-
-        mock_download_csv.assert_called_once_with(
-            city_code=city_code, captcha="ABCDE", folder=folder, chunk_size=chunk_size
-        )
-
-        self.assertIsInstance(result, Path)
-        self.assertEqual(result, Path("shapefile.csv"))
+        self.assertEqual(result, Path("polygon.zip"))
 
     @patch("pathlib.Path.mkdir")
     @patch("time.sleep", return_value=None)
-    def test_download_city_code_invalid_captcha(self, mock_time, mock_mkdir):
-        # Mock city code, tries, output format, folder, and chunk size
-        city_code = "12345"
+    def test_download_polygon_invalid_captcha(self, mock_time, mock_mkdir):
+        state = State.MG
+        polygon = Polygon.APPS
         tries = 25
-        output_format = OutputFormat.SHAPEFILE
         folder = "temp"
         chunk_size = 1024
 
@@ -328,11 +234,11 @@ class SicarTestCase(unittest.TestCase):
         mock_get_captcha = MagicMock(return_value="ABCD")
         sicar._driver.get_captcha = mock_get_captcha
 
-        mock_download_shapefile = MagicMock(return_value=Path("shapefile.zip"))
-        sicar._download_shapefile = mock_download_shapefile
+        mock_download_polygon = MagicMock(return_value=Path("polygon.zip"))
+        sicar._download_polygon = mock_download_polygon
 
-        result = sicar.download_city_code(
-            city_code, output_format, folder, tries, debug=False, chunk_size=chunk_size
+        result = sicar.download_state(
+            state, polygon, folder, tries, debug=False, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -340,22 +246,22 @@ class SicarTestCase(unittest.TestCase):
         self.assertEqual(mock_get_captcha.call_count, tries)
         mock_get_captcha.assert_called_with(mock_download_captcha.return_value)
 
-        mock_download_shapefile.assert_not_called()
+        mock_download_polygon.assert_not_called()
 
         self.assertFalse(result)
 
     @patch("time.sleep", return_value=None)
-    def test_download_city_code_invalid_captcha_failed_to_download_captcha_exception(
+    def test_download_polygon_invalid_captcha_failed_to_download_captcha_exception(
         self, mock_time
     ):
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._get = MagicMock(return_value=MagicMock(ok=False))
-        sicar.download_city_code(
-            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
+        sicar.download_state(
+            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
         )
 
     @patch("time.sleep", return_value=None)
-    def test_download_city_code_invalid_captcha_failed_to_download_shapefile_exception(
+    def test_download_polygon_invalid_captcha_failed_to_download_polygon_exception(
         self, mock_time
     ):
         sicar = Sicar(driver=self.mocked_captcha)
@@ -365,35 +271,16 @@ class SicarTestCase(unittest.TestCase):
         mock_get_captcha = MagicMock(return_value="ABCDE")
         sicar._driver.get_captcha = mock_get_captcha
 
-        mock_download_shapefile = MagicMock()
-        mock_download_shapefile.side_effect = FailedToDownloadShapefileException()
-        sicar._download_shapefile = mock_download_shapefile
+        mock_download_polygon = MagicMock()
+        mock_download_polygon.side_effect = FailedToDownloadPolygonException()
+        sicar._download_polygon = mock_download_polygon
 
-        sicar.download_city_code(
-            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
+        sicar.download_state(
+            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
         )
 
     @patch("time.sleep", return_value=None)
-    def test_download_city_code_invalid_captcha_failed_to_download_csv_exception(
-        self, mock_time
-    ):
-        sicar = Sicar(driver=self.mocked_captcha)
-        mock_download_captcha = MagicMock(return_value=Image.Image)
-        sicar._download_captcha = mock_download_captcha
-
-        mock_get_captcha = MagicMock(return_value="ABCDE")
-        sicar._driver.get_captcha = mock_get_captcha
-
-        mock_download_csv = MagicMock()
-        mock_download_csv.side_effect = FailedToDownloadCsvException()
-        sicar._download_csv = mock_download_csv
-
-        sicar.download_city_code(
-            "12345", OutputFormat.CSV, "temp", 25, chunk_size=1024, debug=True
-        )
-
-    @patch("time.sleep", return_value=None)
-    def test_download_city_code_invalid_captcha_debug(self, mock_time):
+    def test_download_state_invalid_captcha_debug(self, mock_time):
         sicar = Sicar(driver=self.mocked_captcha)
         mock_download_captcha = MagicMock(return_value=Image.Image)
         sicar._download_captcha = mock_download_captcha
@@ -401,121 +288,44 @@ class SicarTestCase(unittest.TestCase):
         mock_get_captcha = MagicMock(return_value="invalid")
         sicar._driver.get_captcha = mock_get_captcha
 
-        mock_download_shapefile = MagicMock(return_value=Path("shapefile.zip"))
-        sicar._download_shapefile = mock_download_shapefile
+        mock_download_polygon = MagicMock(return_value=Path("polygon.zip"))
+        sicar._download_polygon = mock_download_polygon
 
-        sicar.download_city_code(
-            "12345", OutputFormat.SHAPEFILE, "temp", 25, chunk_size=1024, debug=True
+        sicar.download_state(
+            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
         )
 
-    @patch("SICAR.sicar.Sicar.download_city_code")
-    def test_download_cities_success(self, mock_download_city_code):
-        cities_codes = {"City1": "123", "City2": "456"}
-        tries = 25
-        output_format = OutputFormat.SHAPEFILE
-        folder = "temp"
-        chunk_size = 1024
-        debug = False
-        mock_download_city_code.side_effect = (
-            lambda city_code, output_format, folder, tries, debug, chunk_size: Path(
-                f"{city_code}.zip"
-            )
-        )
-
+    def test_download_state_invalid_state_code(self):
         sicar = Sicar(driver=self.mocked_captcha)
-
-        result = sicar.download_cities(
-            cities_codes,
-            output_format,
-            folder,
-            tries,
-            debug=debug,
-            chunk_size=chunk_size,
-        )
-
-        expected_result = {
-            ("City1", "123"): Path("123.zip"),
-            ("City2", "456"): Path("456.zip"),
-        }
-        self.assertEqual(result, expected_result)
-
-        expected_calls = [
-            call(
-                city_code="123",
-                output_format=output_format,
-                folder=folder,
-                tries=tries,
-                debug=debug,
-                chunk_size=chunk_size,
-            ),
-            call(
-                city_code="456",
-                output_format=output_format,
-                folder=folder,
-                tries=tries,
-                debug=debug,
-                chunk_size=chunk_size,
-            ),
-        ]
-        mock_download_city_code.assert_has_calls(expected_calls)
-
-    @patch("SICAR.sicar.Sicar.get_cities_codes")
-    @patch("SICAR.sicar.Sicar.download_cities")
-    def test_download_state(self, mock_download_cities, mock_get_cities_codes):
-        sicar = Sicar(driver=self.mocked_captcha)
-        state = State.MG
-        output_format = OutputFormat.SHAPEFILE
-        folder = "/path/to/folder"
-        tries = 25
-        debug = False
-        chunk_size = 1024
-
-        mock_get_cities_codes.return_value = {"City1": "123", "City2": "456"}
-
-        mock_download_cities.return_value = {
-            ("City1", "123"): Path("123.zip"),
-            ("City2", "456"): Path("456.zip"),
-        }
-
-        result = sicar.download_state(
-            state, output_format, folder, tries, debug, chunk_size
-        )
-
-        self.assertEqual(
-            result,
-            {("City1", "123"): Path("123.zip"), ("City2", "456"): Path("456.zip")},
-        )
-
-        mock_get_cities_codes.assert_called_once_with(state=state)
-
-        expected_calls = [
-            call(
-                cities_codes={"City1": "123", "City2": "456"},
-                output_format=output_format,
-                folder=folder,
-                tries=tries,
-                debug=debug,
-                chunk_size=chunk_size,
+        with self.assertRaises(StateCodeNotValidException):
+            sicar.download_state(
+                "INVALID_STATE", Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
             )
-        ]
-        mock_download_cities.assert_has_calls(expected_calls)
+
+    def test_download_state_invalid_polygon_code(self):
+        sicar = Sicar(driver=self.mocked_captcha)
+        with self.assertRaises(PolygonNotValidException):
+            sicar.download_state(
+                State.MG, "INVALID_POLYGON", "temp", 25, chunk_size=1024, debug=True
+            )
 
     @patch("SICAR.sicar.Sicar.download_state")
     @patch("pathlib.Path.mkdir")
     def test_download_country(self, mock_mkdir, mock_download_state):
         sicar = Sicar(driver=self.mocked_captcha)
-        output_format = OutputFormat.SHAPEFILE
-        folder = "/path/to/folder"
+        state = State.MG
+        polygon = Polygon.APPS
         tries = 25
         debug = False
+        folder = "/path/to/folder"
         chunk_size = 1024
 
         mock_download_state.return_value = {
-            ("City1", "123"): Path("/path/to/123.zip"),
-            ("City2", "456"): Path("/path/to/456.zip"),
+            "State1": Path("/path/to/123.zip"),
+            "State2": Path("/path/to/456.zip"),
         }
 
-        sicar.download_country(output_format, folder, tries, debug, chunk_size)
+        sicar.download_country(polygon, folder, tries, debug, chunk_size)
 
         expected_calls = {"path": [], "download_state": []}
         for state in State:
@@ -523,7 +333,7 @@ class SicarTestCase(unittest.TestCase):
             expected_calls["download_state"].append(
                 call(
                     state=state,
-                    output_format=output_format,
+                    polygon=polygon,
                     folder=folder,
                     tries=tries,
                     debug=debug,

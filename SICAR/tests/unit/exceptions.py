@@ -1,6 +1,5 @@
 import unittest
 from SICAR.exceptions import (
-    EmailNotValidException,
     UrlNotOkException,
     PolygonNotValidException,
     StateCodeNotValidException,
@@ -10,12 +9,6 @@ from SICAR.exceptions import (
 
 
 class ExceptionTestCase(unittest.TestCase):
-    def test_email_not_valid_exception(self):
-        email = "invalid_email"
-        with self.assertRaises(EmailNotValidException) as context:
-            raise EmailNotValidException(email)
-        self.assertEqual(str(context.exception), f"Email {email} not valid!")
-
     def test_url_not_ok_exception(self):
         url = "https://gilsonurbano.com"
         with self.assertRaises(UrlNotOkException) as context:

@@ -153,8 +153,8 @@ class Sicar(Url):
 
     def _download_polygon(
         self,
-        state: State | str,
-        polygon: Polygon | str,
+        state: State,
+        polygon: Polygon,
         captcha: str,
         folder: str,
         chunk_size: int = 1024,

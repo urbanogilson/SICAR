@@ -11,28 +11,6 @@ Classes:
 """
 
 
-class EmailNotValidException(Exception):
-    """
-    Exception raised when an invalid email is encountered.
-
-    Attributes:
-        email (str): The invalid email address.
-    """
-
-    def __init__(self, email: str):
-        """
-        Initialize an instance of EmailNotValidException.
-
-        Parameters:
-            email (str): The invalid email address.
-
-        Returns:
-            None
-        """
-        self.email = email
-        super().__init__(f"Email {self.email} not valid!")
-
-
 class UrlNotOkException(Exception):
     """
     Exception raised when a URL is inaccessible or returns an error.
