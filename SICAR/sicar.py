@@ -9,10 +9,9 @@ Classes:
 
 import io
 import os
-import re
 import time
 import random
-import requests
+import httpx
 from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 from typing import Dict
@@ -30,10 +29,6 @@ from SICAR.exceptions import (
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
 )
-
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class Sicar(Url):
@@ -74,17 +69,24 @@ class Sicar(Url):
         Parameters:
             headers (Dict): Additional headers for the session. Default is None.
 
+        Note:
+            The SSL certificate verification is disabled by default using `verify=False`. This allows connections to servers
+            with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
+            security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
+            certificate authority, you can remove the `verify=False` parameter to enable SSL certificate verification by
+            default.
+
         Returns:
             None
         """
-        self._session = requests.Session()
+        self._session = httpx.Client(verify=False)
         self._session.headers.update(
             headers
             if isinstance(headers, dict)
             else {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0",
                 "Accept-Encoding": "gzip, deflate, br",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             }
         )
 
@@ -113,17 +115,10 @@ class Sicar(Url):
 
         Raises:
             UrlNotOkException: If the response from the GET request is not OK (status code is not 200).
-
-        Note:
-            The SSL certificate verification is disabled by default using `verify=False`. This allows connections to servers
-            with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
-            security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
-            certificate authority, you can remove the `verify=False` parameter to enable SSL certificate verification by
-            default.
         """
-        response = self._session.get(url, verify=False, *args, **kwargs)
+        response = self._session.get(url=url, *args, **kwargs)
 
-        if not response.ok:
+        if response.status_code not in [httpx.codes.OK, httpx.codes.FOUND]:
             raise UrlNotOkException(url)
 
         return response
@@ -141,7 +136,7 @@ class Sicar(Url):
         url = f"{self._RECAPTCHA}?{urlencode({'id': int(random.random() * 1000000)})}"
         response = self._get(url)
 
-        if not response.ok:
+        if response.status_code != httpx.codes.OK:
             raise FailedToDownloadCaptchaException()
 
         try:
@@ -185,32 +180,34 @@ class Sicar(Url):
             {"idEstado": state.value, "tipoBase": polygon.value, "ReCaptcha": captcha}
         )
 
-        try:
-            response = self._get(f"{self._DOWNLOAD_BASE}?{query}", stream=True)
-        except UrlNotOkException as error:
-            raise FailedToDownloadPolygonException() from error
+        with self._session.stream("GET", f"{self._DOWNLOAD_BASE}?{query}") as response:
+            try:
+                if response.status_code != httpx.codes.OK:
+                    raise UrlNotOkException(f"{self._DOWNLOAD_BASE}?{query}")
+            except UrlNotOkException as error:
+                raise FailedToDownloadPolygonException() from error
 
-        content_length = int(response.headers.get("Content-Length", 0))
+            content_length = int(response.headers.get("Content-Length", 0))
 
-        content_type = response.headers.get("Content-Type", "")
+            content_type = response.headers.get("Content-Type", "")
 
-        if content_length == 0 or not content_type.startswith("application/zip"):
-            raise FailedToDownloadPolygonException()
+            if content_length == 0 or not content_type.startswith("application/zip"):
+                raise FailedToDownloadPolygonException()
 
-        path = Path(os.path.join(folder, f"{state.value}_{polygon.value}")).with_suffix(
-            ".zip"
-        )
+            path = Path(
+                os.path.join(folder, f"{state.value}_{polygon.value}")
+            ).with_suffix(".zip")
 
-        with open(path, "wb") as fd:
-            with tqdm(
-                total=content_length,
-                unit="iB",
-                unit_scale=True,
-                desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
-            ) as progress_bar:
-                for chunk in response.iter_content(chunk_size=chunk_size):
-                    fd.write(chunk)
-                    progress_bar.update(len(chunk))
+            with open(path, "wb") as fd:
+                with tqdm(
+                    total=content_length,
+                    unit="iB",
+                    unit_scale=True,
+                    desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
+                ) as progress_bar:
+                    for chunk in response.iter_bytes():
+                        fd.write(chunk)
+                        progress_bar.update(len(chunk))
         return path
 
     def download_state(
