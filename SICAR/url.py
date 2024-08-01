@@ -24,7 +24,7 @@ class Url:
         _RECAPTCHA (str): URL for CAPTCHA-related resources.
     """
 
-    _BASE = "https://www.car.gov.br/publico"
+    _BASE = "https://www.consultapublica.car.gov.br/publico"
     _INDEX = f"{_BASE}/imoveis/index"
     _DOWNLOAD_BASE = f"{_BASE}/estados/downloadBase"
     _RECAPTCHA = f"{_BASE}/municipios/ReCaptcha"
