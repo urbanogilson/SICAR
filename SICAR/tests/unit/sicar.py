@@ -41,7 +41,9 @@ class SicarTestCase(unittest.TestCase):
     def test_initialize_cookies(self, mock_get):
         self.mock_initialize_cookies.stop()
         Sicar(driver=self.mocked_captcha)
-        mock_get.assert_called_once_with("https://www.car.gov.br/publico/imoveis/index")
+        mock_get.assert_called_once_with(
+            "https://consultapublica.car.gov.br/publico/imoveis/index"
+        )
         self.mock_initialize_cookies.start()
 
     def test_ocr_driver_integration(self):
