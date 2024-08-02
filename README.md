@@ -146,11 +146,11 @@ Optional: Make an external directory to store the downloaded data and use a volu
 ## Acknowledgements
 
 - [Sicar - Sistema Nacional de Cadastro Ambiental Rural](https://www.car.gov.br/)
-- [Sicar - Base de Downloads](https://www.car.gov.br/publico/municipios/downloads)
+- [Sicar - Base de Downloads](https://consultapublica.car.gov.br/publico/estados/downloads)
 
 ## Roadmap
 
-- [ ] Upload to pypi registry 
+- [ ] Upload to pypi registry
 
 ## Contributing
 

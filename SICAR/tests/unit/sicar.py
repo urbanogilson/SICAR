@@ -103,7 +103,7 @@ class SicarTestCase(unittest.TestCase):
         captcha_image = sicar._download_captcha()
 
         sicar._get.assert_called_once_with(
-            f"https://www.car.gov.br/publico/municipios/ReCaptcha?id={int(random.random() * 1000000)}"
+            f"https://consultapublica.car.gov.br/publico/municipios/ReCaptcha?id={int(random.random() * 1000000)}"
         )
         Image.open.assert_called_once()
         self.assertEqual(captcha_image, mock_image)
@@ -160,7 +160,7 @@ class SicarTestCase(unittest.TestCase):
 
         stream_mock.assert_called_once_with(
             "GET",
-            r"https://www.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
+            r"https://consultapublica.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
         )
         mock_path.assert_called_once_with(f"{folder}/{state}_{polygon.value}")
         mock_open.assert_called_once_with(
