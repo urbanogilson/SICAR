@@ -107,3 +107,19 @@ class FailedToDownloadPolygonException(Exception):
             None
         """
         super().__init__("Failed to download polygon!")
+
+
+class FailedToRefreshUpdateDateException(Exception):
+    """Exception raised when refreshing updated date."""
+
+    def __init__(self):
+        """
+        Initialize an instance of FailedToRefreshUpdateDateException.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__("Failed to refresh update at date!")
