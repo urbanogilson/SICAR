@@ -13,3 +13,6 @@ class TestSicarBase(unittest.TestCase):
             self._car.download_state(State.RR, Polygon.AREA_FALL, debug=True),
             Path,
         )
+
+    def test_refresh_update_date(self):
+        self.assertIsInstance(self._car.refresh_update_date(), dict)

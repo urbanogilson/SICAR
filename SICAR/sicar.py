@@ -13,6 +13,7 @@ import time
 import random
 import httpx
 from PIL import Image, UnidentifiedImageError
+from bs4 import BeautifulSoup
 from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
@@ -28,6 +29,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
+    FailedToRefreshUpdateDateException,
 )
 
 
@@ -61,6 +63,38 @@ class Sicar(Url):
         self._driver = driver()
         self._create_session(headers=headers)
         self._initialize_cookies()
+
+    @staticmethod
+    def _parse_update_date_html(html_response) -> Dict:
+        """
+        Parse raw html getting states and updated at date.
+
+        Parameters:
+            html_response (bytes): The byte string containing html page
+
+        Returns:
+            Dict: A dict containing state sign as keys and parsed update date as value.
+
+        """
+        html_content = html_response.decode("utf-8")
+
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        state_dates = {}
+
+        for state_block in soup.find_all("div", class_="listagem-estados"):
+            button_tag = state_block.find(
+                "button", class_="btn-abrir-modal-download-base-poligono"
+            )
+            state_sign = button_tag.get("data-estado") if button_tag else None
+
+            date_tag = state_block.find("div", class_="data-disponibilizacao")
+            date = date_tag.get_text(strip=True) if date_tag else None
+
+            if state_sign and date:
+                state_dates[state_sign] = date
+
+        return state_dates
 
     def _create_session(self, headers: Dict = None):
         """
@@ -194,7 +228,6 @@ class Sicar(Url):
 
             if content_length == 0 or not content_type.startswith("application/zip"):
                 raise FailedToDownloadPolygonException()
-
             path = Path(
                 os.path.join(folder, f"{state.value}_{polygon.value}")
             ).with_suffix(".zip")
@@ -325,3 +358,19 @@ class Sicar(Url):
                 debug=debug,
                 chunk_size=chunk_size,
             )
+
+    def refresh_update_date(self) -> Dict:
+        """
+        Get and parse update date for each state in SICAR system.
+
+        Returns:
+            Dict: A dict containing state sign as keys and update date as value.
+
+        Raises:
+            FailedToRefreshUpdateDateException: If the page with update date fails to load.
+        """
+        try:
+            response = self._get(f"{self._UPDATED_AT}")
+            return self._parse_update_date_html(response.content)
+        except UrlNotOkException as error:
+            raise FailedToRefreshUpdateDateException() from error
