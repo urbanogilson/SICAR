@@ -14,7 +14,6 @@ import random
 import httpx
 from PIL import Image, UnidentifiedImageError
 from bs4 import BeautifulSoup
-from datetime import datetime
 from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
