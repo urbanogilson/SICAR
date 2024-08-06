@@ -29,7 +29,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
-    FailedToRefreshUpdateDateException,
+    FailedToGetReleaseDateException,
 )
 
 
@@ -64,17 +64,15 @@ class Sicar(Url):
         self._create_session(headers=headers)
         self._initialize_cookies()
 
-    @staticmethod
-    def _parse_update_date_html(html_response) -> Dict:
+    def _parse_release_dates_html(self, html_response) -> Dict:
         """
-        Parse raw html getting states and updated at date.
+        Parse raw html getting states and release date.
 
         Parameters:
-            html_response (bytes): The byte string containing html page
+            html_response (bytes): The byte string containing html page from SICAR with release dates per state
 
         Returns:
             Dict: A dict containing state sign as keys and parsed update date as value.
-
         """
         html_content = html_response.decode("utf-8")
 
@@ -359,18 +357,18 @@ class Sicar(Url):
                 chunk_size=chunk_size,
             )
 
-    def refresh_update_date(self) -> Dict:
+    def get_release_dates(self) -> Dict:
         """
-        Get and parse update date for each state in SICAR system.
+        Get release date for each state in SICAR system.
 
         Returns:
-            Dict: A dict containing state sign as keys and update date as value.
+            Dict: A dict containing state sign as keys and release date as string in dd/mm/yyyy format.
 
         Raises:
-            FailedToRefreshUpdateDateException: If the page with update date fails to load.
+            FailedToGetReleaseDateException: If the page with release date fails to load.
         """
         try:
-            response = self._get(f"{self._UPDATED_AT}")
-            return self._parse_update_date_html(response.content)
+            response = self._get(f"{self._RELEASE_DATE}")
+            return self._parse_release_dates_html(response.content)
         except UrlNotOkException as error:
-            raise FailedToRefreshUpdateDateException() from error
+            raise FailedToGetReleaseDateException() from error

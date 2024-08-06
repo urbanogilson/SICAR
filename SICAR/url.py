@@ -28,4 +28,4 @@ class Url:
     _INDEX = f"{_BASE}/imoveis/index"
     _DOWNLOAD_BASE = f"{_BASE}/estados/downloadBase"
     _RECAPTCHA = f"{_BASE}/municipios/ReCaptcha"
-    _UPDATED_AT = f"{_BASE}/estados/downloads"
+    _RELEASE_DATE = f"{_BASE}/estados/downloads"

@@ -15,4 +15,4 @@ class TestSicarBase(unittest.TestCase):
         )
 
     def test_refresh_update_date(self):
-        self.assertIsInstance(self._car.refresh_update_date(), dict)
+        self.assertIsInstance(self._car.get_release_dates(), dict)

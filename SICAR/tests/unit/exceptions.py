@@ -5,6 +5,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
+    FailedToGetReleaseDateException,
 )
 
 
@@ -36,3 +37,8 @@ class ExceptionTestCase(unittest.TestCase):
         with self.assertRaises(FailedToDownloadPolygonException) as context:
             raise FailedToDownloadPolygonException()
         self.assertEqual(str(context.exception), "Failed to download polygon!")
+
+    def test_failed_to_get_release_dates_exception(self):
+        with self.assertRaises(FailedToGetReleaseDateException) as context:
+            raise FailedToGetReleaseDateException()
+        self.assertEqual(str(context.exception), "Failed to get release date!")

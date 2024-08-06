@@ -17,7 +17,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
-    FailedToRefreshUpdateDateException,
+    FailedToGetReleaseDateException,
 )
 
 
@@ -372,7 +372,7 @@ class SicarTestCase(unittest.TestCase):
         mock_mkdir.assert_has_calls(expected_calls["path"])
         mock_download_state.assert_has_calls(expected_calls["download_state"])
 
-    def test_refresh_updated_date_success(self):
+    def test_get_release_dates_success(self):
         html_content = (
             b'<div class="listagem-estados">'
             b'<div class="data-disponibilizacao"><i>04/08/2024</i></div>'
@@ -384,7 +384,7 @@ class SicarTestCase(unittest.TestCase):
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._get = MagicMock(return_value=mock_response)
 
-        update_dates = sicar.refresh_update_date()
+        update_dates = sicar.get_release_dates()
 
         sicar._get.assert_called_once_with(
             f"https://consultapublica.car.gov.br/publico/estados/downloads"
@@ -397,7 +397,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._session.get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
         )
-        with self.assertRaises(FailedToRefreshUpdateDateException):
-            sicar.refresh_update_date()
+        with self.assertRaises(FailedToGetReleaseDateException):
+            sicar.get_release_dates()
 
         sicar._session.get.assert_called_once()
