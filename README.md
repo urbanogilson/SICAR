@@ -82,12 +82,44 @@ pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
 ```python
 from SICAR import Sicar, State, Polygon
 from SICAR.drivers import Paddle
+import pprint
 
 # Create Sicar instance using PaddleOCR
 car = Sicar(driver=Paddle)
 
 # Download a state
 car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder='SICAR/AM')
+
+# Get release date for each state
+state_dates = car.get_release_dates()
+pprint.pprint(state_dates)
+# {'AC': '04/08/2024',
+#  'AL': '04/08/2024',
+#  'AM': '04/08/2024',
+#  'AP': '03/08/2024',
+#  'BA': '03/08/2024',
+#  'CE': '03/07/2024',
+#  'DF': '03/07/2024',
+#  'ES': '04/08/2024',
+#  'GO': '04/08/2024',
+#  'MA': '04/08/2024',
+#  'MG': '04/08/2024',
+#  'MS': '03/07/2024',
+#  'MT': '03/07/2024',
+#  'PA': '03/08/2024',
+#  'PB': '04/08/2024',
+#  'PE': '03/08/2024',
+#  'PI': '02/08/2024',
+#  'PR': '03/08/2024',
+#  'RJ': '02/08/2024',
+#  'RN': '03/08/2024',
+#  'RO': '05/08/2024',
+#  'RR': '03/07/2024',
+#  'RS': '05/08/2024',
+#  'SC': '05/08/2024',
+#  'SE': '03/07/2024',
+#  'SP': '05/08/2024',
+#  'TO': '03/07/2024'}
 ```
 
 ### Run with Google Colab
