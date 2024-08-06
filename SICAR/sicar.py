@@ -64,17 +64,17 @@ class Sicar(Url):
         self._create_session(headers=headers)
         self._initialize_cookies()
 
-    def _parse_release_dates_html(self, html_response) -> Dict:
+    def _parse_release_dates_html(self, response: bytes) -> Dict:
         """
         Parse raw html getting states and release date.
 
         Parameters:
-            html_response (bytes): The byte string containing html page from SICAR with release dates per state
+            response (bytes): The request content as byte string containing html page from SICAR with release dates per state
 
         Returns:
             Dict: A dict containing state sign as keys and parsed update date as value.
         """
-        html_content = html_response.decode("utf-8")
+        html_content = response.decode("utf-8")
 
         soup = BeautifulSoup(html_content, "html.parser")
 
@@ -90,7 +90,7 @@ class Sicar(Url):
             date = date_tag.get_text(strip=True) if date_tag else None
 
             if state_sign and date:
-                state_dates[state_sign] = date
+                state_dates[State(state_sign)] = date
 
         return state_dates
 
