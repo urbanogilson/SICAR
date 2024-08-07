@@ -50,6 +50,11 @@ car = Sicar()
 
 # Download APPS polygon for the PA state
 car.download_state(State.PA, Polygon.APPS)
+
+# Get release date for all states as a dict
+release_dates = car.get_release_dates()
+print(release_dates.get(State.PA))
+# '03/08/2024'
 ```
 
 ### OCR drivers

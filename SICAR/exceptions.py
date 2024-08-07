@@ -8,6 +8,7 @@ Classes:
     StateCodeNotValidException: Exception raised when an invalid state code is encountered.
     FailedToDownloadCaptchaException: Exception raised when downloading a captcha fails.
     FailedToDownloadPolygonException: Exception raised when downloading a polygon fails.
+    FailedToGetReleaseDateException: Exception raised when downloading release date fails.
 """
 
 
@@ -107,3 +108,19 @@ class FailedToDownloadPolygonException(Exception):
             None
         """
         super().__init__("Failed to download polygon!")
+
+
+class FailedToGetReleaseDateException(Exception):
+    """Exception raised when get release date fails."""
+
+    def __init__(self):
+        """
+        Initialize an instance of FailedToGetReleaseDateException.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__("Failed to get release date!")

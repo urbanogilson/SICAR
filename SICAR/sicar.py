@@ -13,6 +13,7 @@ import time
 import random
 import httpx
 from PIL import Image, UnidentifiedImageError
+from bs4 import BeautifulSoup
 from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
@@ -28,6 +29,7 @@ from SICAR.exceptions import (
     StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
+    FailedToGetReleaseDateException,
 )
 
 
@@ -61,6 +63,36 @@ class Sicar(Url):
         self._driver = driver()
         self._create_session(headers=headers)
         self._initialize_cookies()
+
+    def _parse_release_dates(self, response: bytes) -> Dict:
+        """
+        Parse raw html getting states and release date.
+
+        Parameters:
+            response (bytes): The request content as byte string containing html page from SICAR with release dates per state
+
+        Returns:
+            Dict: A dict containing state sign as keys and parsed update date as value.
+        """
+        html_content = response.decode("utf-8")
+
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        state_dates = {}
+
+        for state_block in soup.find_all("div", class_="listagem-estados"):
+            button_tag = state_block.find(
+                "button", class_="btn-abrir-modal-download-base-poligono"
+            )
+            state = button_tag.get("data-estado") if button_tag else None
+
+            date_tag = state_block.find("div", class_="data-disponibilizacao")
+            date = date_tag.get_text(strip=True) if date_tag else None
+
+            if state in iter(State) and date:
+                state_dates[State(state)] = date
+
+        return state_dates
 
     def _create_session(self, headers: Dict = None):
         """
@@ -194,7 +226,6 @@ class Sicar(Url):
 
             if content_length == 0 or not content_type.startswith("application/zip"):
                 raise FailedToDownloadPolygonException()
-
             path = Path(
                 os.path.join(folder, f"{state.value}_{polygon.value}")
             ).with_suffix(".zip")
@@ -325,3 +356,19 @@ class Sicar(Url):
                 debug=debug,
                 chunk_size=chunk_size,
             )
+
+    def get_release_dates(self) -> Dict:
+        """
+        Get release date for each state in SICAR system.
+
+        Returns:
+            Dict: A dict containing state sign as keys and release date as string in dd/mm/yyyy format.
+
+        Raises:
+            FailedToGetReleaseDateException: If the page with release date fails to load.
+        """
+        try:
+            response = self._get(f"{self._RELEASE_DATE}")
+            return self._parse_release_dates(response.content)
+        except UrlNotOkException as error:
+            raise FailedToGetReleaseDateException() from error
