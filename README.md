@@ -44,17 +44,44 @@ If you don't want to install dependencies on your computer or don't know how to 
 
 ```python
 from SICAR import Sicar, State, Polygon
+import pprint
 
 # Create Sicar instance
 car = Sicar()
 
+# Get release data dates
+state_dates = car.get_release_dates()
+pprint.pprint(state_dates)
+# {<State.AC: 'AC'>: '04/08/2024',
+#  <State.AL: 'AL'>: '04/08/2024',
+#  <State.AM: 'AM'>: '04/08/2024',
+#  <State.AP: 'AP'>: '03/08/2024',
+#  <State.BA: 'BA'>: '03/08/2024',
+#  <State.CE: 'CE'>: '06/08/2024',
+#  <State.DF: 'DF'>: '06/08/2024',
+#  <State.ES: 'ES'>: '04/08/2024',
+#  <State.GO: 'GO'>: '04/08/2024',
+#  <State.MA: 'MA'>: '04/08/2024',
+#  <State.MG: 'MG'>: '04/08/2024',
+#  <State.MS: 'MS'>: '06/08/2024',
+#  <State.MT: 'MT'>: '05/08/2024',
+#  <State.PA: 'PA'>: '03/08/2024',
+#  <State.PB: 'PB'>: '04/08/2024',
+#  <State.PE: 'PE'>: '03/08/2024',
+#  <State.PI: 'PI'>: '02/08/2024',
+#  <State.PR: 'PR'>: '03/08/2024',
+#  <State.RJ: 'RJ'>: '02/08/2024',
+#  <State.RN: 'RN'>: '03/08/2024',
+#  <State.RO: 'RO'>: '05/08/2024',
+#  <State.RR: 'RR'>: '06/08/2024',
+#  <State.RS: 'RS'>: '05/08/2024',
+#  <State.SC: 'SC'>: '05/08/2024',
+#  <State.SE: 'SE'>: '05/08/2024',
+#  <State.SP: 'SP'>: '05/08/2024',
+#  <State.TO: 'TO'>: '05/08/2024'}
+
 # Download APPS polygon for the PA state
 car.download_state(State.PA, Polygon.APPS)
-
-# Get release date for all states as a dict
-release_dates = car.get_release_dates()
-print(release_dates.get(State.PA))
-# '03/08/2024'
 ```
 
 ### OCR drivers
