@@ -14,5 +14,5 @@ class TestSicarBase(unittest.TestCase):
             Path,
         )
 
-    def test_refresh_update_date(self):
+    def test_get_release_dates(self):
         self.assertIsInstance(self._car.get_release_dates(), dict)
