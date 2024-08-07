@@ -369,6 +369,6 @@ class Sicar(Url):
         """
         try:
             response = self._get(f"{self._RELEASE_DATE}")
-            return self._parse_release_dates_html(response.content)
+            return self._parse_release_dates(response.content)
         except UrlNotOkException as error:
             raise FailedToGetReleaseDateException() from error
