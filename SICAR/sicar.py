@@ -84,13 +84,13 @@ class Sicar(Url):
             button_tag = state_block.find(
                 "button", class_="btn-abrir-modal-download-base-poligono"
             )
-            state_sign = button_tag.get("data-estado") if button_tag else None
+            state = button_tag.get("data-estado") if button_tag else None
 
             date_tag = state_block.find("div", class_="data-disponibilizacao")
             date = date_tag.get_text(strip=True) if date_tag else None
 
-            if state_sign and date:
-                state_dates[State(state_sign)] = date
+            if state in iter(State) and date:
+                state_dates[State(state)] = date
 
         return state_dates
 
