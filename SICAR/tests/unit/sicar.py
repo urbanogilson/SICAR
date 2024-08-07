@@ -390,9 +390,9 @@ class SicarTestCase(unittest.TestCase):
             f"https://consultapublica.car.gov.br/publico/estados/downloads"
         )
 
-        self.assertEqual(update_dates, {"AC": "04/08/2024"})
+        self.assertEqual(update_dates, {State.AC: "04/08/2024"})
 
-    def test_refresh_updated_date_failure(self):
+    def test_get_release_dates_failure(self):
         sicar = Sicar(driver=self.mocked_captcha)
         sicar._session.get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
