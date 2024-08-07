@@ -64,7 +64,7 @@ class Sicar(Url):
         self._create_session(headers=headers)
         self._initialize_cookies()
 
-    def _parse_release_dates_html(self, response: bytes) -> Dict:
+    def _parse_release_dates(self, response: bytes) -> Dict:
         """
         Parse raw html getting states and release date.
 
