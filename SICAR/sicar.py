@@ -9,6 +9,7 @@ Classes:
 
 import io
 import os
+import ssl
 import time
 import random
 import httpx
@@ -18,6 +19,11 @@ from tqdm import tqdm
 from typing import Dict
 from pathlib import Path
 from urllib.parse import urlencode
+import warnings
+
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
+)
 
 from SICAR.drivers import Captcha, Tesseract
 from SICAR.state import State
@@ -102,16 +108,20 @@ class Sicar(Url):
             headers (Dict): Additional headers for the session. Default is None.
 
         Note:
-            The SSL certificate verification is disabled by default using `verify=False`. This allows connections to servers
+            The SSL certificate verification is disabled by default using `verify=context`. This allows connections to servers
             with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
             security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
-            certificate authority, you can remove the `verify=False` parameter to enable SSL certificate verification by
+            certificate authority, you can remove the `verify=context` parameter to enable SSL certificate verification by
             default.
 
         Returns:
             None
         """
-        self._session = httpx.Client(verify=False)
+
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
+
+        self._session = httpx.Client(verify=context)
         self._session.headers.update(
             headers
             if isinstance(headers, dict)

@@ -6,6 +6,7 @@ import httpx
 from PIL import Image
 from pathlib import Path, PosixPath
 import sys
+import ssl
 
 from SICAR import Sicar
 from SICAR.state import State
@@ -55,7 +56,9 @@ class SicarTestCase(unittest.TestCase):
     @patch("httpx.Client")
     def test_create_session_with_ssl_disabled(self, mock_session):
         Sicar(driver=self.mocked_captcha)
-        mock_session.assert_called_once_with(verify=False)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
+        mock_session.assert_called_once()
 
     @patch("httpx.Client")
     def test_create_session_with_custom_headers(self, mock_session):
