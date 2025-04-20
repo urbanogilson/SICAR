@@ -33,7 +33,7 @@ jobs:
       - name: Run linter (black)
         run: |
           pip install black
-          black --check --verbose ./SICAR/
+          black --check --verbose --diff ./SICAR/
 
       - name: Run interrogate
         run: |
