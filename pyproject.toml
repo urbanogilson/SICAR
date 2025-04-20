@@ -10,10 +10,10 @@ dependencies = [
     "urllib3>=2.3.0",
     "pytesseract>=0.3.13",
     "opencv-python>=4.11.0.86",
-    "numpy>2.0.2",
+    "numpy>=2.0.2",
     "tqdm>=4.67.1",
     "matplotlib>=3.10.0",
-    "beautifulsoup4>=4.12.4"
+    "beautifulsoup4>=4.13.4"
 ]
 
 [project.optional-dependencies]
