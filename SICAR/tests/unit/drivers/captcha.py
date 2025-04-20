@@ -70,6 +70,7 @@ class CaptchaTests(unittest.TestCase):
         result = self.captcha._improve_image(image)
 
         # Assert the image processing steps
+
         expected_image = cv2.threshold(
             image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU + 2
         )[1]
