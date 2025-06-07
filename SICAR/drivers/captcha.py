@@ -58,8 +58,8 @@ class Captcha(ABC):
             The saved JPEG image is then loaded using OpenCV's `imread` function, and the image data is returned as a NumPy
             array.
         """
-        with tempfile.NamedTemporaryFile(suffix=".png") as png:
-            with tempfile.NamedTemporaryFile(suffix=".jpg") as jpg:
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as png:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as jpg:                
                 captcha.save(png.name)
                 mpimg.imsave(
                     jpg.name,
