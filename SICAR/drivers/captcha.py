@@ -59,7 +59,7 @@ class Captcha(ABC):
             array.
         """
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as png:
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as jpg:                
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as jpg:
                 captcha.save(png.name)
                 mpimg.imsave(
                     jpg.name,
