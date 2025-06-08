@@ -51,7 +51,7 @@ class CaptchaTests(unittest.TestCase):
             self.assertEqual(mock_tempfile.call_count, 2)
             self.assertEqual(
                 mock_tempfile.call_args_list,
-                [call(suffix=".png"), call(suffix=".jpg")],
+                [call(suffix=".png", delete=False), call(suffix=".jpg", delete=False)],
             )
             imsave_mock.assert_called_once_with(
                 "temp.jpg",

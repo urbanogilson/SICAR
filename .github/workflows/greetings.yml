@@ -8,6 +8,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
+      contents: read
     steps:
       - uses: actions/first-interaction@v1
         with:
