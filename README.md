@@ -4,11 +4,11 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Badges
 
-[![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
+[![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/Malnati/SICAR-for-pipeline/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
-[![Coverage Status](https://coveralls.io/repos/github/urbanogilson/SICAR/badge.svg?branch=main)](https://coveralls.io/github/urbanogilson/SICAR?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/Malnati/SICAR-for-pipeline/badge.svg?branch=main)](https://coveralls.io/github/Malnati/SICAR-for-pipeline?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
 ## Features
@@ -23,7 +23,7 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 Install SICAR with pip
 
 ```bash
-pip install git+https://github.com/urbanogilson/SICAR
+pip install git+https://github.com/Malnati/SICAR-for-pipeline
 ```
 
 Prerequisite:
@@ -108,7 +108,7 @@ car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder='SICAR/SP')
 Install SICAR with pip and include Paddle dependencies
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
+pip install 'SICAR[paddle] @  git+https://github.com/Malnati/SICAR-for-pipeline'
 ```
 
 ```python
@@ -126,7 +126,7 @@ car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder='SICAR/AM')
 
 Using Google Colab, you don't need to install the dependencies on your computer and you can save files directly to your Google Drive.
 
-[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
+[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Malnati/SICAR-for-pipeline/blob/main/examples/colab.ipynb)
 
 ### Run with Docker
 
@@ -188,7 +188,7 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 The development environment with all necessary packages is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
 
-[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Malnati/SICAR-for-pipeline)
 
 Contributions are always welcome!
 
