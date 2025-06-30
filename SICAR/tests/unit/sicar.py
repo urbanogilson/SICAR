@@ -140,9 +140,8 @@ class SicarTestCase(unittest.TestCase):
         sicar._get.assert_called_once()
 
     @patch("builtins.open", new_callable=MagicMock)
-    @patch.object(Path, "__init__", return_value=None)
     @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
-    def test_download_polygon_success(self, mock_tqdm, mock_path, mock_open):
+    def test_download_polygon_success(self, mock_tqdm, mock_open):
         state = State.MG
         polygon = Polygon.APPS
         captcha = "abc123"
@@ -154,10 +153,11 @@ class SicarTestCase(unittest.TestCase):
             "Content-Length": 4096,
         }
 
-        response_mock.iter_bytes = lambda: (
-            (yield b"chunk1"),
-            (yield b"chunk2"),
-        )
+        def fake_iter_bytes(*args, **kwargs):
+            yield b"chunk1"
+            yield b"chunk2"
+
+        response_mock.iter_bytes = fake_iter_bytes
 
         with patch.object(httpx.Client, "stream") as stream_mock:
             stream_mock.return_value.__enter__.return_value = response_mock
@@ -167,13 +167,15 @@ class SicarTestCase(unittest.TestCase):
         stream_mock.assert_called_once_with(
             "GET",
             r"https://consultapublica.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
+            headers={"Range": "bytes=0-"},
         )
-        mock_path.assert_called_once_with(f"{folder}/{state}_{polygon.value}")
         mock_open.assert_called_once_with(
-            PosixPath(f"{folder}/{state}_{polygon.value}.zip"), "wb"
+            PosixPath(f"{folder}/{state.value}_{polygon.value}.zip"), "ab"
         )
         mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, PosixPath(f"{folder}/{state}_{polygon.value}.zip"))
+        self.assertEqual(
+            result, PosixPath(f"{folder}/{state.value}_{polygon.value}.zip")
+        )
 
     def test_download_polygon_failed_response(self):
         with patch.object(httpx.Client, "stream") as stream_mock:
