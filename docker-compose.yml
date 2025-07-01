@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  download:
+    build: .
+    entrypoint: ./entrypoint.download.sh
+    volumes:
+      - .:/sicar
+  api:
+    build: .
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/sicar

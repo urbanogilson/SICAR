@@ -105,27 +105,28 @@ ambiente apropriadas.
 ## 2️⃣ Execução via Docker Compose
 >>>>>>> dffc5aa (Revert "Add shell script runner and env-based example" (#11))
 
-Crie um arquivo `docker-compose.yml` simples apontando para este repositório:
+O repositório já possui um `docker-compose.yml` configurado com dois serviços:
 
-```yaml
-version: "3.8"
-services:
-  sicar:
-    build: .
-    volumes:
-      - .:/sicar
-    command: python examples/docker.py
-```
+* **download** – roda o script `entrypoint.download.sh` para baixar os arquivos
+  desejados. Defina as variáveis `STATE`, `POLYGON` e `FOLDER` conforme a
+  necessidade.
+* **api** – executa o `uvicorn` servindo a aplicação FastAPI em
+  `http://localhost:8000`.
+
+Primeiro, construa a imagem base:
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/Malnati/download-car'
+make build
 ```
 
-Execute:
+Em seguida, suba os serviços:
 
 ```bash
-docker compose up --build
+docker compose up
 ```
+
+Os logs do container de download indicarão o progresso do script, enquanto o
+serviço da API ficará disponível na porta `8000` para testes locais.
 
 ## 4️⃣ Execução via Google Colab (Notebook Interativo)
 
