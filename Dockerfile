@@ -7,7 +7,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 RUN pip install --upgrade pip
 
-RUN pip install 'SICAR[paddle] @  git+https://github.com/Malnati/download-car'
+RUN pip install 'SICAR[paddle]@git+https://github.com/Malnati/download-car'
 
 WORKDIR /sicar
 
