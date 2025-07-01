@@ -30,12 +30,8 @@ Permitir o download programático dos dados públicos do SICAR. O projeto inclui
   - [5️⃣ Execução via API](#5️⃣-execução-via-api)
     - [Campos esperados (multipart/form)](#campos-esperados-multipartform)
     - [Exemplo via curl](#exemplo-via-curl)
-<<<<<<< HEAD
     - [Rodando localmente com FastAPI](#rodando-localmente-com-fastapi)
   - [6️⃣ Importação como módulo Python](#6️⃣-importação-como-módulo-python)
-=======
-  - [5️⃣ Importação como módulo Python](#5️⃣-importação-como-módulo-python)
->>>>>>> dffc5aa (Revert "Add shell script runner and env-based example" (#11))
 - [📦 Resultados e arquivos de saída](#-resultados-e-arquivos-de-saída)
 - [📊 Data dictionary](#data-dictionary)
 - [📝 Licença](#license)
@@ -85,7 +81,6 @@ car = DownloadCar()
 car.download_state(state=State.PA, polygon=Polygon.APPS, folder="PA")
 ```
 
-<<<<<<< HEAD
 ## 2️⃣ Execução via Shell Script
 
 O repositório inclui o script `download_state.sh` que facilita a configuração do
@@ -101,9 +96,6 @@ O script irá garantir que a versão correta do Python esteja disponível via
 ambiente apropriadas.
 
 ## 3️⃣ Execução via Docker Compose
-=======
-## 2️⃣ Execução via Docker Compose
->>>>>>> dffc5aa (Revert "Add shell script runner and env-based example" (#11))
 
 O repositório já possui um `docker-compose.yml` configurado com dois serviços:
 
@@ -164,7 +156,6 @@ curl -X POST https://GitHub.com/Malnati/download-car-api/download \
   --output SP_APPS.zip
 ```
 
-<<<<<<< HEAD
 ### Rodando localmente com FastAPI
 
 Execute o script `api.sh` para iniciar um servidor FastAPI local:
@@ -184,9 +175,6 @@ Rotas disponíveis:
   contendo os arquivos de todos os estados.
 
 ## 6️⃣ Importação como módulo Python
-=======
-## 5️⃣ Importação como módulo Python
->>>>>>> dffc5aa (Revert "Add shell script runner and env-based example" (#11))
 
 Após instalar com `pip install git+https://github.com/Malnati/download-car`, basta importar e usar:
 
