@@ -50,6 +50,7 @@ state = State[os.getenv("STATE", "DF")]
 polygon = Polygon[os.getenv("POLYGON", "APPS")]
 folder = os.getenv("FOLDER", "data/DF")
 debug = os.getenv("DEBUG", "False").lower() == "true"
+tries = int(os.getenv("TRIES", "25"))
 
 # Create Sicar instance (default driver is Tesseract)
 car = Sicar(driver=Tesseract)
