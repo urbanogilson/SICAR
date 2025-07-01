@@ -1,4 +1,5 @@
-# SICAR
+<!-- README.md -->
+# Download CAR files (shape) 
 
 Ferramenta que automatiza o download de arquivos do [Cadastro Ambiental Rural (SICAR)](https://car.gov.br/publico/imoveis/index). Ela é voltada para estudantes, pesquisadores e analistas que precisam acessar shapefiles do sistema de maneira simples.
 
@@ -23,12 +24,13 @@ Permitir o download programático dos dados públicos do SICAR. O projeto inclui
 - [📥 Parâmetros disponíveis](#-parâmetros-disponíveis)
 - [🚀 Como usar](#-como-usar)
   - [1️⃣ Execução via Python (direto)](#1️⃣-execução-via-python-direto)
-  - [2️⃣ Execução via Docker Compose](#2️⃣-execução-via-docker-compose)
-  - [3️⃣ Execução via Google Colab (Notebook Interativo)](#3️⃣-execução-via-google-colab-notebook-interativo)
-  - [4️⃣ Execução via API](#4️⃣-execução-via-api)
+  - [2️⃣ Execução via Shell Script](#2️⃣-execução-via-shell-script)
+  - [3️⃣ Execução via Docker Compose](#3️⃣-execução-via-docker-compose)
+  - [4️⃣ Execução via Google Colab (Notebook Interativo)](#4️⃣-execução-via-google-colab-notebook-interativo)
+  - [5️⃣ Execução via API](#5️⃣-execução-via-api)
     - [Campos esperados (multipart/form)](#campos-esperados-multipartform)
     - [Exemplo via curl](#exemplo-via-curl)
-  - [5️⃣ Importação como módulo Python](#5️⃣-importação-como-módulo-python)
+  - [6️⃣ Importação como módulo Python](#6️⃣-importação-como-módulo-python)
 - [📦 Resultados e arquivos de saída](#-resultados-e-arquivos-de-saída)
 - [📊 Data dictionary](#data-dictionary)
 - [📝 Licença](#license)
@@ -77,7 +79,21 @@ car = Sicar()
 car.download_state(state=State.PA, polygon=Polygon.APPS, folder="PA")
 ```
 
-## 2️⃣ Execução via Docker Compose
+## 2️⃣ Execução via Shell Script
+
+O repositório inclui o script `download_state.sh` que facilita a configuração do
+ambiente e a execução do exemplo `download_state.py`. Basta informar os
+parâmetros desejados:
+
+```bash
+./download_state.sh --state DF --polygon APPS --folder data/DF --debug True
+```
+
+O script irá garantir que a versão correta do Python esteja disponível via
+`pyenv`, criar um ambiente virtual e executar o exemplo com as variáveis de
+ambiente apropriadas.
+
+## 3️⃣ Execução via Docker Compose
 
 Crie um arquivo `docker-compose.yml` simples apontando para este repositório:
 
@@ -100,13 +116,13 @@ Execute:
 docker compose up --build
 ```
 
-## 3️⃣ Execução via Google Colab (Notebook Interativo)
+## 4️⃣ Execução via Google Colab (Notebook Interativo)
 
 [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Malnati/SICAR-for-pipeline/blob/main/examples/colab.ipynb)
 
 O notebook permite baixar os shapefiles diretamente no navegador sem instalar nada.
 
-## 4️⃣ Execução via API
+## 5️⃣ Execução via API
 
 Uma API pública de demonstração está disponível em [GitHub.com/Malnati/sicar-api](https://GitHub.com/Malnati/sicar-api/). O endpoint `/download` aceita requisições `POST` contendo o estado e o tipo de polígono desejado.
 
@@ -126,7 +142,7 @@ curl -X POST https://GitHub.com/Malnati/sicar-api/download \
   --output SP_APPS.zip
 ```
 
-## 5️⃣ Importação como módulo Python
+## 6️⃣ Importação como módulo Python
 
 Após instalar com `pip install git+https://github.com/urbanogilson/SICAR`, basta importar e usar:
 

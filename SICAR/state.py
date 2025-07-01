@@ -1,3 +1,4 @@
+# SICAR/state.py
 """
 State Enumeration Module.
 

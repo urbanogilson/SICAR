@@ -1,3 +1,4 @@
+# SICAR/exceptions.py
 """
 Custom Exception Classes Module.
 

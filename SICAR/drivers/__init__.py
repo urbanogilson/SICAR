@@ -1,3 +1,4 @@
+# SICAR/drivers/__init__.py
 """Drivers."""
 
 from SICAR.drivers.captcha import Captcha

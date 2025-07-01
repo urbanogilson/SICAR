@@ -1,3 +1,4 @@
+# SICAR/drivers/tesseract.py
 """
 Tesseract OCR Driver Module.
 

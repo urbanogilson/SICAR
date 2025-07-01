@@ -1,3 +1,4 @@
+# .github/workflows/greetings.yml
 name: Greetings
 
 on: [pull_request, issues]

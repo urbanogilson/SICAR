@@ -1,3 +1,4 @@
+# SICAR/tests/unit/exceptions.py
 import unittest
 from SICAR.exceptions import (
     UrlNotOkException,

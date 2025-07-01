@@ -1,3 +1,4 @@
+# pyproject.toml
 [project]
 name = "SICAR"
 version = "0.7.7"
