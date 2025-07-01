@@ -11,7 +11,7 @@ from SICAR.exceptions import (
 
 class ExceptionTestCase(unittest.TestCase):
     def test_url_not_ok_exception(self):
-        url = "https://gilsonurbano.com"
+        url = "https://GitHub.com/Malnati"
         with self.assertRaises(UrlNotOkException) as context:
             raise UrlNotOkException(url)
         self.assertEqual(str(context.exception), f"Oh no! Failed to access {url}!")

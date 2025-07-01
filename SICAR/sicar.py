@@ -223,31 +223,39 @@ class Sicar(Url):
             {"idEstado": state.value, "tipoBase": polygon.value, "ReCaptcha": captcha}
         )
 
-        with self._session.stream("GET", f"{self._DOWNLOAD_BASE}?{query}") as response:
+        path = (Path(folder) / f"{state.value}_{polygon.value}").with_suffix(".zip")
+
+        downloaded_size = path.stat().st_size if path.exists() else 0
+
+        headers = {"Range": f"bytes={downloaded_size}-"}
+
+        with self._session.stream(
+            "GET", f"{self._DOWNLOAD_BASE}?{query}", headers=headers
+        ) as response:
             try:
-                if response.status_code != httpx.codes.OK:
+                if response.status_code not in [
+                    httpx.codes.OK,
+                    httpx.codes.PARTIAL_CONTENT,
+                ]:
                     raise UrlNotOkException(f"{self._DOWNLOAD_BASE}?{query}")
             except UrlNotOkException as error:
                 raise FailedToDownloadPolygonException() from error
 
             content_length = int(response.headers.get("Content-Length", 0))
-
             content_type = response.headers.get("Content-Type", "")
 
             if content_length == 0 or not content_type.startswith("application/zip"):
                 raise FailedToDownloadPolygonException()
-            path = Path(
-                os.path.join(folder, f"{state.value}_{polygon.value}")
-            ).with_suffix(".zip")
 
-            with open(path, "wb") as fd:
+            with open(path, "ab") as fd:
                 with tqdm(
-                    total=content_length,
+                    total=content_length + downloaded_size,
                     unit="iB",
                     unit_scale=True,
                     desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
+                    initial=downloaded_size,
                 ) as progress_bar:
-                    for chunk in response.iter_bytes():
+                    for chunk in response.iter_bytes(chunk_size):
                         fd.write(chunk)
                         progress_bar.update(len(chunk))
         return path

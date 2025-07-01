@@ -1,7 +1,7 @@
 [project]
 name = "SICAR"
 version = "0.7.7"
-authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
+authors = [{ name = "Gilson Urbano", email = "ricardomalnati@gmail.com" }]
 description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -22,8 +22,8 @@ dev = ["coverage", "interrogate", "black", "coveralls"]
 all = ["SICAR[paddle,dev]"]
 
 [project.urls]
-"Homepage" = "https://github.com/urbanogilson/SICAR"
-"Bug Tracker" = "https://github.com/urbanogilson/SICAR/issues"
+"Homepage" = "https://github.com/Malnati/SICAR-for-pipeline"
+"Bug Tracker" = "https://github.com/Malnati/SICAR-for-pipeline/issues"
 
 [tool.setuptools]
 packages = ["SICAR", "SICAR.drivers"]
