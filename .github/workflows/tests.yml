@@ -1,0 +1,62 @@
+# .github/workflows/tests.yml
+name: Tests
+
+on:
+  pull_request:
+  push:
+    tags-ignore:
+      - "**"
+    paths-ignore:
+      - '.devcontainer/**'
+      - '.github/**'
+      - 'examples/**'
+      - 'README.md'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip" # caching pip dependencies
+
+      - name: Upgrade pip and setuptools
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools --upgrade
+
+      - name: Run linter (black)
+        run: |
+          pip install black
+          black --check --verbose --diff ./download_car/
+
+      - name: Run interrogate
+        run: |
+          pip install interrogate
+          interrogate
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install tesseract-ocr python3-opencv --no-install-recommends --no-upgrade --show-progress
+
+      - name: Install requirements
+        run: pip install --editable .[all]
+
+      - name: Run unit tests
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          coverage run --rcfile=pyproject.toml -m unittest download_car/tests/unit/*.py download_car/tests/unit/drivers/*.py
+          coverage report
+          coveralls
+
+      - name: Run integration tests
+        run: |
+          python -m unittest download_car/tests/integration/*.py

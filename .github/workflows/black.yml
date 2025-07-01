@@ -1,0 +1,22 @@
+# .github/workflows/black.yml
+name: Lint
+
+on:
+  push:
+    tags-ignore:
+      - "**"
+    paths-ignore:
+      - '.devcontainer/**'
+      - '.github/**'
+      - 'examples/**'
+      - 'README.md'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./download_car/"
