@@ -79,6 +79,7 @@ async def download_country_endpoint(
     tries: int = Form(25),
     debug: bool = Form(False),
     timeout: int = Form(30),
+    max_retries: int = Form(5),
 ):
     try:
         car = DownloadCar(driver=Tesseract)
