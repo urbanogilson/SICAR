@@ -107,6 +107,16 @@ ambiente apropriadas.
 
 O repositório já possui um `docker-compose.yml` configurado com dois serviços:
 
+```yaml
+version: "3.8"
+services:
+  sicar:
+    build: .
+    volumes:
+      - .:/download-car
+    command: python examples/docker.py
+```
+
 * **download** – roda o script `entrypoint.download.sh` para baixar os arquivos
   desejados. Defina as variáveis `STATE`, `POLYGON` e `FOLDER` conforme a
   necessidade.

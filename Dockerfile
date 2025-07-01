@@ -9,7 +9,7 @@ RUN pip install --upgrade pip
 
 RUN pip install 'SICAR[paddle]@git+https://github.com/Malnati/download-car'
 
-WORKDIR /sicar
+WORKDIR /download-car
 
 # Download PaddleOCR models
 RUN echo 'from paddleocr import PaddleOCR\nPaddleOCR(lang="en")' | python

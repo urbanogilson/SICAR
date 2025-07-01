@@ -1,18 +1,12 @@
 # Dockerfile.api
+
 FROM download-car-base:latest
 
-ENV CPLUS_INCLUDE_PATH=/usr/include/gdal \
-    C_INCLUDE_PATH=/usr/include/gdal
+WORKDIR /download-car
 
-WORKDIR /app
-COPY app.py ./
+COPY app.py /download-car/
 
-COPY entrypoint.api.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN pip install fastapi uvicorn httpx Pillow tqdm
 
-ENV PYENV_ROOT=/opt/pyenv
-ENV PATH=/opt/pyenv/shims:/opt/pyenv/bin:$PATH
+ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
-EXPOSE 8000
-
-ENTRYPOINT ["/entrypoint.sh"]
