@@ -8,7 +8,7 @@ Ferramenta que automatiza o download de arquivos do [Cadastro Ambiental Rural (S
 [![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/Malnati/download-car/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/download-car)](https://hub.docker.com/r/urbanogilson/download-car)
+[![Docker Pulls](https://img.shields.io/docker/pulls/malnati/download-car)](https://hub.docker.com/r/malnati/download-car)
 [![Coverage Status](https://coveralls.io/repos/github/Malnati/download-car/badge.svg?branch=main)](https://coveralls.io/github/Malnati/download-car?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
