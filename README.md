@@ -24,9 +24,10 @@ Permitir o download programático dos dados públicos do SICAR. O projeto inclui
 - [📥 Parâmetros disponíveis](#-parâmetros-disponíveis)
 - [🚀 Como usar](#-como-usar)
   - [1️⃣ Execução via Python (direto)](#1️⃣-execução-via-python-direto)
-  - [2️⃣ Execução via Docker Compose](#2️⃣-execução-via-docker-compose)
-  - [3️⃣ Execução via Google Colab (Notebook Interativo)](#3️⃣-execução-via-google-colab-notebook-interativo)
-  - [4️⃣ Execução via API](#4️⃣-execução-via-api)
+  - [2️⃣ Execução via Shell Script](#2️⃣-execução-via-shell-script)
+  - [3️⃣ Execução via Docker Compose](#3️⃣-execução-via-docker-compose)
+  - [4️⃣ Execução via Google Colab (Notebook Interativo)](#4️⃣-execução-via-google-colab-notebook-interativo)
+  - [5️⃣ Execução via API](#5️⃣-execução-via-api)
     - [Campos esperados (multipart/form)](#campos-esperados-multipartform)
     - [Exemplo via curl](#exemplo-via-curl)
 <<<<<<< HEAD
@@ -126,13 +127,13 @@ Execute:
 docker compose up --build
 ```
 
-## 3️⃣ Execução via Google Colab (Notebook Interativo)
+## 4️⃣ Execução via Google Colab (Notebook Interativo)
 
 [![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Malnati/download-car/blob/main/examples/colab.ipynb)
 
 O notebook permite baixar os shapefiles diretamente no navegador sem instalar nada.
 
-## 4️⃣ Execução via API
+## 5️⃣ Execução via API
 
 Uma API pública de demonstração está disponível em [GitHub.com/Malnati/sicar-api](https://GitHub.com/Malnati/sicar-api/). O endpoint `/download` aceita requisições `POST` contendo o estado e o tipo de polígono desejado.
 
