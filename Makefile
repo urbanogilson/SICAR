@@ -37,12 +37,14 @@ integration-test:
 test: unit-test integration-test
 
 download:
-	@echo "🛠️  Executando download_state.sh com parâmetros: state=$(state), polygon=$(polygon), folder=$(folder), debug=$(debug)"
-	./download_state.sh --state $(state) --polygon $(polygon) --folder $(folder) --debug $(debug)
+	@echo "🛠️  Executando download_state.sh com parâmetros: state=$(state), polygon=$(polygon), folder=$(folder), debug=$(debug), timeout=$(timeout), max_retries=$(max_retries)"
+	./download_state.sh --state $(state) --polygon $(polygon) --folder $(folder) --debug $(debug) --timeout $(timeout) --max_retries $(max_retries)
 
 # Valores padrão para os parâmetros
 state ?= DF
 polygon ?= APPS
 folder ?= data/DF
 debug ?= True
+timeout ?= 30
+max_retries ?= 5
 

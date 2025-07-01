@@ -30,6 +30,7 @@ Permitir o download programático dos dados públicos do SICAR. O projeto inclui
   - [5️⃣ Execução via API](#5️⃣-execução-via-api)
     - [Campos esperados (multipart/form)](#campos-esperados-multipartform)
     - [Exemplo via curl](#exemplo-via-curl)
+    - [Rodando localmente com FastAPI](#rodando-localmente-com-fastapi)
   - [6️⃣ Importação como módulo Python](#6️⃣-importação-como-módulo-python)
 - [📦 Resultados e arquivos de saída](#-resultados-e-arquivos-de-saída)
 - [📊 Data dictionary](#data-dictionary)
@@ -47,8 +48,8 @@ Prerequisite:
 
 A classe central deste pacote é `Sicar`, que disponibiliza três métodos principais:
 
-- `download_state(state, polygon, folder="temp", tries=25, debug=False, chunk_size=1024)`
-- `download_country(polygon, folder="brazil", tries=25, debug=False, chunk_size=1024)`
+- `download_state(state, polygon, folder="temp", tries=25, debug=False, chunk_size=1024, timeout=30)`
+- `download_country(polygon, folder="brazil", tries=25, debug=False, chunk_size=1024, timeout=30)`
 - `get_release_dates()`
 
 ---
@@ -63,6 +64,7 @@ A classe central deste pacote é `Sicar`, que disponibiliza três métodos princ
 | `tries`    | int          | ❌          | `25`   | Número máximo de tentativas em caso de falha.                                      | `tries=10`                          |
 | `debug`    | bool         | ❌          | `False`| Exibe mensagens extras de depuração.                                              | `debug=True`                        |
 | `chunk_size`| int         | ❌          | `1024` | Tamanho do bloco para escrita do arquivo (em bytes).                               | `chunk_size=2048`                   |
+| `timeout`   | int         | ❌          | `30`    | Tempo máximo em segundos para cada tentativa de download.                         | `timeout=60`                     |
 
 Esses parâmetros se aplicam principalmente ao método `download_state`. O método `download_country` utiliza a mesma assinatura (exceto pelo parâmetro `state`).
 
@@ -86,7 +88,7 @@ ambiente e a execução do exemplo `download_state.py`. Basta informar os
 parâmetros desejados:
 
 ```bash
-./download_state.sh --state DF --polygon APPS --folder data/DF --debug True
+./download_state.sh --state DF --polygon APPS --folder data/DF --tries 25 --debug True
 ```
 
 O script irá garantir que a versão correta do Python esteja disponível via
@@ -142,6 +144,24 @@ curl -X POST https://GitHub.com/Malnati/sicar-api/download \
   -F "polygon=APPS" \
   --output SP_APPS.zip
 ```
+
+### Rodando localmente com FastAPI
+
+Execute o script `api.sh` para iniciar um servidor FastAPI local:
+
+```bash
+./api.sh
+```
+
+O script cria um ambiente virtual via `pyenv`, instala as dependências
+necessárias e disponibiliza o serviço em `http://localhost:8000`.
+
+Rotas disponíveis:
+
+- `POST /download_state` &ndash; recebe `state` e `polygon` (além dos
+  parâmetros opcionais) e retorna um arquivo ZIP com o shapefile do estado.
+- `POST /download_country` &ndash; recebe apenas `polygon` e retorna um ZIP
+  contendo os arquivos de todos os estados.
 
 ## 6️⃣ Importação como módulo Python
 
