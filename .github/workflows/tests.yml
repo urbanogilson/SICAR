@@ -34,7 +34,7 @@ jobs:
       - name: Run linter (black)
         run: |
           pip install black
-          black --check --verbose --diff ./SICAR/
+          black --check --verbose --diff ./download_car/
 
       - name: Run interrogate
         run: |
@@ -53,10 +53,10 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          coverage run --rcfile=pyproject.toml -m unittest SICAR/tests/unit/*.py SICAR/tests/unit/drivers/*.py
+          coverage run --rcfile=pyproject.toml -m unittest download_car/tests/unit/*.py download_car/tests/unit/drivers/*.py
           coverage report
           coveralls
 
       - name: Run integration tests
         run: |
-          python -m unittest SICAR/tests/integration/*.py
+          python -m unittest download_car/tests/integration/*.py

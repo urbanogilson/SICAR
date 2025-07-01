@@ -1,7 +1,9 @@
 # Makefile
+
 # Variables
 DOCKER_CONFIG ?= /tmp/docker-config-noauth
-IMAGE ?= sicar
+IMAGE ?= download-car
+
 API_IMAGE ?= download-car-api
 DOCKERFILE ?= Dockerfile
 API_DOCKERFILE ?= Dockerfile.api
@@ -49,12 +51,12 @@ clean-api:
 # Execute Python unit tests
 unit-test:
 	@echo "🧪 Executando testes unitários..."
-	python -m unittest SICAR/tests/unit/*.py SICAR/tests/unit/drivers/*.py
+	python -m unittest download_car/tests/unit/*.py download_car/tests/unit/drivers/*.py
 
 # Execute Python integration tests
 integration-test:
 	@echo "🧪 Executando testes de integração..."
-	python -m unittest SICAR/tests/integration/*.py
+	python -m unittest download_car/tests/integration/*.py
 
 test: unit-test integration-test
 
@@ -74,15 +76,15 @@ max_retries ?= 5
 # Docker Compose targets
 build-base:
 	@echo "🛠️  Building base image..."
-	docker build -t sicar-base:latest -f Dockerfile.base .
+	docker build -t download-car-base:latest -f Dockerfile.base .
 
 build-download:
 	@echo "🛠️  Building download image..."
-	docker build -t sicar-download:latest -f Dockerfile.download-car .
+	docker build -t download-car-download:latest -f Dockerfile.download-car .
 
 build-api:
 	@echo "🛠️  Building api image..."
-	docker build -t sicar-api:latest -f Dockerfile.api .
+	docker build -t download-car-api:latest -f Dockerfile.api .
 
 build: build-base build-download build-api
 

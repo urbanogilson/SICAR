@@ -31,7 +31,7 @@ max_retries = args.max_retries
 car = Sicar(driver=Tesseract)
 # car = Sicar(driver=Paddle)
 
-# Download polygons for the chosen state
+# Download APPS polygons for the Roraima state
 car.download_state(
     state=state,
     polygon=polygon,

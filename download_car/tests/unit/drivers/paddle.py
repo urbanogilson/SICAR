@@ -1,15 +1,15 @@
-# SICAR/tests/unit/drivers/paddle.py
+# download_car/tests/unit/drivers/paddle.py
 import unittest
 from PIL import Image
 from unittest.mock import patch, MagicMock
-from SICAR.drivers import Paddle
+from download_car.drivers import Paddle
 import paddleocr
 
 
 class PaddleTestCase(unittest.TestCase):
     @patch.object(paddleocr.PaddleOCR, "__init__", return_value=None)
     @patch("re.sub")
-    @patch("SICAR.drivers.paddle.Paddle._process_captcha")
+    @patch("download_car.drivers.paddle.Paddle._process_captcha")
     def test_get_captcha(self, process_captcha_mock, re_mock, paddle_mock):
         ocr_result = [(["ABC123", 0.99],)]
         captcha_image = MagicMock(spec=Image.Image)

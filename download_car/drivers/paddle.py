@@ -1,4 +1,4 @@
-# SICAR/drivers/paddle.py
+# download_car/drivers/paddle.py
 """
 PaddleOCR Driver Module.
 
@@ -17,7 +17,7 @@ import itertools
 import re
 from PIL import Image
 
-from SICAR.drivers.captcha import Captcha
+from download_car.drivers.captcha import Captcha
 
 
 class Paddle(Captcha):

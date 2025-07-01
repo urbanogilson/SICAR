@@ -1,11 +1,11 @@
-# SICAR/polygon.py
+# download_car/polygon.py
 """
 Polygon Enumeration Module.
 
-This module defines an enumeration representing Sicar polygons.
+This module defines an enumeration representing DownloadCar polygons.
 
 Enumerations:
-    State: Enumeration representing Sicar polygons.
+    State: Enumeration representing DownloadCar polygons.
         - AREA_PROPERTY: Perímetros dos imóveis (Property perimeters)
         - APPS: Área de Preservação Permanente (Permanent preservation area)
         - NATIVE_VEGETATION: Remanescente de Vegetação Nativa (Native Vegetation Remnants)
@@ -22,7 +22,7 @@ from enum import Enum
 
 class Polygon(str, Enum):
     """
-    Enumeration representing Sicar polygons.
+    Enumeration representing DownloadCar polygons.
 
     Options:
         - AREA_PROPERTY: Perímetros dos imóveis (Property perimeters)

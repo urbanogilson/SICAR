@@ -1,11 +1,11 @@
-# SICAR/sicar.py
+# download_car/sicar.py
 """
-SICAR Class Module.
+DownloadCar Class Module.
 
-This module defines a class representing the Sicar system for managing environmental rural properties in Brazil.
+This module defines a class representing the DownloadCar system for managing environmental rural properties in Brazil.
 
 Classes:
-    Sicar: Class representing the Sicar system.
+    DownloadCar: Class representing the DownloadCar system.
 """
 
 import io
@@ -26,11 +26,11 @@ warnings.filterwarnings(
     "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
 )
 
-from SICAR.drivers import Captcha, Tesseract
-from SICAR.state import State
-from SICAR.url import Url
-from SICAR.polygon import Polygon
-from SICAR.exceptions import (
+from download_car.drivers import Captcha, Tesseract
+from download_car.state import State
+from download_car.url import Url
+from download_car.polygon import Polygon
+from download_car.exceptions import (
     UrlNotOkException,
     PolygonNotValidException,
     StateCodeNotValidException,
@@ -42,13 +42,13 @@ from SICAR.exceptions import (
 DEFAULT_TIMEOUT = 30
 
 
-class Sicar(Url):
+class DownloadCar(Url):
     """
-    Class representing the Sicar system.
+    Class representing the DownloadCar system.
 
-    Sicar is a system for managing environmental rural properties in Brazil.
+    DownloadCar is a system for managing environmental rural properties in Brazil.
 
-    It inherits from the Url class to provide access to URLs related to the Sicar system.
+    It inherits from the Url class to provide access to URLs related to the DownloadCar system.
 
     Attributes:
         _driver (Captcha): The driver used for handling captchas. Default is Tesseract.
@@ -60,7 +60,7 @@ class Sicar(Url):
         headers: Dict = None,
     ):
         """
-        Initialize an instance of the Sicar class.
+        Initialize an instance of the DownloadCar class.
 
         Parameters:
             driver (Captcha): The driver used for handling captchas. Default is Tesseract.
@@ -78,7 +78,7 @@ class Sicar(Url):
         Parse raw html getting states and release date.
 
         Parameters:
-            response (bytes): The request content as byte string containing html page from SICAR with release dates per state
+            response (bytes): The request content as byte string containing html page from download_car with release dates per state
 
         Returns:
             Dict: A dict containing state sign as keys and parsed update date as value.
@@ -171,7 +171,7 @@ class Sicar(Url):
 
     def _download_captcha(self) -> Image:
         """
-        Download a captcha image from the SICAR system.
+        Download a captcha image from the download-car system.
 
         Returns:
             Image: The captcha image.
@@ -414,7 +414,7 @@ class Sicar(Url):
 
     def get_release_dates(self) -> Dict:
         """
-        Get release date for each state in SICAR system.
+        Get release date for each state in download-car system.
 
         Returns:
             Dict: A dict containing state sign as keys and release date as string in dd/mm/yyyy format.

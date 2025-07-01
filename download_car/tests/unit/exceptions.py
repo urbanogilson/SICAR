@@ -1,6 +1,6 @@
-# SICAR/tests/unit/exceptions.py
+# download_car/tests/unit/exceptions.py
 import unittest
-from SICAR.exceptions import (
+from download_car.exceptions import (
     UrlNotOkException,
     PolygonNotValidException,
     StateCodeNotValidException,

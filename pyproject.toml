@@ -1,9 +1,9 @@
 # pyproject.toml
 [project]
-name = "SICAR"
+name = "download-car"
 version = "0.7.7"
 authors = [{ name = "Gilson Urbano", email = "ricardomalnati@gmail.com" }]
-description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
+description = "download-car - Tool designed for students, researchers, data scientists or anyone who would like to have access to download-car files."
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = [
@@ -20,23 +20,23 @@ dependencies = [
 [project.optional-dependencies]
 paddle = ["paddlepaddle>=3.0.0", "paddleocr>=2.10.0"]
 dev = ["coverage", "interrogate", "black", "coveralls"]
-all = ["SICAR[paddle,dev]"]
+all = ["download-car[paddle,dev]"]
 
 [project.urls]
-"Homepage" = "https://github.com/Malnati/SICAR-for-pipeline"
-"Bug Tracker" = "https://github.com/Malnati/SICAR-for-pipeline/issues"
+"Homepage" = "https://github.com/Malnati/download-car"
+"Bug Tracker" = "https://github.com/Malnati/download-car/issues"
 
 [tool.setuptools]
-packages = ["SICAR", "SICAR.drivers"]
+packages = ["download_car", "download_car.drivers"]
 
 [tool.interrogate]
-exclude = ["SICAR/tests*", "examples/*"]
+exclude = ["download_car/tests*", "examples/*"]
 verbose = 2
 generate-badge = ".github"
 
 [tool.coverage.run]
-source = ["SICAR"]
-omit = ["SICAR/tests/integration/*"]
+source = ["download_car"]
+omit = ["download_car/tests/integration/*"]
 
 [tool.coverage.report]
 show_missing = true

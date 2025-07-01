@@ -1,10 +1,10 @@
-# SICAR/tests/unit/drivers/captcha.py
+# download_car/tests/unit/drivers/captcha.py
 import unittest
 from unittest.mock import MagicMock, patch, ANY, call
 from PIL import Image
 import numpy as np
 import cv2
-from SICAR.drivers import Captcha
+from download_car.drivers import Captcha
 import numpy as np
 
 

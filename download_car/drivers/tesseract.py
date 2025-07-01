@@ -1,4 +1,4 @@
-# SICAR/drivers/tesseract.py
+# download_car/drivers/tesseract.py
 """
 Tesseract OCR Driver Module.
 
@@ -16,7 +16,7 @@ import re
 import pytesseract
 from PIL import Image
 
-from SICAR.drivers.captcha import Captcha
+from download_car.drivers.captcha import Captcha
 
 
 class Tesseract(Captcha):

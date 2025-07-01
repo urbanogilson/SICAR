@@ -24,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: urbanogilson/sicar
+          images: urbanogilson/download-car
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v4

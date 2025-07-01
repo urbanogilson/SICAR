@@ -6,8 +6,8 @@ import os
 import zipfile
 from pathlib import Path
 
-from SICAR import Sicar, State, Polygon
-from SICAR.drivers import Tesseract
+from download_car import DownloadCar, State, Polygon
+from download_car.drivers import Tesseract
 
 app = FastAPI()
 
@@ -51,7 +51,7 @@ async def download_state_endpoint(
     timeout: int = Form(30),
 ):
     try:
-        car = Sicar(driver=Tesseract)
+        car = DownloadCar(driver=Tesseract)
         path = car.download_state(
             state=State[state.upper()],
             polygon=Polygon[polygon.upper()],
@@ -80,7 +80,7 @@ async def download_country_endpoint(
     timeout: int = Form(30),
 ):
     try:
-        car = Sicar(driver=Tesseract)
+        car = DownloadCar(driver=Tesseract)
         result = car.download_country(
             polygon=Polygon[polygon.upper()],
             folder=folder,

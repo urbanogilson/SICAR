@@ -1,14 +1,14 @@
-# SICAR/tests/unit/drivers/tesseract.py
+# download_car/tests/unit/drivers/tesseract.py
 import unittest
 from PIL import Image
 from unittest.mock import patch, MagicMock
-from SICAR.drivers import Tesseract
+from download_car.drivers import Tesseract
 
 
 class TesseractTest(unittest.TestCase):
     @patch("pytesseract.image_to_string")
     @patch("re.sub")
-    @patch("SICAR.drivers.tesseract.Tesseract._process_captcha")
+    @patch("download_car.drivers.tesseract.Tesseract._process_captcha")
     def test_get_captcha(self, process_captcha_mock, re_mock, pytesseract_mock):
         pytesseract_mock.return_value = "ABC123"
         captcha_image = MagicMock(spec=Image.Image)

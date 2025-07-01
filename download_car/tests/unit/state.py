@@ -1,6 +1,6 @@
-# SICAR/tests/unit/state.py
+# download_car/tests/unit/state.py
 import unittest
-from SICAR import State
+from download_car import State
 
 
 class StateTestCase(unittest.TestCase):

@@ -1,6 +1,6 @@
-# SICAR/tests/unit/polygon.py
+# download_car/tests/unit/polygon.py
 import unittest
-from SICAR.url import Url
+from download_car.url import Url
 
 
 class UrlTestCase(unittest.TestCase):

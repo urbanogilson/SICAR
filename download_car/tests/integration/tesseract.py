@@ -1,6 +1,6 @@
-# SICAR/tests/integration/tesseract.py
+# download_car/tests/integration/tesseract.py
 import unittest
-from SICAR.drivers import Tesseract
+from download_car.drivers import Tesseract
 from pathlib import Path
 from PIL import Image
 import os
@@ -10,7 +10,7 @@ class TestTesseractDriver(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self._driver = Tesseract()
-        self._captchas = Path("SICAR/tests/integration/captchas")
+        self._captchas = Path("download_car/tests/integration/captchas")
 
     def test_get_captcha_AbgBy(self):
         captcha = Path(os.path.join(self._captchas, "AbgBy")).with_suffix(".png")

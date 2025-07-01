@@ -8,7 +8,7 @@ Ferramenta que automatiza o download de arquivos do [Cadastro Ambiental Rural (S
 [![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/Malnati/download-car/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
+[![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/download-car)](https://hub.docker.com/r/urbanogilson/download-car)
 [![Coverage Status](https://coveralls.io/repos/github/Malnati/download-car/badge.svg?branch=main)](https://coveralls.io/github/Malnati/download-car?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
@@ -50,7 +50,7 @@ Prerequisite:
 
 # ⚙️ Funções principais
 
-A classe central deste pacote é `Sicar`, que disponibiliza três métodos principais:
+A classe central deste pacote é `DownloadCar`, que disponibiliza três métodos principais:
 
 - `download_state(state, polygon, folder="temp", tries=25, debug=False, chunk_size=1024, timeout=30)`
 - `download_country(polygon, folder="brazil", tries=25, debug=False, chunk_size=1024, timeout=30)`
@@ -79,9 +79,9 @@ Esses parâmetros se aplicam principalmente ao método `download_state`. O méto
 ## 1️⃣ Execução via Python (direto)
 
 ```python
-from SICAR import Sicar, State, Polygon
+from download_car import DownloadCar, State, Polygon
 
-car = Sicar()
+car = DownloadCar()
 car.download_state(state=State.PA, polygon=Polygon.APPS, folder="PA")
 ```
 
@@ -110,7 +110,7 @@ O repositório já possui um `docker-compose.yml` configurado com dois serviços
 ```yaml
 version: "3.8"
 services:
-  sicar:
+  download-car:
     build: .
     volumes:
       - .:/download-car
@@ -146,7 +146,7 @@ O notebook permite baixar os shapefiles diretamente no navegador sem instalar na
 
 ## 5️⃣ Execução via API
 
-Uma API pública de demonstração está disponível em [GitHub.com/Malnati/sicar-api](https://GitHub.com/Malnati/sicar-api/). O endpoint `/download` aceita requisições `POST` contendo o estado e o tipo de polígono desejado.
+Uma API pública de demonstração está disponível em [GitHub.com/Malnati/download-car-api](https://GitHub.com/Malnati/download-car-api/). O endpoint `/download` aceita requisições `POST` contendo o estado e o tipo de polígono desejado.
 
 ### Campos esperados (multipart/form)
 
@@ -158,7 +158,7 @@ Uma API pública de demonstração está disponível em [GitHub.com/Malnati/sica
 ### Exemplo via curl
 
 ```bash
-curl -X POST https://GitHub.com/Malnati/sicar-api/download \
+curl -X POST https://GitHub.com/Malnati/download-car-api/download \
   -F "state=SP" \
   -F "polygon=APPS" \
   --output SP_APPS.zip
@@ -188,12 +188,12 @@ Rotas disponíveis:
 ## 5️⃣ Importação como módulo Python
 >>>>>>> dffc5aa (Revert "Add shell script runner and env-based example" (#11))
 
-Após instalar com `pip install git+https://github.com/urbanogilson/SICAR`, basta importar e usar:
+Após instalar com `pip install git+https://github.com/Malnati/download-car`, basta importar e usar:
 
 ```python
-from SICAR import Sicar, State, Polygon
+from download_car import DownloadCar, State, Polygon
 
-car = Sicar()
+car = DownloadCar()
 car.download_state(State.MG, Polygon.LEGAL_RESERVE, folder="MG")
 ```
 
@@ -252,4 +252,4 @@ If you have any feedback, please reach me at ricardomalnati@gmail.com
 
 [MIT](LICENSE)
 
-Se utilizar este projeto, cite: **Urbano, Gilson**. *SICAR Package*. Consulte o arquivo [CITATION.cff](CITATION.cff) para mais detalhes.
+Se utilizar este projeto, cite: **Urbano, Gilson**. *download-car Package*. Consulte o arquivo [CITATION.cff](CITATION.cff) para mais detalhes.

@@ -6,13 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile.download-car
     volumes:
-      - .:/sicar
+      - .:/download-car
     entrypoint: ./entrypoint.download.sh
   api:
     build:
       context: .
       dockerfile: Dockerfile.api
     volumes:
-      - .:/sicar
+      - .:/download-car
     ports:
       - "8000:8000"

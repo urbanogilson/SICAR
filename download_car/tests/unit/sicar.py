@@ -1,4 +1,4 @@
-# SICAR/tests/unit/sicar.py
+# download_car/tests/unit/sicar.py
 import unittest
 from unittest.mock import MagicMock, patch, call
 import random
@@ -9,12 +9,12 @@ from pathlib import Path, PosixPath
 import sys
 import ssl
 
-from SICAR import Sicar
-from SICAR.sicar import DEFAULT_TIMEOUT
-from SICAR.state import State
-from SICAR.polygon import Polygon
-from SICAR.drivers import Captcha
-from SICAR.exceptions import (
+from download_car import DownloadCar
+from download_car.sicar import DEFAULT_TIMEOUT
+from download_car.state import State
+from download_car.polygon import Polygon
+from download_car.drivers import Captcha
+from download_car.exceptions import (
     PolygonNotValidException,
     UrlNotOkException,
     StateCodeNotValidException,
@@ -34,37 +34,37 @@ class SicarTestCase(unittest.TestCase):
         self.mocked_captcha = MockCaptcha
         self.stdout = io.StringIO()
         sys.stdout = self.stdout
-        self.mock_initialize_cookies = patch("SICAR.sicar.Sicar._initialize_cookies")
+        self.mock_initialize_cookies = patch("download_car.sicar.DownloadCar._initialize_cookies")
         self.mock_initialize_cookies.start()
 
     def tearDown(self):
         sys.stdout = sys.__stdout__
         self.mock_initialize_cookies.stop()
 
-    @patch.object(Sicar, "_get")
+    @patch.object(DownloadCar, "_get")
     def test_initialize_cookies(self, mock_get):
         self.mock_initialize_cookies.stop()
-        Sicar(driver=self.mocked_captcha)
+        DownloadCar(driver=self.mocked_captcha)
         mock_get.assert_called_once_with(
             "https://consultapublica.car.gov.br/publico/imoveis/index"
         )
         self.mock_initialize_cookies.start()
 
     def test_ocr_driver_integration(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         captcha_image = Image.new("RGB", (10, 10))
         self.assertEqual(sicar._driver.get_captcha(captcha_image), "mocked_captcha")
 
     @patch("httpx.Client")
     def test_create_session_with_ssl_disabled(self, mock_session):
-        Sicar(driver=self.mocked_captcha)
+        DownloadCar(driver=self.mocked_captcha)
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
         mock_session.assert_called_once()
 
     @patch("httpx.Client")
     def test_create_session_with_custom_headers(self, mock_session):
-        sicar = Sicar(driver=self.mocked_captcha, headers={"Custom-Header": "Value"})
+        sicar = DownloadCar(driver=self.mocked_captcha, headers={"Custom-Header": "Value"})
         mock_session.assert_called_once()
         sicar._session.headers.update.assert_called_once_with(
             {"Custom-Header": "Value"}
@@ -72,7 +72,7 @@ class SicarTestCase(unittest.TestCase):
 
     @patch("httpx.Client")
     def test_create_session_with_default_headers(self, mock_session):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         mock_session.assert_called_once()
         sicar._session.headers.update.assert_called_once_with(
             {
@@ -86,13 +86,13 @@ class SicarTestCase(unittest.TestCase):
     def test_get_with_successful_response(self):
         with patch.object(httpx.Client, "get") as stream_mock:
             stream_mock.return_value = MagicMock(status_code=httpx.codes.OK)
-            sicar = Sicar(driver=self.mocked_captcha)
+            sicar = DownloadCar(driver=self.mocked_captcha)
             response = sicar._get("https://example.com")
             sicar._session.get.assert_called_once_with(url="https://example.com")
             self.assertIsInstance(response, MagicMock)
 
     def test_get_with_unsuccessful_response(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         with patch.object(httpx.Client, "get") as stream_mock:
             stream_mock.return_value = MagicMock(status_code=httpx.codes.NOT_FOUND)
             with self.assertRaises(UrlNotOkException):
@@ -103,7 +103,7 @@ class SicarTestCase(unittest.TestCase):
         mock_response = MagicMock(
             status_code=httpx.codes.OK, content=b"mocked_image_data"
         )
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._get = MagicMock(return_value=mock_response)
         mock_image = MagicMock(spec=Image.Image)
         Image.open = MagicMock(return_value=mock_image)
@@ -118,7 +118,7 @@ class SicarTestCase(unittest.TestCase):
 
     @patch("random.random", lambda: 0.1)
     def test_download_captcha_invalid_image(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._get = MagicMock(
             return_value=MagicMock(
                 status_code=httpx.codes.OK, content=b"invalid_captcha_image"
@@ -131,7 +131,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._get.assert_called_once()
 
     def test_download_captcha_failure(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
         )
@@ -163,7 +163,7 @@ class SicarTestCase(unittest.TestCase):
 
         with patch.object(httpx.Client, "stream") as stream_mock:
             stream_mock.return_value.__enter__.return_value = response_mock
-            sicar = Sicar(driver=self.mocked_captcha)
+            sicar = DownloadCar(driver=self.mocked_captcha)
             result = sicar._download_polygon(state, polygon, captcha, folder)
 
         stream_mock.assert_called_once_with(
@@ -186,7 +186,7 @@ class SicarTestCase(unittest.TestCase):
                 status_code=httpx.codes.NOT_FOUND
             )
 
-            sicar = Sicar(driver=self.mocked_captcha)
+            sicar = DownloadCar(driver=self.mocked_captcha)
 
             with self.assertRaises(FailedToDownloadPolygonException):
                 sicar._download_polygon(
@@ -209,7 +209,7 @@ class SicarTestCase(unittest.TestCase):
                 status_code=httpx.codes.OK, headers={"Content-Type": "text/html"}
             )
 
-            sicar = Sicar(driver=self.mocked_captcha)
+            sicar = DownloadCar(driver=self.mocked_captcha)
 
             with self.assertRaises(FailedToDownloadPolygonException):
                 sicar._download_polygon(state, polygon, captcha, folder, chunk_size)
@@ -222,7 +222,7 @@ class SicarTestCase(unittest.TestCase):
         folder = "temp"
         chunk_size = 1024
 
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         mock_download_captcha = MagicMock(return_value=Image.Image)
         sicar._download_captcha = mock_download_captcha
 
@@ -262,7 +262,7 @@ class SicarTestCase(unittest.TestCase):
         folder = "temp"
         chunk_size = 1024
 
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         mock_download_captcha = MagicMock(return_value=Image.Image)
         sicar._download_captcha = mock_download_captcha
 
@@ -289,7 +289,7 @@ class SicarTestCase(unittest.TestCase):
     def test_download_polygon_invalid_captcha_failed_to_download_captcha_exception(
         self, mock_time
     ):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
         )
@@ -301,7 +301,7 @@ class SicarTestCase(unittest.TestCase):
     def test_download_polygon_invalid_captcha_failed_to_download_polygon_exception(
         self, mock_time
     ):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         mock_download_captcha = MagicMock(return_value=Image.Image)
         sicar._download_captcha = mock_download_captcha
 
@@ -318,7 +318,7 @@ class SicarTestCase(unittest.TestCase):
 
     @patch("time.sleep", return_value=None)
     def test_download_state_invalid_captcha_debug(self, mock_time):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         mock_download_captcha = MagicMock(return_value=Image.Image)
         sicar._download_captcha = mock_download_captcha
 
@@ -333,23 +333,23 @@ class SicarTestCase(unittest.TestCase):
         )
 
     def test_download_state_invalid_state_code(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         with self.assertRaises(StateCodeNotValidException):
             sicar.download_state(
                 "INVALID_STATE", Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
             )
 
     def test_download_state_invalid_polygon_code(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         with self.assertRaises(PolygonNotValidException):
             sicar.download_state(
                 State.MG, "INVALID_POLYGON", "temp", 25, chunk_size=1024, debug=True
             )
 
-    @patch("SICAR.sicar.Sicar.download_state")
+    @patch("download_car.sicar.DownloadCar.download_state")
     @patch("pathlib.Path.mkdir")
     def test_download_country(self, mock_mkdir, mock_download_state):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         state = State.MG
         polygon = Polygon.APPS
         tries = 25
@@ -391,7 +391,7 @@ class SicarTestCase(unittest.TestCase):
         )
 
         mock_response = MagicMock(status_code=httpx.codes.OK, content=html_content)
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._get = MagicMock(return_value=mock_response)
 
         update_dates = sicar.get_release_dates()
@@ -403,7 +403,7 @@ class SicarTestCase(unittest.TestCase):
         self.assertEqual(update_dates, {State.AC: "04/08/2024"})
 
     def test_get_release_dates_failure(self):
-        sicar = Sicar(driver=self.mocked_captcha)
+        sicar = DownloadCar(driver=self.mocked_captcha)
         sicar._session.get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
         )

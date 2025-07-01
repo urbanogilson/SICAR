@@ -1,16 +1,16 @@
-# SICAR/tests/integration/sicar.py
+# download_car/tests/integration/sicar.py
 import os
 from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from SICAR import Sicar, State, Polygon
+from download_car import DownloadCar, State, Polygon
 
 
 class TestSicarBase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self._car = Sicar()
+        self._car = DownloadCar()
 
     def test_download_state(self):
         self.assertIsInstance(
@@ -18,7 +18,7 @@ class TestSicarBase(unittest.TestCase):
             Path,
         )
 
-    @patch("SICAR.sicar.Sicar._download_polygon")
+    @patch("download_car.sicar.DownloadCar._download_polygon")
     def test_download_resume(self, mock_download):
         state = State.RR
         polygon = Polygon.AREA_FALL
