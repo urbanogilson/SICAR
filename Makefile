@@ -10,8 +10,8 @@ API_DOCKERFILE ?= Dockerfile.api
 
 # Build Docker image
 build:
-	@echo "🛠️  Buildando imagem $(IMAGE):latest via $(DOCKERFILE)..."
-	docker build -t $(IMAGE):latest -f $(DOCKERFILE) .
+@echo "🛠️  Buildando imagem $(IMAGE):latest via $(DOCKERFILE)..."
+docker build -t $(IMAGE):latest -f $(DOCKERFILE) .
 
 # Build API Docker image
 build-api:

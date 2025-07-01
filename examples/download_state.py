@@ -47,5 +47,6 @@ car.download_state(
 
 # Get release date for all states and print the one for the chosen state
 release_dates = car.get_release_dates()
-print(f"Release date for {state.name} is: {release_dates.get(state)}")
+# get a single state value
+print(f"Release date for DF is: {release_dates.get(State.DF)}")
 
