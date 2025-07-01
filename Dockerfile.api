@@ -1,0 +1,18 @@
+# Dockerfile.api
+FROM download-car-base:latest
+
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal \
+    C_INCLUDE_PATH=/usr/include/gdal
+
+WORKDIR /app
+COPY app.py ./
+
+COPY entrypoint.api.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV PYENV_ROOT=/opt/pyenv
+ENV PATH=/opt/pyenv/shims:/opt/pyenv/bin:$PATH
+
+EXPOSE 8000
+
+ENTRYPOINT ["/entrypoint.sh"]

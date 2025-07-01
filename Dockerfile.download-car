@@ -1,0 +1,16 @@
+# Dockerfile.download-car
+FROM download-car-base:latest
+
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal \
+    C_INCLUDE_PATH=/usr/include/gdal
+
+WORKDIR /app
+COPY . .
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --editable .[paddle]
+
+COPY entrypoint.download.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
