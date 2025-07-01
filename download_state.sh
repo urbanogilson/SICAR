@@ -31,7 +31,7 @@ source $VENV_DIR/bin/activate
 
 # \u1F680 Instala dependências
 pip install --upgrade pip
-pip install SICAR httpx Pillow tqdm
+pip install 'git+https://github.com/Malnati/download-car#egg=SICAR[paddle]'
 
 # \u1F6E0 Define variáveis de ambiente para passar os parâmetros para o script Python
 while [[ "$#" -gt 0 ]]; do

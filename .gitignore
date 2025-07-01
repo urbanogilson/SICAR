@@ -152,3 +152,4 @@ dmypy.json
 *.jpg
 .png
 *.zip
+.venv-download

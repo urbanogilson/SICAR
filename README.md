@@ -5,11 +5,11 @@ Ferramenta que automatiza o download de arquivos do [Cadastro Ambiental Rural (S
 
 ## Badges
 
-[![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/Malnati/SICAR-for-pipeline/blob/main/examples/colab.ipynb)
+[![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/Malnati/download-car/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
-[![Coverage Status](https://coveralls.io/repos/github/Malnati/SICAR-for-pipeline/badge.svg?branch=main)](https://coveralls.io/github/Malnati/SICAR-for-pipeline?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/Malnati/download-car/badge.svg?branch=main)](https://coveralls.io/github/Malnati/download-car?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
 
 # ✨ Objetivo
@@ -36,7 +36,7 @@ Permitir o download programático dos dados públicos do SICAR. O projeto inclui
 - [📝 Licença](#license)
 
 ```bash
-pip install git+https://github.com/Malnati/SICAR-for-pipeline
+pip install git+https://github.com/Malnati/download-car
 ```
 
 Prerequisite:
@@ -105,9 +105,10 @@ services:
     volumes:
       - .:/sicar
     command: python examples/docker.py
+```
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/Malnati/SICAR-for-pipeline'
+pip install 'SICAR[paddle] @  git+https://github.com/Malnati/download-car'
 ```
 
 Execute:
@@ -118,7 +119,7 @@ docker compose up --build
 
 ## 4️⃣ Execução via Google Colab (Notebook Interativo)
 
-[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Malnati/SICAR-for-pipeline/blob/main/examples/colab.ipynb)
+[![Open In Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Malnati/download-car/blob/main/examples/colab.ipynb)
 
 O notebook permite baixar os shapefiles diretamente no navegador sem instalar nada.
 
@@ -196,7 +197,7 @@ data.zip
 
 The development environment with all necessary packages is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
 
-[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Malnati/SICAR-for-pipeline)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Malnati/download-car)
 
 Contributions are always welcome!
 
