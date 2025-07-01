@@ -7,16 +7,16 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYENV_ROOT=/opt/pyenv \
     PATH="/opt/pyenv/bin:/opt/pyenv/shims:${PATH}"
 
-RUN git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT} && \
-    pyenv install ${PYTHON_VERSION} && \
-    pyenv global ${PYTHON_VERSION}
-    
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential curl git ca-certificates \
         libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
         libffi-dev liblzma-dev libncursesw5-dev xz-utils tk-dev libgdbm-dev \
         uuid-dev wget && \
     rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT} && \
+    pyenv install ${PYTHON_VERSION} && \
+    pyenv global ${PYTHON_VERSION}
     
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install tesseract-ocr python3-opencv \
