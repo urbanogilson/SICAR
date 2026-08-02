@@ -8,7 +8,8 @@ from SICAR import Polygon, Sicar, State
 class TestSicarBase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.WARNING)
+        logging.getLogger("SICAR").setLevel(logging.DEBUG)
         self._car = Sicar()
 
     def test_download_state(self):
