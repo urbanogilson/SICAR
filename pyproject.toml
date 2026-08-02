@@ -3,13 +3,13 @@ name = "SICAR"
 version = "0.7.7"
 authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
 description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 dependencies = [
     "httpx>=0.28.1",
     "urllib3>=2.3.0",
     "pytesseract>=0.3.13",
-    "opencv-python>=4.11.0.86",
+    "opencv-python-headless>=4.11.0.86",
     "numpy>=2.0.2",
     "tqdm>=4.67.1",
     "matplotlib>=3.10.0",

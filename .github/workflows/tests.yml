@@ -19,10 +19,11 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           cache: "pip" # caching pip dependencies
 
       - name: Upgrade pip and setuptools
@@ -43,7 +44,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install tesseract-ocr python3-opencv --no-install-recommends --no-upgrade --show-progress
+          sudo apt-get -y install tesseract-ocr --no-install-recommends --no-upgrade --show-progress
 
       - name: Install requirements
         run: pip install --editable .[all]

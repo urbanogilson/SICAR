@@ -1,12 +1,15 @@
-ARG VARIANT="3.10"
-FROM python:${VARIANT}
+ARG VARIANT="3.12"
+FROM python:${VARIANT}-slim
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install tesseract-ocr python3-opencv
+    && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        libglib2.0-0 \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
-
-RUN pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir 'SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR'
 
 WORKDIR /sicar
 
