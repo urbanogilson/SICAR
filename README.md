@@ -22,10 +22,18 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Installation
 
-Install SICAR with pip
+Requires Python 3.12+.
+
+Install with [uv](https://docs.astral.sh/uv/) (recommended):
 
 ```bash
-pip install git+https://github.com/urbanogilson/SICAR
+uv add "SICAR @ git+https://github.com/urbanogilson/SICAR"
+```
+
+Or with pip:
+
+```bash
+pip install "git+https://github.com/urbanogilson/SICAR"
 ```
 
 Prerequisite:
@@ -107,10 +115,12 @@ car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder="SICAR/SP")
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
-Install SICAR with pip and include Paddle dependencies
+Install SICAR including the Paddle dependencies
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
+uv add "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
+# or
+pip install "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
 ```
 
 ```python
@@ -193,7 +203,24 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Contributing
 
-The development environment with all necessary packages is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management. Set up the environment:
+
+```bash
+git clone https://github.com/urbanogilson/SICAR && cd SICAR
+uv sync --all-extras
+pre-commit install
+```
+
+Run the checks and tests:
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src
+uv run coverage run --rcfile=pyproject.toml -m unittest tests/unit/*.py tests/unit/drivers/*.py
+```
+
+Alternatively, a fully configured development environment is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
 
 [![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 

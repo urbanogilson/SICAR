@@ -22,10 +22,18 @@ Esta ferramenta foi desenvolvida para estudantes, pesquisadores, cientistas de d
 
 ## Instalação
 
-Instale o SICAR com pip
+Requer Python 3.12+.
+
+Instale com [uv](https://docs.astral.sh/uv/) (recomendado):
 
 ```bash
-pip install git+https://github.com/urbanogilson/SICAR
+uv add "SICAR @ git+https://github.com/urbanogilson/SICAR"
+```
+
+Ou com pip:
+
+```bash
+pip install "git+https://github.com/urbanogilson/SICAR"
 ```
 
 Pré-requisito:
@@ -107,10 +115,12 @@ car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder="SICAR/SP")
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
-Instale o SICAR com pip incluindo as dependências do Paddle
+Instale o SICAR incluindo as dependências do Paddle
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
+uv add "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
+# ou
+pip install "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
 ```
 
 ```python
@@ -193,7 +203,24 @@ Opcional: Crie um diretório externo para armazenar os dados baixados e use o pa
 
 ## Contribuindo
 
-O ambiente de desenvolvimento com todos os pacotes necessários está disponível usando [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
+Este projeto usa [uv](https://docs.astral.sh/uv/) para gerenciamento de dependências. Configure o ambiente:
+
+```bash
+git clone https://github.com/urbanogilson/SICAR && cd SICAR
+uv sync --all-extras
+pre-commit install
+```
+
+Rode as verificações e os testes:
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src
+uv run coverage run --rcfile=pyproject.toml -m unittest tests/unit/*.py tests/unit/drivers/*.py
+```
+
+Como alternativa, um ambiente de desenvolvimento totalmente configurado está disponível usando [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
 
 [![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 
