@@ -11,9 +11,10 @@ Classes:
     Paddle: Implementation of the Captcha driver using PaddleOCR.
 """
 
-from paddleocr import PaddleOCR
 import itertools
 import re
+
+from paddleocr import PaddleOCR
 from PIL import Image
 
 from SICAR.drivers.captcha import Captcha
@@ -29,7 +30,7 @@ class Paddle(Captcha):
         This driver requires the paddlepaddle and paddleocr libraries to be installed.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the PaddleOCR instance.
 
@@ -43,7 +44,7 @@ class Paddle(Captcha):
             use_angle_cls=False, lang="en", use_space_char=False, show_log=False
         )
 
-    def get_captcha(self, captcha: Image) -> str:
+    def get_captcha(self, captcha: Image.Image) -> str:
         """
         Extract text from the provided captcha image.
 

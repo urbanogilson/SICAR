@@ -8,7 +8,7 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 [![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
 [![Coverage Status](https://coveralls.io/repos/github/urbanogilson/SICAR/badge.svg?branch=main)](https://coveralls.io/github/urbanogilson/SICAR?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
@@ -102,7 +102,7 @@ from SICAR.drivers import Tesseract
 car = Sicar(driver=Tesseract)
 
 # Download a state
-car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder='SICAR/SP')
+car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder="SICAR/SP")
 ```
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
@@ -121,7 +121,7 @@ from SICAR.drivers import Paddle
 car = Sicar(driver=Paddle)
 
 # Download a state
-car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder='SICAR/AM')
+car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder="SICAR/AM")
 ```
 
 ### Run with Google Colab

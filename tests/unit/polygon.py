@@ -1,4 +1,5 @@
 import unittest
+
 from SICAR.url import Url
 
 

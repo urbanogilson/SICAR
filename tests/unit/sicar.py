@@ -1,25 +1,26 @@
-import unittest
-from unittest.mock import MagicMock, patch, call
-import random
 import io
+import random
+import ssl
+import sys
+import unittest
+from pathlib import Path, PosixPath
+from unittest.mock import MagicMock, call, patch
+
 import httpx
 from PIL import Image
-from pathlib import Path, PosixPath
-import sys
-import ssl
 
 from SICAR import Sicar
-from SICAR.state import State
-from SICAR.polygon import Polygon
 from SICAR.drivers import Captcha
 from SICAR.exceptions import (
-    PolygonNotValidException,
-    UrlNotOkException,
-    StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
     FailedToGetReleaseDateException,
+    PolygonNotValidException,
+    StateCodeNotValidException,
+    UrlNotOkException,
 )
+from SICAR.polygon import Polygon
+from SICAR.state import State
 
 
 class MockCaptcha(Captcha):
@@ -392,7 +393,7 @@ class SicarTestCase(unittest.TestCase):
         update_dates = sicar.get_release_dates()
 
         sicar._get.assert_called_once_with(
-            f"https://consultapublica.car.gov.br/publico/estados/downloads"
+            "https://consultapublica.car.gov.br/publico/estados/downloads"
         )
 
         self.assertEqual(update_dates, {State.AC: "04/08/2024"})

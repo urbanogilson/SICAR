@@ -1,11 +1,12 @@
 import unittest
+
 from SICAR.exceptions import (
-    UrlNotOkException,
-    PolygonNotValidException,
-    StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
     FailedToGetReleaseDateException,
+    PolygonNotValidException,
+    StateCodeNotValidException,
+    UrlNotOkException,
 )
 
 

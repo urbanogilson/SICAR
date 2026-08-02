@@ -1,5 +1,5 @@
-from SICAR import Sicar, Polygon, State
-from SICAR.drivers import Paddle, Tesseract
+from SICAR import Polygon, Sicar, State
+from SICAR.drivers import Tesseract
 
 # Create Sicar instance
 car = Sicar(driver=Tesseract)

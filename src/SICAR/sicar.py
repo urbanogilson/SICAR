@@ -9,33 +9,34 @@ Classes:
 
 import io
 import os
+import random
 import ssl
 import time
-import random
-import httpx
-from PIL import Image, UnidentifiedImageError
-from bs4 import BeautifulSoup
-from tqdm import tqdm
-from typing import Dict
-from pathlib import Path
-from urllib.parse import urlencode
 import warnings
+from pathlib import Path
+from typing import Any
+from urllib.parse import urlencode
 
-warnings.filterwarnings(
-    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
-)
+import httpx
+from bs4 import BeautifulSoup
+from PIL import Image, UnidentifiedImageError
+from tqdm import tqdm
 
 from SICAR.drivers import Captcha, Tesseract
-from SICAR.state import State
-from SICAR.url import Url
-from SICAR.polygon import Polygon
 from SICAR.exceptions import (
-    UrlNotOkException,
-    PolygonNotValidException,
-    StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
     FailedToGetReleaseDateException,
+    PolygonNotValidException,
+    StateCodeNotValidException,
+    UrlNotOkException,
+)
+from SICAR.polygon import Polygon
+from SICAR.state import State
+from SICAR.url import Url
+
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
 )
 
 
@@ -53,9 +54,9 @@ class Sicar(Url):
 
     def __init__(
         self,
-        driver: Captcha = Tesseract,
-        headers: Dict = None,
-    ):
+        driver: type[Captcha] = Tesseract,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         """
         Initialize an instance of the Sicar class.
 
@@ -70,7 +71,7 @@ class Sicar(Url):
         self._create_session(headers=headers)
         self._initialize_cookies()
 
-    def _parse_release_dates(self, response: bytes) -> Dict:
+    def _parse_release_dates(self, response: bytes) -> dict[State, str]:
         """
         Parse raw html getting states and release date.
 
@@ -95,12 +96,12 @@ class Sicar(Url):
             date_tag = state_block.find("div", class_="data-disponibilizacao")
             date = date_tag.get_text(strip=True) if date_tag else None
 
-            if state in iter(State) and date:
+            if isinstance(state, str) and state in {s.value for s in State} and date:
                 state_dates[State(state)] = date
 
         return state_dates
 
-    def _create_session(self, headers: Dict = None):
+    def _create_session(self, headers: dict[str, str] | None = None) -> None:
         """
         Create a new session for making HTTP requests.
 
@@ -133,7 +134,7 @@ class Sicar(Url):
             }
         )
 
-    def _initialize_cookies(self):
+    def _initialize_cookies(self) -> None:
         """
         Initialize cookies by making the initial request and accepting any redirections.
 
@@ -144,7 +145,7 @@ class Sicar(Url):
         """
         self._get(self._INDEX)
 
-    def _get(self, url: str, *args, **kwargs):
+    def _get(self, url: str, **kwargs: Any) -> httpx.Response:
         """
         Send a GET request to the specified URL using the session.
 
@@ -159,14 +160,14 @@ class Sicar(Url):
         Raises:
             UrlNotOkException: If the response from the GET request is not OK (status code is not 200).
         """
-        response = self._session.get(url=url, *args, **kwargs)
+        response = self._session.get(url=url, **kwargs)
 
         if response.status_code not in [httpx.codes.OK, httpx.codes.FOUND]:
             raise UrlNotOkException(url)
 
         return response
 
-    def _download_captcha(self) -> Image:
+    def _download_captcha(self) -> Image.Image:
         """
         Download a captcha image from the SICAR system.
 
@@ -194,7 +195,7 @@ class Sicar(Url):
         state: State,
         polygon: Polygon,
         captcha: str,
-        folder: str,
+        folder: Path | str,
         chunk_size: int = 1024,
     ) -> Path:
         """
@@ -337,7 +338,7 @@ class Sicar(Url):
         tries: int = 25,
         debug: bool = False,
         chunk_size: int = 1024,
-    ):
+    ) -> dict[str, Path | bool]:
         """
         Download polygon for the entire country.
 
@@ -354,7 +355,7 @@ class Sicar(Url):
                 Each state's dictionary follows the same structure as the result of the `download_state` method.
                 If a download fails for a state the corresponding value will be False.
         """
-        result = {}
+        result: dict[str, Path | bool] = {}
         for state in State:
             Path(os.path.join(folder, state.value)).mkdir(parents=True, exist_ok=True)
 
@@ -367,7 +368,9 @@ class Sicar(Url):
                 chunk_size=chunk_size,
             )
 
-    def get_release_dates(self) -> Dict:
+        return result
+
+    def get_release_dates(self) -> dict[State, str]:
         """
         Get release date for each state in SICAR system.
 

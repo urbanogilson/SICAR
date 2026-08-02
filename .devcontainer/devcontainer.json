@@ -10,15 +10,14 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"python.defaultInterpreterPath": "/usr/local/bin/python",
-				"python.linting.enabled": true,
-				"python.formatting.blackPath": "/usr/local/py-utils/bin/black"
+				"python.defaultInterpreterPath": "/usr/local/bin/python"
 			},
 			"extensions": [
-				"ms-python.python"
+				"ms-python.python",
+				"charliermarsh.ruff"
 			]
 		}
 	},
-	"postCreateCommand": "/usr/local/bin/python -m pip install --upgrade pip && pip install setuptools --upgrade && pip install --editable .[all]",
+	"postCreateCommand": "uv sync --all-extras",
 	"remoteUser": "vscode"
 }

@@ -1,10 +1,11 @@
 import unittest
-from unittest.mock import MagicMock, patch, ANY, call
-from PIL import Image
-import numpy as np
+from unittest.mock import ANY, MagicMock, call, patch
+
 import cv2
-from SICAR.drivers import Captcha
 import numpy as np
+from PIL import Image
+
+from SICAR.drivers import Captcha
 
 
 class MockCaptcha(Captcha):

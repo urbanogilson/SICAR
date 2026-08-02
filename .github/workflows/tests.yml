@@ -21,25 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
-          cache: "pip" # caching pip dependencies
-
-      - name: Upgrade pip and setuptools
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools --upgrade
-
-      - name: Run linter (black)
-        run: |
-          pip install black
-          black --check --verbose --diff ./SICAR/
-
-      - name: Run interrogate
-        run: |
-          pip install interrogate
-          interrogate
+          enable-cache: true
 
       - name: Install OS dependencies
         run: |
@@ -47,16 +33,22 @@ jobs:
           sudo apt-get -y install tesseract-ocr --no-install-recommends --no-upgrade --show-progress
 
       - name: Install requirements
-        run: pip install --editable .[all]
+        run: uv sync --all-extras
+
+      - name: Run type checker (mypy)
+        run: uv run mypy src
+
+      - name: Run interrogate
+        run: uv run interrogate src
 
       - name: Run unit tests
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          coverage run --rcfile=pyproject.toml -m unittest SICAR/tests/unit/*.py SICAR/tests/unit/drivers/*.py
-          coverage report
-          coveralls
+          uv run coverage run --rcfile=pyproject.toml -m unittest tests/unit/*.py tests/unit/drivers/*.py
+          uv run coverage report
+          uv run coveralls
 
       - name: Run integration tests
         run: |
-          python -m unittest SICAR/tests/integration/*.py
+          uv run python -m unittest tests/integration/*.py

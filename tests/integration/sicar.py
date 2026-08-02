@@ -1,6 +1,7 @@
-from pathlib import Path
 import unittest
-from SICAR import Sicar, State, Polygon
+from pathlib import Path
+
+from SICAR import Polygon, Sicar, State
 
 
 class TestSicarBase(unittest.TestCase):

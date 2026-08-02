@@ -1,8 +1,10 @@
 import unittest
-from PIL import Image
-from unittest.mock import patch, MagicMock
-from SICAR.drivers import Paddle
+from unittest.mock import MagicMock, patch
+
 import paddleocr
+from PIL import Image
+
+from SICAR.drivers import Paddle
 
 
 class PaddleTestCase(unittest.TestCase):

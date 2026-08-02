@@ -12,6 +12,7 @@ Classes:
 """
 
 import re
+
 import pytesseract
 from PIL import Image
 
@@ -42,7 +43,7 @@ class Tesseract(Captcha):
         depending on the specific captcha format.
     """
 
-    def get_captcha(self, captcha: Image) -> str:
+    def get_captcha(self, captcha: Image.Image) -> str:
         """
         Extract text from the provided captcha image.
 
