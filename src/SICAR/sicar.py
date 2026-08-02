@@ -37,6 +37,9 @@ from SICAR.url import Url
 
 logger = logging.getLogger(__name__)
 
+# Per-chunk read timeout (seconds) for polygon downloads; the SICAR server is slow on big files.
+_DEFAULT_DOWNLOAD_TIMEOUT = 60
+
 
 class Sicar(Url):
     """
@@ -199,6 +202,7 @@ class Sicar(Url):
         captcha: str,
         folder: Path | str,
         chunk_size: int = 1024,
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
     ) -> Path:
         """
         Download polygon for the specified state.
@@ -209,6 +213,7 @@ class Sicar(Url):
             captcha (str): The captcha value for verification.
             folder (str): The folder path where the polygon will be saved.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to the download stream. Defaults to 60.
 
         Returns:
             Path: The path to the downloaded polygon.
@@ -219,40 +224,46 @@ class Sicar(Url):
         Note:
             This method performs the polygon download by making a GET request to the polygon URL with the specified
             state code and captcha. The response is then streamed and saved to a file in chunks. A progress bar is displayed
-            during the download. The downloaded file path is returned.
+            during the download. The downloaded file path is returned. Transport errors (timeouts, dropped connections)
+            are raised as `FailedToDownloadPolygonException` so callers can retry.
         """
 
         query = urlencode(
             {"idEstado": state.value, "tipoBase": polygon.value, "ReCaptcha": captcha}
         )
 
-        with self._session.stream("GET", f"{self._DOWNLOAD_BASE}?{query}") as response:
-            try:
+        path = Path(os.path.join(folder, f"{state.value}_{polygon.value}")).with_suffix(
+            ".zip"
+        )
+
+        try:
+            with self._session.stream(
+                "GET", f"{self._DOWNLOAD_BASE}?{query}", timeout=timeout
+            ) as response:
                 if response.status_code != httpx.codes.OK:
-                    raise UrlNotOkException(f"{self._DOWNLOAD_BASE}?{query}")
-            except UrlNotOkException as error:
-                raise FailedToDownloadPolygonException() from error
+                    raise FailedToDownloadPolygonException()
 
-            content_length = int(response.headers.get("Content-Length", 0))
+                content_length = int(response.headers.get("Content-Length", 0))
 
-            content_type = response.headers.get("Content-Type", "")
+                content_type = response.headers.get("Content-Type", "")
 
-            if content_length == 0 or not content_type.startswith("application/zip"):
-                raise FailedToDownloadPolygonException()
-            path = Path(
-                os.path.join(folder, f"{state.value}_{polygon.value}")
-            ).with_suffix(".zip")
+                if content_length == 0 or not content_type.startswith(
+                    "application/zip"
+                ):
+                    raise FailedToDownloadPolygonException()
 
-            with open(path, "wb") as fd:
-                with tqdm(
-                    total=content_length,
-                    unit="iB",
-                    unit_scale=True,
-                    desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
-                ) as progress_bar:
-                    for chunk in response.iter_bytes():
-                        fd.write(chunk)
-                        progress_bar.update(len(chunk))
+                with open(path, "wb") as fd:
+                    with tqdm(
+                        total=content_length,
+                        unit="iB",
+                        unit_scale=True,
+                        desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
+                    ) as progress_bar:
+                        for chunk in response.iter_bytes():
+                            fd.write(chunk)
+                            progress_bar.update(len(chunk))
+        except httpx.HTTPError as error:
+            raise FailedToDownloadPolygonException() from error
         return path
 
     def download_state(
@@ -262,6 +273,7 @@ class Sicar(Url):
         folder: Path | str = Path("temp"),
         tries: int = 25,
         chunk_size: int = 1024,
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
     ) -> Path | None:
         """
         Download the polygon or other output format for the specified state.
@@ -272,6 +284,7 @@ class Sicar(Url):
             folder (Path | str, optional): The folder path where the downloaded data will be saved. Defaults to "temp".
             tries (int, optional): The number of attempts to download the data. Defaults to 25.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to the download stream. Defaults to 60.
 
         Returns:
             Path | None: The path to the downloaded data if successful, or None if download fails.
@@ -314,6 +327,7 @@ class Sicar(Url):
                         captcha=captcha,
                         folder=folder,
                         chunk_size=chunk_size,
+                        timeout=timeout,
                     )
                 logger.debug(
                     "[%02d] - Invalid captcha '%s' to request %s", tries, captcha, info
@@ -335,6 +349,7 @@ class Sicar(Url):
         folder: Path | str = Path("brazil"),
         tries: int = 25,
         chunk_size: int = 1024,
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
     ) -> dict[str, Path | None]:
         """
         Download polygon for the entire country.
@@ -344,6 +359,7 @@ class Sicar(Url):
             folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'brazil'.
             tries (int, optional): The number of download attempts allowed per state. Defaults to 25.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to each download stream. Defaults to 60.
 
         Returns:
             dict[str, Path | None]: A dictionary mapping each state abbreviation to the path of the
@@ -359,6 +375,7 @@ class Sicar(Url):
                 folder=folder,
                 tries=tries,
                 chunk_size=chunk_size,
+                timeout=timeout,
             )
 
         return result

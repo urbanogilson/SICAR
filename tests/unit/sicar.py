@@ -166,6 +166,7 @@ class SicarTestCase(unittest.TestCase):
         stream_mock.assert_called_once_with(
             "GET",
             r"https://consultapublica.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
+            timeout=60,
         )
         mock_path.assert_called_once_with(f"{folder}/{state.value}_{polygon.value}")
         mock_open.assert_called_once_with(
@@ -182,6 +183,21 @@ class SicarTestCase(unittest.TestCase):
                 status_code=httpx.codes.NOT_FOUND
             )
 
+            sicar = Sicar(driver=self.mocked_captcha)
+
+            with self.assertRaises(FailedToDownloadPolygonException):
+                sicar._download_polygon(
+                    state=State.MG,
+                    polygon=Polygon.APPS,
+                    captcha="abc123",
+                    folder="polygons",
+                    chunk_size=1024,
+                )
+
+    def test_download_polygon_raises_on_transport_error(self):
+        with patch.object(
+            httpx.Client, "stream", side_effect=httpx.ReadTimeout("timed out")
+        ):
             sicar = Sicar(driver=self.mocked_captcha)
 
             with self.assertRaises(FailedToDownloadPolygonException):
@@ -243,6 +259,7 @@ class SicarTestCase(unittest.TestCase):
             captcha="ABCDE",
             folder=folder,
             chunk_size=chunk_size,
+            timeout=60,
         )
 
         self.assertIsInstance(result, Path)
@@ -367,6 +384,7 @@ class SicarTestCase(unittest.TestCase):
                     folder=folder,
                     tries=tries,
                     chunk_size=chunk_size,
+                    timeout=60,
                 )
             )
 
