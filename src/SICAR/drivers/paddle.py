@@ -11,10 +11,10 @@ Classes:
     Paddle: Implementation of the Captcha driver using PaddleOCR.
 """
 
-import itertools
 import re
 
-from paddleocr import PaddleOCR
+import cv2
+from paddleocr import TextRecognition
 from PIL import Image
 
 from SICAR.drivers.captcha import Captcha
@@ -24,7 +24,7 @@ class Paddle(Captcha):
     """
     Implementation of the Captcha driver using PaddleOCR.
 
-    This driver utializes PaddleOCR to extract text from captcha images.
+    This driver utilizes PaddleOCR's text recognition to extract text from captcha images.
 
     Note:
         This driver requires the paddlepaddle and paddleocr libraries to be installed.
@@ -32,17 +32,14 @@ class Paddle(Captcha):
 
     def __init__(self) -> None:
         """
-        Initialize the PaddleOCR instance.
+        Initialize the PaddleOCR text recognition predictor.
 
         Note:
-            The `use_angle_cls` parameter is set to False to disable text angle detection.
-            The `lang` parameter is set to "en" to specify the English language.
-            The `use_space_char` parameter is set to False to disable space character output.
-            The `show_log` parameter is set to False to suppress PaddleOCR's logging messages.
+            The captcha is already a single, cropped line of text, so only recognition is
+            needed (no detection). The English recognition model `en_PP-OCRv4_mobile_rec`
+            is used to match the Latin alphanumeric characters used by SICAR captchas.
         """
-        self.ocr = PaddleOCR(
-            use_angle_cls=False, lang="en", use_space_char=False, show_log=False
-        )
+        self.ocr = TextRecognition(model_name="en_PP-OCRv4_mobile_rec")
 
     def get_captcha(self, captcha: Image.Image) -> str:
         """
@@ -55,16 +52,12 @@ class Paddle(Captcha):
             str: The extracted text from the captcha.
 
         Note:
-            This method processes the captcha image, improves its quality, and uses PaddleOCR's ocr method to perform
-            optical character recognition. The extracted text is then cleaned using regular expressions to remove
-            non-alphanumeric characters.
+            This method processes the captcha image, improves its quality, and uses PaddleOCR's
+            text recognition to perform optical character recognition. The processed image is
+            converted to a 3-channel (BGR) image as required by the recognition model, and the
+            extracted text is cleaned using regular expressions to remove non-alphanumeric
+            characters.
         """
-        return re.sub(
-            "[^A-Za-z0-9]+",
-            "",
-            list(
-                itertools.chain.from_iterable(
-                    self.ocr.ocr(self._process_captcha(captcha), det=False, cls=False)
-                )
-            )[0][0],
-        )
+        image = cv2.cvtColor(self._process_captcha(captcha), cv2.COLOR_GRAY2BGR)
+        result = self.ocr.predict(image)
+        return re.sub("[^A-Za-z0-9]+", "", result[0]["rec_text"])

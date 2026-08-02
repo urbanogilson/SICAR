@@ -20,7 +20,7 @@ COPY src ./src
 RUN uv sync --extra paddle --frozen --no-dev --no-editable
 
 # Download PaddleOCR models
-RUN echo 'from paddleocr import PaddleOCR\nPaddleOCR(lang="en")' | /opt/venv/bin/python
+RUN echo 'from paddleocr import TextRecognition\nTextRecognition(model_name="en_PP-OCRv4_mobile_rec")' | /opt/venv/bin/python
 
 WORKDIR /sicar
 ENTRYPOINT ["/opt/venv/bin/python"]

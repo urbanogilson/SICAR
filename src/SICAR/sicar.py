@@ -55,6 +55,9 @@ class Sicar(Url):
         _driver (Captcha): The driver used for handling captchas. Default is Tesseract.
     """
 
+    # SICAR captchas are always 5 alphanumeric characters.
+    _CAPTCHA_LENGTH = 5
+
     def __init__(
         self,
         driver: type[Captcha] = Tesseract,
@@ -304,7 +307,7 @@ class Sicar(Url):
             try:
                 captcha = self._driver.get_captcha(self._download_captcha())
 
-                if len(captcha) == 5:
+                if len(captcha) == self._CAPTCHA_LENGTH:
                     logger.debug(
                         "[%02d] - Requesting %s with captcha '%s'", tries, info, captcha
                     )
