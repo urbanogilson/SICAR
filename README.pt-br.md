@@ -165,6 +165,8 @@ Opcional: Crie um diretório externo para armazenar os dados baixados e use o pa
 
 ## Dicionário de dados
 
+> Baseado no [Dicionário de Dados do SICAR](docs/Dicionario_de_Dados_SICAR.pdf) oficial.
+
 | **Nome Atributo** | **Tipificação** | **Tipo de Dado** | **Descrição** |
 |-------------------|-----------------|------------------|---------------|
 | cod_tema      | publico | texto  | Indica o código do tema de uso do solo que compõe o cadastro da propriedade ou posse rural no Sistema Nacional de Cadastro Ambiental Rural (Sicar). Este dado classifica as diferentes áreas da propriedade conforme suas características e regulamentações. |

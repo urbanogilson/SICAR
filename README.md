@@ -165,6 +165,8 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Data dictionary
 
+> Based on the official [SICAR Data Dictionary](docs/Dicionario_de_Dados_SICAR.pdf).
+
 | **Attribute** | **Classification** | **Data type** | **Description** |
 |---------------|--------------------|---------------|-----------------|
 | cod_tema      | public | text   | Indicates the code of the land use theme that makes up the registration of the rural property or possession in the National Rural Environmental Registry System (Sicar). This data classifies the different areas of the property according to their characteristics and regulations. |

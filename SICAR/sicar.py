@@ -356,9 +356,9 @@ class Sicar(Url):
         """
         result = {}
         for state in State:
-            Path(os.path.join(folder, f"{state}")).mkdir(parents=True, exist_ok=True)
+            Path(os.path.join(folder, state.value)).mkdir(parents=True, exist_ok=True)
 
-            result[str(state)] = self.download_state(
+            result[state.value] = self.download_state(
                 state=state,
                 polygon=polygon,
                 folder=folder,

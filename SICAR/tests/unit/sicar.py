@@ -168,12 +168,14 @@ class SicarTestCase(unittest.TestCase):
             "GET",
             r"https://consultapublica.car.gov.br/publico/estados/downloadBase?idEstado=MG&tipoBase=APPS&ReCaptcha=abc123",
         )
-        mock_path.assert_called_once_with(f"{folder}/{state}_{polygon.value}")
+        mock_path.assert_called_once_with(f"{folder}/{state.value}_{polygon.value}")
         mock_open.assert_called_once_with(
-            PosixPath(f"{folder}/{state}_{polygon.value}.zip"), "wb"
+            PosixPath(f"{folder}/{state.value}_{polygon.value}.zip"), "wb"
         )
         mock_open.return_value.__enter__.return_value.write.assert_called()
-        self.assertEqual(result, PosixPath(f"{folder}/{state}_{polygon.value}.zip"))
+        self.assertEqual(
+            result, PosixPath(f"{folder}/{state.value}_{polygon.value}.zip")
+        )
 
     def test_download_polygon_failed_response(self):
         with patch.object(httpx.Client, "stream") as stream_mock:
