@@ -1,12 +1,14 @@
 # SICAR
 
+[English](README.md) | [Português (BR)](README.pt-br.md)
+
 This tool is designed for students, researchers, data scientists, or anyone who would like to have access to [SICAR](https://car.gov.br/publico/imoveis/index) files.
 
 ## Badges
 
 [![Open In Collab](.github/colab-badge.svg)](https://colab.research.google.com/github/urbanogilson/SICAR/blob/main/examples/colab.ipynb)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/sicar)](https://hub.docker.com/r/urbanogilson/sicar)
 [![Coverage Status](https://coveralls.io/repos/github/urbanogilson/SICAR/badge.svg?branch=main)](https://coveralls.io/github/urbanogilson/SICAR?branch=main)
 [![interrogate](.github/interrogate_badge.svg)](https://interrogate.readthedocs.io/)
@@ -20,10 +22,18 @@ This tool is designed for students, researchers, data scientists, or anyone who 
 
 ## Installation
 
-Install SICAR with pip
+Requires Python 3.12+.
+
+Install with [uv](https://docs.astral.sh/uv/) (recommended):
 
 ```bash
-pip install git+https://github.com/urbanogilson/SICAR
+uv add "SICAR @ git+https://github.com/urbanogilson/SICAR"
+```
+
+Or with pip:
+
+```bash
+pip install "git+https://github.com/urbanogilson/SICAR"
 ```
 
 Prerequisite:
@@ -52,33 +62,33 @@ car = Sicar()
 # Get release data dates
 state_dates = car.get_release_dates()
 pprint.pprint(state_dates)
-# {<State.AC: 'AC'>: '03/06/2025',
-#  <State.AL: 'AL'>: '04/06/2025',
-#  <State.AM: 'AM'>: '03/06/2025',
-#  <State.AP: 'AP'>: '03/06/2025',
-#  <State.BA: 'BA'>: '03/06/2025',
-#  <State.CE: 'CE'>: '04/06/2025',
-#  <State.DF: 'DF'>: '03/06/2025',
-#  <State.ES: 'ES'>: '05/06/2025',
-#  <State.GO: 'GO'>: '04/06/2025',
-#  <State.MA: 'MA'>: '01/06/2025',
-#  <State.MG: 'MG'>: '05/06/2025',
-#  <State.MS: 'MS'>: '08/06/2025',
-#  <State.MT: 'MT'>: '05/06/2025',
-#  <State.PA: 'PA'>: '03/06/2025',
-#  <State.PB: 'PB'>: '05/06/2025',
-#  <State.PE: 'PE'>: '01/06/2025',
-#  <State.PI: 'PI'>: '01/06/2025',
-#  <State.PR: 'PR'>: '03/06/2025',
-#  <State.RJ: 'RJ'>: '01/06/2025',
-#  <State.RN: 'RN'>: '01/06/2025',
-#  <State.RO: 'RO'>: '01/06/2025',
-#  <State.RR: 'RR'>: '04/06/2025',
-#  <State.RS: 'RS'>: '04/06/2025',
-#  <State.SC: 'SC'>: '01/06/2025',
-#  <State.SE: 'SE'>: '04/06/2025',
-#  <State.SP: 'SP'>: '05/06/2025',
-#  <State.TO: 'TO'>: '04/06/2025'}
+# {<State.AC: 'AC'>: '02/08/2026',
+#  <State.AL: 'AL'>: '03/07/2026',
+#  <State.AM: 'AM'>: '01/07/2026',
+#  <State.AP: 'AP'>: '02/08/2026',
+#  <State.BA: 'BA'>: '02/08/2026',
+#  <State.CE: 'CE'>: '01/08/2026',
+#  <State.DF: 'DF'>: '02/07/2026',
+#  <State.ES: 'ES'>: '03/07/2026',
+#  <State.GO: 'GO'>: '01/07/2026',
+#  <State.MA: 'MA'>: '02/08/2026',
+#  <State.MG: 'MG'>: '04/06/2026',
+#  <State.MS: 'MS'>: '02/07/2026',
+#  <State.MT: 'MT'>: '01/08/2026',
+#  <State.PA: 'PA'>: '19/07/2026',
+#  <State.PB: 'PB'>: '03/07/2026',
+#  <State.PE: 'PE'>: '01/08/2026',
+#  <State.PI: 'PI'>: '01/08/2026',
+#  <State.PR: 'PR'>: '02/08/2026',
+#  <State.RJ: 'RJ'>: '01/08/2026',
+#  <State.RN: 'RN'>: '01/08/2026',
+#  <State.RO: 'RO'>: '01/07/2026',
+#  <State.RR: 'RR'>: '02/08/2026',
+#  <State.RS: 'RS'>: '01/08/2026',
+#  <State.SC: 'SC'>: '02/08/2026',
+#  <State.SE: 'SE'>: '03/07/2026',
+#  <State.SP: 'SP'>: '02/06/2026',
+#  <State.TO: 'TO'>: '02/07/2026'}
 
 # Download APPS polygon for the PA state
 car.download_state(State.PA, Polygon.APPS)
@@ -100,15 +110,17 @@ from SICAR.drivers import Tesseract
 car = Sicar(driver=Tesseract)
 
 # Download a state
-car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder='SICAR/SP')
+car.download_state(State.SP, Polygon.LEGAL_RESERVE, folder="SICAR/SP")
 ```
 
 #### [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
-Install SICAR with pip and include Paddle dependencies
+Install SICAR including the Paddle dependencies
 
 ```bash
-pip install 'SICAR[paddle] @  git+https://github.com/urbanogilson/SICAR'
+uv add "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
+# or
+pip install "SICAR[paddle] @ git+https://github.com/urbanogilson/SICAR"
 ```
 
 ```python
@@ -119,7 +131,7 @@ from SICAR.drivers import Paddle
 car = Sicar(driver=Paddle)
 
 # Download a state
-car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder='SICAR/AM')
+car.download_state(State.AM, Polygon.CONSOLIDATED_AREA, folder="SICAR/AM")
 ```
 
 ### Run with Google Colab
@@ -163,17 +175,22 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Data dictionary
 
-| **Attribute** | **Description**                                              |
-|---------------|--------------------------------------------------------------|
-| cod_estado    | Unit of the Federation in which the registration is located. |
-| municipio     | Municipality in which the registration is located. |
-| num_area      | Gross area of the rural property or the subject that makes up the registry, in hectare. |
-| cod_imovel    | Registration number in the Rural Environmental Registry (CAR). |
-| ind_status    | Status of registration in CAR, according to Normative Instruction no. 2, of May 6, 2014, of the Ministry of the Environment (https://www.car.gov.br/leis/IN_CAR.pdf), and the Resolution No. 3, of August 27, 2018, of the Brazilian Forest Service (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), being AT - Active; PE - Pending; SU - Suspended; and CA - Cancelled. |
-| des_condic    | Condition in which the registration is in the analysis flow by the competent body. |
-| ind_tipo      | Type of Rural Property, being IRU - Rural Property; AST - Agrarian Reform Settlements; PCT - Traditional Territory of Traditional Peoples and Communities. |
-| mod_fiscal    | Number of rural property tax modules. |
-| nom_tema      | Name of the theme that makes up the registration (Permanent Preservation Area, Path, Remnant of Native Vegetation, Restricted Use Area, Administrative Easement, Legal Reserve, Hydrography, Wetlands, Consolidated Rural Area, Areas with Altitude Higher than 1800 meters, Areas with Slopes Higher than 45 degrees, Hilltops, Plateau Edges, Fallow Areas, Mangroves and Restinga). |
+> Based on the official [SICAR Data Dictionary](docs/Dicionario_de_Dados_SICAR.pdf).
+
+| **Attribute** | **Classification** | **Data type** | **Description** |
+|---------------|--------------------|---------------|-----------------|
+| cod_tema      | public | text   | Indicates the code of the land use theme that makes up the registration of the rural property or possession in the National Rural Environmental Registry System (Sicar). This data classifies the different areas of the property according to their characteristics and regulations. |
+| nom_tema      | public | text   | Indicates the name of the theme or environmental land use category that makes up the registration of the rural property or possession in the Sicar. This data classifies the different areas of the property according to their characteristics and regulations, including, for example: Permanent Preservation Area (APP), Remnant of Native Vegetation, Legal Reserve, Restricted Use Area, Consolidated Rural Area, Administrative Easement, Path, Hydrography, Wetland, Areas with Altitude Higher than 1800 meters, Areas with Slopes Higher than 45 degrees, Hilltops, Plateau Edges, Fallow Area, Mangrove and Restinga. |
+| cod_imovel    | public | text   | Unique registration number assigned to each rural property or possession in the Sicar at the moment of its registration. |
+| mod_fiscal    | public | number | Agrarian unit of measurement that varies by municipality and is used to classify the size of a rural property or possession (small, medium, large) in the Sicar, according to current legislation. |
+| num_area      | public | number | Total gross area of the rural property informed by the owner or possessor at the moment of registration in the Sicar. |
+| ind_status    | public | text   | Status of the registration in CAR, according to Normative Instruction no. 2, of May 6, 2014, of the Ministry of the Environment (https://www.car.gov.br/leis/IN_CAR.pdf), and the Resolution No. 3, of August 27, 2018, of the Brazilian Forest Service (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), being AT - Active; PE - Pending; SU - Suspended; and CA - Cancelled. |
+| ind_tipo      | public | text   | Classification of the type of rural property or possession according to the registration in the Sicar. Being IRU - Rural Property; AST - Agrarian Reform Settlements; PCT - Traditional Peoples and Communities. |
+| des_condic    | public | text   | Indicates the current condition of the rural property or possession registration analysis in the Sicar. Reflects the stage the registration is at in the validation process, according to the progress of the technical analysis by the competent body. |
+| municipio     | public | text   | Indicates the municipal political-administrative unit to which the rural property or possession is territorially located. |
+| cod_estado    | public | text   | Two-letter code (UF) that identifies the Federative Unit (state) of Brazil to which the rural property or possession is located. |
+| dat_criaca    | public | text   | Date on which the rural property or possession was registered in the Sicar. |
+| dat_atuali    | public | text   | Date of the last time the registration data of the rural property or possession was modified in the Sicar. |
 
 ## Acknowledgements
 
@@ -186,7 +203,24 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Contributing
 
-The development environment with all necessary packages is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management. Set up the environment:
+
+```bash
+git clone https://github.com/urbanogilson/SICAR && cd SICAR
+uv sync --all-extras
+pre-commit install
+```
+
+Run the checks and tests:
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src
+uv run coverage run --rcfile=pyproject.toml -m unittest tests/unit/*.py tests/unit/drivers/*.py
+```
+
+Alternatively, a fully configured development environment is available using [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/remote/containers).
 
 [![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/urbanogilson/SICAR)
 

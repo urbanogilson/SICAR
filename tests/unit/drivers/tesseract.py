@@ -1,6 +1,8 @@
 import unittest
+from unittest.mock import MagicMock, patch
+
 from PIL import Image
-from unittest.mock import patch, MagicMock
+
 from SICAR.drivers import Tesseract
 
 

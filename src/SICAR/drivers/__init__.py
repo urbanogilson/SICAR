@@ -7,3 +7,5 @@ try:
     from SICAR.drivers.paddle import Paddle
 except ImportError:
     pass
+
+__all__ = ["Captcha", "Tesseract", "Paddle"]

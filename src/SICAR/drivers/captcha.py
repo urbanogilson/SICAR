@@ -7,12 +7,15 @@ Classes:
     Captcha: Abstract base class representing a Captcha.
 """
 
-from abc import ABC, abstractmethod
 import tempfile
-from PIL import Image
+from abc import ABC, abstractmethod
+from typing import Any, cast
+
+import cv2
 import matplotlib.image as mpimg
 import numpy as np
-import cv2
+from numpy.typing import NDArray
+from PIL import Image
 
 
 class Captcha(ABC):
@@ -28,7 +31,7 @@ class Captcha(ABC):
     """
 
     @abstractmethod
-    def get_captcha(self, captcha: Image) -> str:
+    def get_captcha(self, captcha: Image.Image) -> str:
         """
         Abstract method to get the Captcha value.
 
@@ -40,7 +43,7 @@ class Captcha(ABC):
 
         """
 
-    def _png_to_jpg(self, captcha: Image) -> np.ndarray:
+    def _png_to_jpg(self, captcha: Image.Image) -> NDArray[Any]:
         """
         Convert a PNG image to a JPEG image represented as a NumPy array.
 
@@ -63,14 +66,15 @@ class Captcha(ABC):
                 captcha.save(png.name)
                 mpimg.imsave(
                     jpg.name,
-                    mpimg.imread(png.name, 0),
+                    # a non-str format forces matplotlib's uint8 PIL read path
+                    mpimg.imread(png.name, 0),  # type: ignore[arg-type]
                     cmap="gray",
                     vmin=0,
                     vmax=255,
                 )
-                return cv2.imread(jpg.name, -1)
+                return cast(NDArray[Any], cv2.imread(jpg.name, -1))
 
-    def _improve_image(self, image: np.ndarray):
+    def _improve_image(self, image: NDArray[Any]) -> NDArray[Any]:
         """
         Apply image enhancement operations to improve OCR results.
 
@@ -91,7 +95,7 @@ class Captcha(ABC):
         image = cv2.erode(image, np.ones((2, 1), np.uint8), iterations=2)
         return image
 
-    def _process_captcha(self, captcha: Image):
+    def _process_captcha(self, captcha: Image.Image) -> NDArray[Any]:
         """
         Process the captcha image to enhance its quality for OCR.
 

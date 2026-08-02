@@ -1,16 +1,20 @@
-from pathlib import Path
+import logging
 import unittest
-from SICAR import Sicar, State, Polygon
+from pathlib import Path
+
+from SICAR import Polygon, Sicar, State
 
 
 class TestSicarBase(unittest.TestCase):
     @classmethod
     def setUpClass(self):
+        logging.basicConfig(level=logging.WARNING)
+        logging.getLogger("SICAR").setLevel(logging.DEBUG)
         self._car = Sicar()
 
     def test_download_state(self):
         self.assertIsInstance(
-            self._car.download_state(State.RR, Polygon.AREA_FALL, debug=True),
+            self._car.download_state(State.RR, Polygon.AREA_FALL),
             Path,
         )
 

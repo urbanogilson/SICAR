@@ -1,15 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "SICAR"
-version = "0.7.7"
+version = "0.8.0"
 authors = [{ name = "Gilson Urbano", email = "hello@gilsonurbano.com" }]
 description = "SICAR - Tool designed for students, researchers, data scientists or anyone who would like to have access to SICAR files."
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 dependencies = [
     "httpx>=0.28.1",
     "urllib3>=2.3.0",
     "pytesseract>=0.3.13",
-    "opencv-python>=4.11.0.86",
+    "opencv-python-headless>=4.11.0.86",
     "numpy>=2.0.2",
     "tqdm>=4.67.1",
     "matplotlib>=3.10.0",
@@ -18,24 +22,44 @@ dependencies = [
 
 [project.optional-dependencies]
 paddle = ["paddlepaddle>=3.0.0", "paddleocr>=2.10.0"]
-dev = ["coverage", "interrogate", "black", "coveralls"]
+dev = ["coverage", "interrogate", "ruff", "mypy", "coveralls", "pre-commit"]
 all = ["SICAR[paddle,dev]"]
 
 [project.urls]
 "Homepage" = "https://github.com/urbanogilson/SICAR"
 "Bug Tracker" = "https://github.com/urbanogilson/SICAR/issues"
 
-[tool.setuptools]
-packages = ["SICAR", "SICAR.drivers"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/SICAR"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = [
+    "E501",   # line length is owned by the formatter
+    "UP042",  # keep the intentional `str, Enum` pattern (StrEnum changes str() semantics)
+]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["cv2.*", "pytesseract.*", "paddleocr.*", "bs4.*", "tqdm.*"]
+ignore_missing_imports = true
 
 [tool.interrogate]
-exclude = ["SICAR/tests*", "examples/*"]
+exclude = ["tests", "examples"]
 verbose = 2
 generate-badge = ".github"
 
 [tool.coverage.run]
 source = ["SICAR"]
-omit = ["SICAR/tests/integration/*"]
+omit = ["tests/*"]
 
 [tool.coverage.report]
 show_missing = true

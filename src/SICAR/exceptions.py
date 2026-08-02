@@ -81,7 +81,7 @@ class PolygonNotValidException(Exception):
 class FailedToDownloadCaptchaException(Exception):
     """Exception raised when downloading a captcha fails."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize an instance of FailedToDownloadCaptchaException.
 
@@ -97,7 +97,7 @@ class FailedToDownloadCaptchaException(Exception):
 class FailedToDownloadPolygonException(Exception):
     """Exception raised when downloading a polygon fails."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize an instance of FailedToDownloadPolygonException.
 
@@ -113,7 +113,7 @@ class FailedToDownloadPolygonException(Exception):
 class FailedToGetReleaseDateException(Exception):
     """Exception raised when get release date fails."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize an instance of FailedToGetReleaseDateException.
 

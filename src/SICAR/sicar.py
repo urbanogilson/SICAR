@@ -8,35 +8,37 @@ Classes:
 """
 
 import io
+import logging
 import os
+import random
 import ssl
 import time
-import random
-import httpx
-from PIL import Image, UnidentifiedImageError
-from bs4 import BeautifulSoup
-from tqdm import tqdm
-from typing import Dict
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlencode
-import warnings
 
-warnings.filterwarnings(
-    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
-)
+import httpx
+from bs4 import BeautifulSoup
+from PIL import Image, UnidentifiedImageError
+from tqdm import tqdm
 
 from SICAR.drivers import Captcha, Tesseract
-from SICAR.state import State
-from SICAR.url import Url
-from SICAR.polygon import Polygon
 from SICAR.exceptions import (
-    UrlNotOkException,
-    PolygonNotValidException,
-    StateCodeNotValidException,
     FailedToDownloadCaptchaException,
     FailedToDownloadPolygonException,
     FailedToGetReleaseDateException,
+    PolygonNotValidException,
+    StateCodeNotValidException,
+    UrlNotOkException,
 )
+from SICAR.polygon import Polygon
+from SICAR.state import State
+from SICAR.url import Url
+
+logger = logging.getLogger(__name__)
+
+# Per-chunk read timeout (seconds) for polygon downloads; the SICAR server is slow on big files.
+_DEFAULT_DOWNLOAD_TIMEOUT = 60
 
 
 class Sicar(Url):
@@ -51,11 +53,14 @@ class Sicar(Url):
         _driver (Captcha): The driver used for handling captchas. Default is Tesseract.
     """
 
+    # SICAR captchas are always 5 alphanumeric characters.
+    _CAPTCHA_LENGTH = 5
+
     def __init__(
         self,
-        driver: Captcha = Tesseract,
-        headers: Dict = None,
-    ):
+        driver: type[Captcha] = Tesseract,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         """
         Initialize an instance of the Sicar class.
 
@@ -70,7 +75,7 @@ class Sicar(Url):
         self._create_session(headers=headers)
         self._initialize_cookies()
 
-    def _parse_release_dates(self, response: bytes) -> Dict:
+    def _parse_release_dates(self, response: bytes) -> dict[State, str]:
         """
         Parse raw html getting states and release date.
 
@@ -95,12 +100,12 @@ class Sicar(Url):
             date_tag = state_block.find("div", class_="data-disponibilizacao")
             date = date_tag.get_text(strip=True) if date_tag else None
 
-            if state in iter(State) and date:
+            if isinstance(state, str) and state in {s.value for s in State} and date:
                 state_dates[State(state)] = date
 
         return state_dates
 
-    def _create_session(self, headers: Dict = None):
+    def _create_session(self, headers: dict[str, str] | None = None) -> None:
         """
         Create a new session for making HTTP requests.
 
@@ -108,17 +113,18 @@ class Sicar(Url):
             headers (Dict): Additional headers for the session. Default is None.
 
         Note:
-            The SSL certificate verification is disabled by default using `verify=context`. This allows connections to servers
-            with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
-            security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
-            certificate authority, you can remove the `verify=context` parameter to enable SSL certificate verification by
-            default.
+            The connection is pinned to TLS 1.2 with a specific cipher suite for compatibility with
+            the SICAR server, which does not negotiate newer defaults. Server certificates are still
+            verified against the system CA bundle (hostname and chain validation), so the connection
+            is protected against man-in-the-middle attacks.
 
         Returns:
             None
         """
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.maximum_version = ssl.TLSVersion.TLSv1_2
         context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
 
         self._session = httpx.Client(verify=context)
@@ -133,7 +139,7 @@ class Sicar(Url):
             }
         )
 
-    def _initialize_cookies(self):
+    def _initialize_cookies(self) -> None:
         """
         Initialize cookies by making the initial request and accepting any redirections.
 
@@ -144,7 +150,7 @@ class Sicar(Url):
         """
         self._get(self._INDEX)
 
-    def _get(self, url: str, *args, **kwargs):
+    def _get(self, url: str, **kwargs: Any) -> httpx.Response:
         """
         Send a GET request to the specified URL using the session.
 
@@ -159,14 +165,14 @@ class Sicar(Url):
         Raises:
             UrlNotOkException: If the response from the GET request is not OK (status code is not 200).
         """
-        response = self._session.get(url=url, *args, **kwargs)
+        response = self._session.get(url=url, **kwargs)
 
         if response.status_code not in [httpx.codes.OK, httpx.codes.FOUND]:
             raise UrlNotOkException(url)
 
         return response
 
-    def _download_captcha(self) -> Image:
+    def _download_captcha(self) -> Image.Image:
         """
         Download a captcha image from the SICAR system.
 
@@ -194,8 +200,9 @@ class Sicar(Url):
         state: State,
         polygon: Polygon,
         captcha: str,
-        folder: str,
+        folder: Path | str,
         chunk_size: int = 1024,
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
     ) -> Path:
         """
         Download polygon for the specified state.
@@ -206,6 +213,7 @@ class Sicar(Url):
             captcha (str): The captcha value for verification.
             folder (str): The folder path where the polygon will be saved.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to the download stream. Defaults to 60.
 
         Returns:
             Path: The path to the downloaded polygon.
@@ -216,40 +224,46 @@ class Sicar(Url):
         Note:
             This method performs the polygon download by making a GET request to the polygon URL with the specified
             state code and captcha. The response is then streamed and saved to a file in chunks. A progress bar is displayed
-            during the download. The downloaded file path is returned.
+            during the download. The downloaded file path is returned. Transport errors (timeouts, dropped connections)
+            are raised as `FailedToDownloadPolygonException` so callers can retry.
         """
 
         query = urlencode(
             {"idEstado": state.value, "tipoBase": polygon.value, "ReCaptcha": captcha}
         )
 
-        with self._session.stream("GET", f"{self._DOWNLOAD_BASE}?{query}") as response:
-            try:
+        path = Path(os.path.join(folder, f"{state.value}_{polygon.value}")).with_suffix(
+            ".zip"
+        )
+
+        try:
+            with self._session.stream(
+                "GET", f"{self._DOWNLOAD_BASE}?{query}", timeout=timeout
+            ) as response:
                 if response.status_code != httpx.codes.OK:
-                    raise UrlNotOkException(f"{self._DOWNLOAD_BASE}?{query}")
-            except UrlNotOkException as error:
-                raise FailedToDownloadPolygonException() from error
+                    raise FailedToDownloadPolygonException()
 
-            content_length = int(response.headers.get("Content-Length", 0))
+                content_length = int(response.headers.get("Content-Length", 0))
 
-            content_type = response.headers.get("Content-Type", "")
+                content_type = response.headers.get("Content-Type", "")
 
-            if content_length == 0 or not content_type.startswith("application/zip"):
-                raise FailedToDownloadPolygonException()
-            path = Path(
-                os.path.join(folder, f"{state.value}_{polygon.value}")
-            ).with_suffix(".zip")
+                if content_length == 0 or not content_type.startswith(
+                    "application/zip"
+                ):
+                    raise FailedToDownloadPolygonException()
 
-            with open(path, "wb") as fd:
-                with tqdm(
-                    total=content_length,
-                    unit="iB",
-                    unit_scale=True,
-                    desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
-                ) as progress_bar:
-                    for chunk in response.iter_bytes():
-                        fd.write(chunk)
-                        progress_bar.update(len(chunk))
+                with open(path, "wb") as fd:
+                    with tqdm(
+                        total=content_length,
+                        unit="iB",
+                        unit_scale=True,
+                        desc=f"Downloading polygon '{polygon.value}' for state '{state.value}'",
+                    ) as progress_bar:
+                        for chunk in response.iter_bytes():
+                            fd.write(chunk)
+                            progress_bar.update(len(chunk))
+        except httpx.HTTPError as error:
+            raise FailedToDownloadPolygonException() from error
         return path
 
     def download_state(
@@ -258,9 +272,9 @@ class Sicar(Url):
         polygon: Polygon | str,
         folder: Path | str = Path("temp"),
         tries: int = 25,
-        debug: bool = False,
         chunk_size: int = 1024,
-    ) -> Path | bool:
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
+    ) -> Path | None:
         """
         Download the polygon or other output format for the specified state.
 
@@ -269,16 +283,17 @@ class Sicar(Url):
             polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded data will be saved. Defaults to "temp".
             tries (int, optional): The number of attempts to download the data. Defaults to 25.
-            debug (bool, optional): Whether to print debug information. Defaults to False.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to the download stream. Defaults to 60.
 
         Returns:
-            Path | bool: The path to the downloaded data if successful, or False if download fails.
+            Path | None: The path to the downloaded data if successful, or None if download fails.
 
         Note:
             This method attempts to download the polygon for the specified state.
             It tries multiple times, using a captcha for verification. The downloaded data is saved to the specified folder.
-            The method returns the path to the downloaded data if successful, or False if the download fails after the specified number of tries.
+            The method returns the path to the downloaded data if successful, or None if the download fails after the specified number of tries.
+            Enable per-attempt diagnostics by configuring logging (e.g. `logging.basicConfig(level=logging.DEBUG)`).
         """
         if isinstance(state, str):
             try:
@@ -301,11 +316,10 @@ class Sicar(Url):
             try:
                 captcha = self._driver.get_captcha(self._download_captcha())
 
-                if len(captcha) == 5:
-                    if debug:
-                        print(
-                            f"[{tries:02d}] - Requesting {info} with captcha '{captcha}'"
-                        )
+                if len(captcha) == self._CAPTCHA_LENGTH:
+                    logger.debug(
+                        "[%02d] - Requesting %s with captcha '%s'", tries, info, captcha
+                    )
 
                     return self._download_polygon(
                         state=state,
@@ -313,31 +327,30 @@ class Sicar(Url):
                         captcha=captcha,
                         folder=folder,
                         chunk_size=chunk_size,
+                        timeout=timeout,
                     )
-                elif debug:
-                    print(
-                        f"[{tries:02d}] - Invalid captcha '{captcha}' to request {info}"
-                    )
+                logger.debug(
+                    "[%02d] - Invalid captcha '%s' to request %s", tries, captcha, info
+                )
             except (
                 FailedToDownloadCaptchaException,
                 FailedToDownloadPolygonException,
             ) as error:
-                if debug:
-                    print(f"[{tries:02d}] - {error} When requesting {info}")
+                logger.debug("[%02d] - %s when requesting %s", tries, error, info)
             finally:
                 tries -= 1
                 time.sleep(random.random() + random.random())
 
-        return False
+        return None
 
     def download_country(
         self,
         polygon: Polygon | str,
         folder: Path | str = Path("brazil"),
         tries: int = 25,
-        debug: bool = False,
         chunk_size: int = 1024,
-    ):
+        timeout: float = _DEFAULT_DOWNLOAD_TIMEOUT,
+    ) -> dict[str, Path | None]:
         """
         Download polygon for the entire country.
 
@@ -345,29 +358,29 @@ class Sicar(Url):
             polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'brazil'.
             tries (int, optional): The number of download attempts allowed per state. Defaults to 25.
-            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
+            timeout (float, optional): The per-request timeout, in seconds, applied to each download stream. Defaults to 60.
 
         Returns:
-            Dict: A dictionary containing the results of the download operation.
-                The keys are the state abbreviations, and the values are dictionaries representing the results of downloading each state.
-                Each state's dictionary follows the same structure as the result of the `download_state` method.
-                If a download fails for a state the corresponding value will be False.
+            dict[str, Path | None]: A dictionary mapping each state abbreviation to the path of the
+                downloaded data, or None if the download failed for that state.
         """
-        result = {}
+        result: dict[str, Path | None] = {}
         for state in State:
-            Path(os.path.join(folder, f"{state}")).mkdir(parents=True, exist_ok=True)
+            Path(os.path.join(folder, state.value)).mkdir(parents=True, exist_ok=True)
 
-            result[str(state)] = self.download_state(
+            result[state.value] = self.download_state(
                 state=state,
                 polygon=polygon,
                 folder=folder,
                 tries=tries,
-                debug=debug,
                 chunk_size=chunk_size,
+                timeout=timeout,
             )
 
-    def get_release_dates(self) -> Dict:
+        return result
+
+    def get_release_dates(self) -> dict[State, str]:
         """
         Get release date for each state in SICAR system.
 
