@@ -140,7 +140,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._get.assert_called_once()
 
     @patch("builtins.open", new_callable=MagicMock)
-    @patch.object(Path, "__init__", return_value=None)
+    @patch("SICAR.sicar.Path", wraps=Path)
     @patch("tqdm.tqdm", side_effect=lambda *args, **kwargs: MagicMock())
     def test_download_polygon_success(self, mock_tqdm, mock_path, mock_open):
         state = State.MG
