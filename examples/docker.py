@@ -1,8 +1,8 @@
 import logging
+import pprint
 
 from SICAR import Polygon, Sicar, State
 from SICAR.drivers import Tesseract
-import pprint
 
 # Show SICAR's per-attempt download logs
 logging.basicConfig(level=logging.INFO)
@@ -21,4 +21,3 @@ car.download_state(state=State.RR, polygon=Polygon.AREA_FALL, folder="data/Rorai
 
 # Download APPS polygons for all states in Brazil
 # car.download_country(polygon=Polygon.APPS, folder="/Brazil")
-
