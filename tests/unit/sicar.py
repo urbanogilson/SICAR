@@ -50,11 +50,14 @@ class SicarTestCase(unittest.TestCase):
         self.assertEqual(sicar._driver.get_captcha(captcha_image), "mocked_captcha")
 
     @patch("httpx.Client")
-    def test_create_session_with_ssl_disabled(self, mock_session):
+    def test_create_session_uses_verified_context(self, mock_session):
         Sicar(driver=self.mocked_captcha)
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
         mock_session.assert_called_once()
+        context = mock_session.call_args.kwargs["verify"]
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)
+        self.assertEqual(context.minimum_version, ssl.TLSVersion.TLSv1_2)
+        self.assertEqual(context.maximum_version, ssl.TLSVersion.TLSv1_2)
 
     @patch("httpx.Client")
     def test_create_session_with_custom_headers(self, mock_session):

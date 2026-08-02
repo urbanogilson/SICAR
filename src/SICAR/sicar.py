@@ -13,7 +13,6 @@ import os
 import random
 import ssl
 import time
-import warnings
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -35,10 +34,6 @@ from SICAR.exceptions import (
 from SICAR.polygon import Polygon
 from SICAR.state import State
 from SICAR.url import Url
-
-warnings.filterwarnings(
-    "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
-)
 
 logger = logging.getLogger(__name__)
 
@@ -115,17 +110,18 @@ class Sicar(Url):
             headers (Dict): Additional headers for the session. Default is None.
 
         Note:
-            The SSL certificate verification is disabled by default using `verify=context`. This allows connections to servers
-            with self-signed or invalid certificates. Disabling SSL certificate verification can expose your application to
-            security risks, such as man-in-the-middle attacks. If the server has a valid SSL certificate issued by a trusted
-            certificate authority, you can remove the `verify=context` parameter to enable SSL certificate verification by
-            default.
+            The connection is pinned to TLS 1.2 with a specific cipher suite for compatibility with
+            the SICAR server, which does not negotiate newer defaults. Server certificates are still
+            verified against the system CA bundle (hostname and chain validation), so the connection
+            is protected against man-in-the-middle attacks.
 
         Returns:
             None
         """
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.maximum_version = ssl.TLSVersion.TLSv1_2
         context.set_ciphers("RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS")
 
         self._session = httpx.Client(verify=context)
