@@ -1,7 +1,5 @@
-import io
 import random
 import ssl
-import sys
 import unittest
 from pathlib import Path, PosixPath
 from unittest.mock import MagicMock, call, patch
@@ -31,13 +29,10 @@ class MockCaptcha(Captcha):
 class SicarTestCase(unittest.TestCase):
     def setUp(self):
         self.mocked_captcha = MockCaptcha
-        self.stdout = io.StringIO()
-        sys.stdout = self.stdout
         self.mock_initialize_cookies = patch("SICAR.sicar.Sicar._initialize_cookies")
         self.mock_initialize_cookies.start()
 
     def tearDown(self):
-        sys.stdout = sys.__stdout__
         self.mock_initialize_cookies.stop()
 
     @patch.object(Sicar, "_get")
@@ -231,7 +226,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_polygon = mock_download_polygon
 
         result = sicar.download_state(
-            state, polygon, folder, tries, debug=False, chunk_size=chunk_size
+            state, polygon, folder, tries, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -270,7 +265,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._download_polygon = mock_download_polygon
 
         result = sicar.download_state(
-            state, polygon, folder, tries, debug=False, chunk_size=chunk_size
+            state, polygon, folder, tries, chunk_size=chunk_size
         )
 
         mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
@@ -280,7 +275,7 @@ class SicarTestCase(unittest.TestCase):
 
         mock_download_polygon.assert_not_called()
 
-        self.assertFalse(result)
+        self.assertIsNone(result)
 
     @patch("time.sleep", return_value=None)
     def test_download_polygon_invalid_captcha_failed_to_download_captcha_exception(
@@ -290,9 +285,7 @@ class SicarTestCase(unittest.TestCase):
         sicar._get = MagicMock(
             return_value=MagicMock(status_code=httpx.codes.NOT_FOUND)
         )
-        sicar.download_state(
-            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
-        )
+        sicar.download_state(State.MG, Polygon.APPS, "temp", 25, chunk_size=1024)
 
     @patch("time.sleep", return_value=None)
     def test_download_polygon_invalid_captcha_failed_to_download_polygon_exception(
@@ -309,9 +302,7 @@ class SicarTestCase(unittest.TestCase):
         mock_download_polygon.side_effect = FailedToDownloadPolygonException()
         sicar._download_polygon = mock_download_polygon
 
-        sicar.download_state(
-            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
-        )
+        sicar.download_state(State.MG, Polygon.APPS, "temp", 25, chunk_size=1024)
 
     @patch("time.sleep", return_value=None)
     def test_download_state_invalid_captcha_debug(self, mock_time):
@@ -325,22 +316,25 @@ class SicarTestCase(unittest.TestCase):
         mock_download_polygon = MagicMock(return_value=Path("polygon.zip"))
         sicar._download_polygon = mock_download_polygon
 
-        sicar.download_state(
-            State.MG, Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
+        with self.assertLogs("SICAR.sicar", level="DEBUG") as captured:
+            sicar.download_state(State.MG, Polygon.APPS, "temp", 25, chunk_size=1024)
+
+        self.assertTrue(
+            any("Invalid captcha" in message for message in captured.output)
         )
 
     def test_download_state_invalid_state_code(self):
         sicar = Sicar(driver=self.mocked_captcha)
         with self.assertRaises(StateCodeNotValidException):
             sicar.download_state(
-                "INVALID_STATE", Polygon.APPS, "temp", 25, chunk_size=1024, debug=True
+                "INVALID_STATE", Polygon.APPS, "temp", 25, chunk_size=1024
             )
 
     def test_download_state_invalid_polygon_code(self):
         sicar = Sicar(driver=self.mocked_captcha)
         with self.assertRaises(PolygonNotValidException):
             sicar.download_state(
-                State.MG, "INVALID_POLYGON", "temp", 25, chunk_size=1024, debug=True
+                State.MG, "INVALID_POLYGON", "temp", 25, chunk_size=1024
             )
 
     @patch("SICAR.sicar.Sicar.download_state")
@@ -350,7 +344,6 @@ class SicarTestCase(unittest.TestCase):
         state = State.MG
         polygon = Polygon.APPS
         tries = 25
-        debug = False
         folder = "/path/to/folder"
         chunk_size = 1024
 
@@ -359,7 +352,7 @@ class SicarTestCase(unittest.TestCase):
             "State2": Path("/path/to/456.zip"),
         }
 
-        sicar.download_country(polygon, folder, tries, debug, chunk_size)
+        sicar.download_country(polygon, folder, tries, chunk_size)
 
         expected_calls = {"path": [], "download_state": []}
         for state in State:
@@ -370,7 +363,6 @@ class SicarTestCase(unittest.TestCase):
                     polygon=polygon,
                     folder=folder,
                     tries=tries,
-                    debug=debug,
                     chunk_size=chunk_size,
                 )
             )

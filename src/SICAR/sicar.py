@@ -8,6 +8,7 @@ Classes:
 """
 
 import io
+import logging
 import os
 import random
 import ssl
@@ -38,6 +39,8 @@ from SICAR.url import Url
 warnings.filterwarnings(
     "ignore", category=DeprecationWarning, message="ssl.PROTOCOL_TLSv1_2 is deprecated"
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Sicar(Url):
@@ -259,9 +262,8 @@ class Sicar(Url):
         polygon: Polygon | str,
         folder: Path | str = Path("temp"),
         tries: int = 25,
-        debug: bool = False,
         chunk_size: int = 1024,
-    ) -> Path | bool:
+    ) -> Path | None:
         """
         Download the polygon or other output format for the specified state.
 
@@ -270,16 +272,16 @@ class Sicar(Url):
             polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded data will be saved. Defaults to "temp".
             tries (int, optional): The number of attempts to download the data. Defaults to 25.
-            debug (bool, optional): Whether to print debug information. Defaults to False.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
         Returns:
-            Path | bool: The path to the downloaded data if successful, or False if download fails.
+            Path | None: The path to the downloaded data if successful, or None if download fails.
 
         Note:
             This method attempts to download the polygon for the specified state.
             It tries multiple times, using a captcha for verification. The downloaded data is saved to the specified folder.
-            The method returns the path to the downloaded data if successful, or False if the download fails after the specified number of tries.
+            The method returns the path to the downloaded data if successful, or None if the download fails after the specified number of tries.
+            Enable per-attempt diagnostics by configuring logging (e.g. `logging.basicConfig(level=logging.DEBUG)`).
         """
         if isinstance(state, str):
             try:
@@ -303,10 +305,9 @@ class Sicar(Url):
                 captcha = self._driver.get_captcha(self._download_captcha())
 
                 if len(captcha) == 5:
-                    if debug:
-                        print(
-                            f"[{tries:02d}] - Requesting {info} with captcha '{captcha}'"
-                        )
+                    logger.debug(
+                        "[%02d] - Requesting %s with captcha '%s'", tries, info, captcha
+                    )
 
                     return self._download_polygon(
                         state=state,
@@ -315,30 +316,27 @@ class Sicar(Url):
                         folder=folder,
                         chunk_size=chunk_size,
                     )
-                elif debug:
-                    print(
-                        f"[{tries:02d}] - Invalid captcha '{captcha}' to request {info}"
-                    )
+                logger.debug(
+                    "[%02d] - Invalid captcha '%s' to request %s", tries, captcha, info
+                )
             except (
                 FailedToDownloadCaptchaException,
                 FailedToDownloadPolygonException,
             ) as error:
-                if debug:
-                    print(f"[{tries:02d}] - {error} When requesting {info}")
+                logger.debug("[%02d] - %s when requesting %s", tries, error, info)
             finally:
                 tries -= 1
                 time.sleep(random.random() + random.random())
 
-        return False
+        return None
 
     def download_country(
         self,
         polygon: Polygon | str,
         folder: Path | str = Path("brazil"),
         tries: int = 25,
-        debug: bool = False,
         chunk_size: int = 1024,
-    ) -> dict[str, Path | bool]:
+    ) -> dict[str, Path | None]:
         """
         Download polygon for the entire country.
 
@@ -346,16 +344,13 @@ class Sicar(Url):
             polygon (Polygon | str): The polygon to download the files. It can be either a `Polygon` enum value or a string representing the polygon's.
             folder (Path | str, optional): The folder path where the downloaded files will be saved. Defaults to 'brazil'.
             tries (int, optional): The number of download attempts allowed per state. Defaults to 25.
-            debug (bool, optional): Whether to enable debug mode with additional print statements. Defaults to False.
             chunk_size (int, optional): The size of each chunk to download. Defaults to 1024.
 
         Returns:
-            Dict: A dictionary containing the results of the download operation.
-                The keys are the state abbreviations, and the values are dictionaries representing the results of downloading each state.
-                Each state's dictionary follows the same structure as the result of the `download_state` method.
-                If a download fails for a state the corresponding value will be False.
+            dict[str, Path | None]: A dictionary mapping each state abbreviation to the path of the
+                downloaded data, or None if the download failed for that state.
         """
-        result: dict[str, Path | bool] = {}
+        result: dict[str, Path | None] = {}
         for state in State:
             Path(os.path.join(folder, state.value)).mkdir(parents=True, exist_ok=True)
 
@@ -364,7 +359,6 @@ class Sicar(Url):
                 polygon=polygon,
                 folder=folder,
                 tries=tries,
-                debug=debug,
                 chunk_size=chunk_size,
             )
 

@@ -1,14 +1,17 @@
+import logging
+
 from SICAR import Polygon, Sicar, State
 from SICAR.drivers import Tesseract
+
+# Enable per-attempt download logs (optional)
+logging.basicConfig(level=logging.DEBUG)
 
 # Create Sicar instance
 car = Sicar(driver=Tesseract)
 # car = Sicar(driver=Paddle)
 
 # Download APPS polygons for the Roraima state
-car.download_state(
-    state=State.RR, polygon=Polygon.APPS, folder="data/Roraima", debug=True
-)
+car.download_state(state=State.RR, polygon=Polygon.APPS, folder="data/Roraima")
 
 # Download APPS polygons for all states in Brazil
 # car.download_country(polygon=Polygon.APPS, folder="/Brazil")
