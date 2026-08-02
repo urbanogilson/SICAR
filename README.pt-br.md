@@ -165,17 +165,20 @@ Opcional: Crie um diretório externo para armazenar os dados baixados e use o pa
 
 ## Dicionário de dados
 
-| **Atributo**  | **Descrição**                                                |
-|---------------|--------------------------------------------------------------|
-| cod_estado    | Unidade da Federação em que o cadastro está localizado. |
-| municipio     | Município em que o cadastro está localizado. |
-| num_area      | Área bruta do imóvel rural ou do objeto que compõe o cadastro, em hectares. |
-| cod_imovel    | Número de registro no Cadastro Ambiental Rural (CAR). |
-| ind_status    | Situação do cadastro no CAR, conforme a Instrução Normativa nº 2, de 6 de maio de 2014, do Ministério do Meio Ambiente (https://www.car.gov.br/leis/IN_CAR.pdf), e a Resolução nº 3, de 27 de agosto de 2018, do Serviço Florestal Brasileiro (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), sendo AT - Ativo; PE - Pendente; SU - Suspenso; e CA - Cancelado. |
-| des_condic    | Condição em que o cadastro se encontra no fluxo de análise pelo órgão competente. |
-| ind_tipo      | Tipo de Imóvel Rural, sendo IRU - Imóvel Rural; AST - Assentamentos de Reforma Agrária; PCT - Território Tradicional de Povos e Comunidades Tradicionais. |
-| mod_fiscal    | Número de módulos fiscais do imóvel rural. |
-| nom_tema      | Nome do tema que compõe o cadastro (Área de Preservação Permanente, Servidão de Passagem, Remanescente de Vegetação Nativa, Área de Uso Restrito, Servidão Administrativa, Reserva Legal, Hidrografia, Áreas Úmidas, Área Rural Consolidada, Áreas com Altitude Superior a 1800 metros, Áreas com Declividade Superior a 45 graus, Topos de Morro, Bordas de Chapada, Áreas de Pousio, Manguezais e Restinga). |
+| **Nome Atributo** | **Tipificação** | **Tipo de Dado** | **Descrição** |
+|-------------------|-----------------|------------------|---------------|
+| cod_tema      | publico | texto  | Indica o código do tema de uso do solo que compõe o cadastro da propriedade ou posse rural no Sistema Nacional de Cadastro Ambiental Rural (Sicar). Este dado classifica as diferentes áreas da propriedade conforme suas características e regulamentações. |
+| nom_tema      | publico | texto  | Indica o nome do tema ou categoria ambiental de uso do solo que compõe o cadastro da propriedade ou posse rural no Sistema Nacional de Cadastro Ambiental Rural (Sicar). Este dado classifica as diferentes áreas da propriedade conforme suas características e regulamentações, incluindo, por exemplo: Área de Preservação Permanente (APP), Remanescente de Vegetação Nativa, Reserva Legal, Área de Uso Restrito, Área Rural Consolidada, Servidão Administrativa, Vereda, Hidrografia, Banhado, Áreas com Altitude Superior a 1800 metros, Áreas com Declividades Superiores a 45 graus, Topos de Morro, Bordas de Chapada, Área de Pousio, Manguezal e Restinga. |
+| cod_imovel    | publico | texto  | Número de inscrição único atribuído a cada propriedade ou posse rural no Sistema Nacional de Cadastro Ambiental Rural (Sicar) no momento de sua inscrição. |
+| mod_fiscal    | publico | numero | Unidade de medida agrária que varia por município e é utilizada para classificar o tamanho de uma propriedade ou posse rural (pequena, média, grande) no Sistema Nacional de Cadastro Ambiental Rural (Sicar), conforme a legislação vigente. |
+| num_area      | publico | numero | Área bruta total do imóvel rural informada pelo proprietário ou possuidor no momento da inscrição no Sistema Nacional de Cadastro Ambiental Rural (Sicar). |
+| ind_status    | publico | texto  | Situação do cadastro no CAR, segundo a Instrução Normativa nº 2, de 06 de maio de 2014, do Ministério do Meio Ambiente (https://www.car.gov.br/leis/IN_CAR.pdf), e a Resolução nº 3, de 27 de agosto de 2018, do Serviço Florestal Brasileiro (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agosto-de-2018-38536774), sendo AT - Ativo; PE - Pendente; SU - Suspenso; e CA - Cancelado. |
+| ind_tipo      | publico | texto  | Classificação do tipo de propriedade ou posse rural conforme o registro no Sistema Nacional de Cadastro Ambiental Rural (Sicar). Sendo IRU - Imóvel Rural; AST - Assentamentos de Reforma Agrária; PCT - Povos e Comunidades Tradicionais. |
+| des_condic    | publico | texto  | Indica a condição atual da análise do registro da propriedade ou posse rural no Sistema Nacional de Cadastro Ambiental Rural (Sicar). Reflete a etapa em que o cadastro se encontra no processo de validação, conforme o andamento da análise técnica pelo órgão competente. |
+| municipio     | publico | texto  | Indica a unidade político-administrativa municipal à qual a propriedade ou posse rural está territorialmente localizada. |
+| cod_estado    | publico | texto  | Código de duas letras (UF) que identifica a Unidade Federativa (estado) do Brasil à qual a propriedade ou posse rural está localizada. |
+| dat_criaca    | publico | texto  | Data em que a propriedade ou posse rural foi inscrita no Sistema Nacional de Cadastro Ambiental Rural (Sicar). |
+| dat_atuali    | publico | texto  | Data da última vez em que os dados de inscrição da propriedade ou posse rural foram modificados no Sistema Nacional de Cadastro Ambiental Rural (Sicar). |
 
 ## Agradecimentos
 

@@ -165,17 +165,20 @@ Optional: Make an external directory to store the downloaded data and use a volu
 
 ## Data dictionary
 
-| **Attribute** | **Description**                                              |
-|---------------|--------------------------------------------------------------|
-| cod_estado    | Unit of the Federation in which the registration is located. |
-| municipio     | Municipality in which the registration is located. |
-| num_area      | Gross area of the rural property or the subject that makes up the registry, in hectare. |
-| cod_imovel    | Registration number in the Rural Environmental Registry (CAR). |
-| ind_status    | Status of registration in CAR, according to Normative Instruction no. 2, of May 6, 2014, of the Ministry of the Environment (https://www.car.gov.br/leis/IN_CAR.pdf), and the Resolution No. 3, of August 27, 2018, of the Brazilian Forest Service (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), being AT - Active; PE - Pending; SU - Suspended; and CA - Cancelled. |
-| des_condic    | Condition in which the registration is in the analysis flow by the competent body. |
-| ind_tipo      | Type of Rural Property, being IRU - Rural Property; AST - Agrarian Reform Settlements; PCT - Traditional Territory of Traditional Peoples and Communities. |
-| mod_fiscal    | Number of rural property tax modules. |
-| nom_tema      | Name of the theme that makes up the registration (Permanent Preservation Area, Path, Remnant of Native Vegetation, Restricted Use Area, Administrative Easement, Legal Reserve, Hydrography, Wetlands, Consolidated Rural Area, Areas with Altitude Higher than 1800 meters, Areas with Slopes Higher than 45 degrees, Hilltops, Plateau Edges, Fallow Areas, Mangroves and Restinga). |
+| **Attribute** | **Classification** | **Data type** | **Description** |
+|---------------|--------------------|---------------|-----------------|
+| cod_tema      | public | text   | Indicates the code of the land use theme that makes up the registration of the rural property or possession in the National Rural Environmental Registry System (Sicar). This data classifies the different areas of the property according to their characteristics and regulations. |
+| nom_tema      | public | text   | Indicates the name of the theme or environmental land use category that makes up the registration of the rural property or possession in the Sicar. This data classifies the different areas of the property according to their characteristics and regulations, including, for example: Permanent Preservation Area (APP), Remnant of Native Vegetation, Legal Reserve, Restricted Use Area, Consolidated Rural Area, Administrative Easement, Path, Hydrography, Wetland, Areas with Altitude Higher than 1800 meters, Areas with Slopes Higher than 45 degrees, Hilltops, Plateau Edges, Fallow Area, Mangrove and Restinga. |
+| cod_imovel    | public | text   | Unique registration number assigned to each rural property or possession in the Sicar at the moment of its registration. |
+| mod_fiscal    | public | number | Agrarian unit of measurement that varies by municipality and is used to classify the size of a rural property or possession (small, medium, large) in the Sicar, according to current legislation. |
+| num_area      | public | number | Total gross area of the rural property informed by the owner or possessor at the moment of registration in the Sicar. |
+| ind_status    | public | text   | Status of the registration in CAR, according to Normative Instruction no. 2, of May 6, 2014, of the Ministry of the Environment (https://www.car.gov.br/leis/IN_CAR.pdf), and the Resolution No. 3, of August 27, 2018, of the Brazilian Forest Service (https://imprensanacional.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/38537086/do1-2018-08-28-resolucao-n-3-de-27-de-agos-de-2018-38536774), being AT - Active; PE - Pending; SU - Suspended; and CA - Cancelled. |
+| ind_tipo      | public | text   | Classification of the type of rural property or possession according to the registration in the Sicar. Being IRU - Rural Property; AST - Agrarian Reform Settlements; PCT - Traditional Peoples and Communities. |
+| des_condic    | public | text   | Indicates the current condition of the rural property or possession registration analysis in the Sicar. Reflects the stage the registration is at in the validation process, according to the progress of the technical analysis by the competent body. |
+| municipio     | public | text   | Indicates the municipal political-administrative unit to which the rural property or possession is territorially located. |
+| cod_estado    | public | text   | Two-letter code (UF) that identifies the Federative Unit (state) of Brazil to which the rural property or possession is located. |
+| dat_criaca    | public | text   | Date on which the rural property or possession was registered in the Sicar. |
+| dat_atuali    | public | text   | Date of the last time the registration data of the rural property or possession was modified in the Sicar. |
 
 ## Acknowledgements
 
